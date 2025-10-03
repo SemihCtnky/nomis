@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destek - Kilitçim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2d5a3d 0%, #4a7c59 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #2d5a3d;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .support-box {
+            background-color: #f1f8f4;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #2d5a3d;
+        }
+        
+        h2 {
+            color: #2d5a3d;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: white;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .contact-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .icon {
+            font-size: 2em;
+            margin-right: 20px;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .contact-info h3 {
+            color: #2d5a3d;
+            margin-bottom: 5px;
+        }
+        
+        .contact-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        a {
+            color: #2d5a3d;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .email-link {
+            display: inline-block;
+            background-color: #2d5a3d;
+            color: white !important;
+            padding: 12px 30px;
+            border-radius: 25px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .email-link:hover {
+            background-color: #1e3d28;
+            text-decoration: none;
+        }
+        
+        .faq {
+            margin-top: 30px;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        .faq-item h4 {
+            color: #2d5a3d;
+            margin-bottom: 10px;
+        }
+        
+        .faq-item p {
+            color: #555;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>KİLİTÇİM</h1>
+            <p>Profesyonel İş Takip Sistemi</p>
+        </div>
+
+        <h2>📞 Destek ve İletişim</h2>
+        
+        <div class="support-box">
+            <div class="contact-item">
+                <div class="icon">✉️</div>
+                <div class="contact-info">
+                    <h3>E-posta Desteği</h3>
+                    <p>Sorularınız, önerileriniz veya sorun bildirimleri için:</p>
+                    <a href="mailto:semih.ctnky@icloud.com" class="email-link">semih.ctnky@icloud.com</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq">
+            <h2>❓ Sık Sorulan Sorular</h2>
+            
+            <div class="faq-item">
+                <h4>Şifremi unuttum, ne yapmalıyım?</h4>
+                <p>Admin şifrenizi sıfırlamak için <a href="mailto:semih.ctnky@icloud.com">semih.ctnky@icloud.com</a> adresine e-posta gönderin.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Verilerim güvende mi?</h4>
+                <p>Evet! Tüm verileriniz cihazınızda güvenli bir şekilde saklanır. Hiçbir veri sunucuya gönderilmez.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Yedekleme nasıl yapılır?</h4>
+                <p>Ana sayfa → Yedekleme modülü → Export seçeneklerinden JSON veya CSV formatında yedek alabilirsiniz.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Admin ve görüntüleyici arasındaki fark nedir?</h4>
+                <p>Admin tüm işlemleri yapabilirken, görüntüleyici sadece verileri görüntüleyebilir, düzenleme/silme yapamaz.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Uygulama çöktü veya hata veriyor</h4>
+                <p>Lütfen hatanın detaylarını (hangi sayfada, ne yaparken oldu) ile birlikte <a href="mailto:semih.ctnky@icloud.com">semih.ctnky@icloud.com</a> adresine bildirin.</p>
+            </div>
+        </div>
+
+        <div class="support-box" style="margin-top: 30px;">
+            <h3 style="color: #2d5a3d; margin-bottom: 15px;">⏰ Yanıt Süresi</h3>
+            <p>E-postalarınız genellikle <strong>24-48 saat</strong> içinde yanıtlanır.</p>
+            <p style="margin-top: 10px;">Acil durumlar için e-posta konusuna <strong>[ACİL]</strong> ekleyin.</p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Kilitçim v1.0.0</strong></p>
+            <p>© 2025 Kilitçim. Tüm hakları saklıdır.</p>
+            <p style="margin-top: 10px;">
+                <a href="privacy-policy.html">Gizlilik Politikası</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
