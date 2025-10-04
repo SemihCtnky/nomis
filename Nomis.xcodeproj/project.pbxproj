@@ -347,7 +347,8 @@
 /* Begin PBXShellScriptBuildPhase section */
 		7F54512E2E900018002F54C9 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -358,7 +359,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       xcrun agvtool next-version -all\n   fi\n";
 		};
