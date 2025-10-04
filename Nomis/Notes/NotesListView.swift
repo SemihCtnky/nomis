@@ -28,7 +28,7 @@ struct NotesListView: View {
                                 note: note,
                                 onTap: { selectedNote = note },
                                 onEdit: { selectedNote = note },
-                                onDelete: authManager.currentUsername == "admin" ? {
+                                onDelete: authManager.currentUsername == "mert" ? {
                                     noteToDelete = note
                                     showingAdminAuth = true
                                 } : nil

@@ -72,7 +72,7 @@ Kilitçim, kuyumcu atölyeleri için tasarlanmış profesyonel bir iOS uygulamas
 
 ### Admin
 ```
-Kullanıcı Adı: admin
+Kullanıcı Adı: mert
 Şifre: 9023
 ```
 **Yetkiler:**

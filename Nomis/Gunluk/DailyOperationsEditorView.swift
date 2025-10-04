@@ -328,7 +328,7 @@ struct DailyOperationsEditorView: View {
                         Text("21").tag(21)
                         Text("22").tag(22)
                     }
-                    .disabled(!(authManager.currentUsername == "admin") || isReadOnly)
+                    .disabled(!(authManager.currentUsername == "mert") || isReadOnly)
                     .font(.system(size: NomisTheme.headlineSize, weight: .bold))
                     .foregroundColor(NomisTheme.prominentText)
                     .pickerStyle(MenuPickerStyle())
@@ -377,7 +377,7 @@ struct DailyOperationsEditorView: View {
                 tezgahTotalRow(for: tezgahKarti)
                 
                 // Stable Add Row Button
-                if !isReadOnly && authManager.currentUsername == "admin" {
+                if !isReadOnly && authManager.currentUsername == "mert" {
                     StableAddRowButton(title: "Satır Ekle") {
                         addTezgahRow(to: tezgahKarti)
                     }
@@ -407,7 +407,7 @@ struct DailyOperationsEditorView: View {
                     }
                 ))
                 .focused($focusedTezgahField, equals: .solAciklama(cardIndex: cardIndex, satirIndex: index))
-                .disabled(isReadOnly || authManager.currentUsername != "admin" || !hasGirisValue(satir))
+                .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasGirisValue(satir))
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -424,7 +424,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -446,7 +446,7 @@ struct DailyOperationsEditorView: View {
             ), format: .number)
             .keyboardType(.decimalPad)
             .focused($focusedTezgahField, equals: .giris(cardIndex: cardIndex, satirIndex: index))
-            .disabled(isReadOnly || authManager.currentUsername != "admin")
+            .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
             .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
             .foregroundColor(NomisTheme.darkText)
@@ -471,7 +471,7 @@ struct DailyOperationsEditorView: View {
             ), format: .number)
             .keyboardType(.decimalPad)
             .focused($focusedTezgahField, equals: .cikis(cardIndex: cardIndex, satirIndex: index))
-            .disabled(isReadOnly || authManager.currentUsername != "admin")
+            .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
             .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
             .foregroundColor(NomisTheme.darkText)
@@ -496,7 +496,7 @@ struct DailyOperationsEditorView: View {
                     }
                 ))
                 .focused($focusedTezgahField, equals: .sagAciklama(cardIndex: cardIndex, satirIndex: index))
-                .disabled(isReadOnly || authManager.currentUsername != "admin" || !hasCikisValue(satir))
+                .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasCikisValue(satir))
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -513,7 +513,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -602,7 +602,7 @@ struct DailyOperationsEditorView: View {
                             satir: satir, 
                             index: index, 
                             ayar: cilaKarti.ayar ?? 14,
-                            isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                            isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                             allowExpandableCikis: false, // Cila kartı için çıkış genişletme kapalı
                             showAyarColumn: true, // Bu kartlarda ayar sütunu var
                             onAddRowAfter: nil // Bu kartlarda çıkış genişletme yok
@@ -610,7 +610,7 @@ struct DailyOperationsEditorView: View {
                     }
                     
                     // Stable Add Row Button
-                    if !isReadOnly && authManager.currentUsername == "admin" {
+                    if !isReadOnly && authManager.currentUsername == "mert" {
                         StableAddRowButton(title: "Satır Ekle") {
                             addCilaRow(to: cilaKarti)
                         }
@@ -666,7 +666,7 @@ struct DailyOperationsEditorView: View {
                             satir: satir, 
                             index: index, 
                             ayar: ocakKarti.ayar ?? 14,
-                            isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                            isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                             allowExpandableCikis: false, // Ocak kartı için çıkış genişletme kapalı
                             showAyarColumn: true, // Bu kartlarda ayar sütunu var
                             onAddRowAfter: nil // Bu kartlarda çıkış genişletme yok
@@ -674,7 +674,7 @@ struct DailyOperationsEditorView: View {
                     }
                     
                     // Stable Add Row Button
-                    if !isReadOnly && authManager.currentUsername == "admin" {
+                    if !isReadOnly && authManager.currentUsername == "mert" {
                         StableAddRowButton(title: "Satır Ekle") {
                             addOcakRow(to: ocakKarti)
                         }
@@ -816,7 +816,7 @@ struct DailyOperationsEditorView: View {
                                 satir: satir, 
                                 index: index, 
                                 ayar: makineKesmeKarti.ayar,
-                                isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                                isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                                 allowExpandableCikis: true, // Makine Kesme için çıkış genişletme açık
                                 showAyarColumn: true, // Makine Kesme için ayar sütunu açık
                                 onAddRowAfter: nil // Çıkış genişletme sistemi için gerek yok
@@ -825,7 +825,7 @@ struct DailyOperationsEditorView: View {
                     }
                     
                     // Stable Add Row Button
-                    if !isReadOnly && authManager.currentUsername == "admin" {
+                    if !isReadOnly && authManager.currentUsername == "mert" {
                         StableAddRowButton(title: "Satır Ekle") {
                             addMakineKesmeRow(to: makineKesmeKarti)
                         }
@@ -879,7 +879,7 @@ struct DailyOperationsEditorView: View {
                                 satir: satir, 
                                 index: index, 
                                 ayar: testereKesmeKarti.ayar,
-                                isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                                isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                                 allowExpandableCikis: true, // Testere Kesme için çıkış genişletme açık
                                 showAyarColumn: true, // Testere Kesme için ayar sütunu açık
                                 onAddRowAfter: nil // Çıkış genişletme sistemi için gerek yok
@@ -888,7 +888,7 @@ struct DailyOperationsEditorView: View {
                     }
                     
                     // Stable Add Row Button
-                    if !isReadOnly && authManager.currentUsername == "admin" {
+                    if !isReadOnly && authManager.currentUsername == "mert" {
                         StableAddRowButton(title: "Satır Ekle") {
                             addTestereKesmeRow(to: testereKesmeKarti)
                         }
@@ -1015,7 +1015,7 @@ struct DailyOperationsEditorView: View {
                         satir: satir, 
                         index: index, 
                         ayar: ayar.wrappedValue,
-                        isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                        isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                         allowExpandableCikis: false, // Default olarak expandable çıkış kapalı
                         showAyarColumn: true, // Artık ayar sütunu var
                         onAddRowAfter: nil // Bu kartlarda çıkış genişletme yok
@@ -1024,7 +1024,7 @@ struct DailyOperationsEditorView: View {
             }
             
             // Stable Add Row Button
-            if !isReadOnly && authManager.currentUsername == "admin" {
+            if !isReadOnly && authManager.currentUsername == "mert" {
                 StableAddRowButton(title: "Satır Ekle", action: addAction)
             }
         }
@@ -1048,7 +1048,7 @@ struct DailyOperationsEditorView: View {
                         satir: satir, 
                         index: index, 
                         ayar: ayar.wrappedValue,
-                        isReadOnly: isReadOnly || authManager.currentUsername != "admin",
+                        isReadOnly: isReadOnly || authManager.currentUsername != "mert",
                         allowExpandableCikis: false, // Cila, Ocak, Patlatma, Tambur kartları için çıkış genişletme kapalı
                         showAyarColumn: true, // Bu kartlarda ayar sütunu var
                         onAddRowAfter: nil // Bu kartlarda çıkış genişletme yok
@@ -1057,7 +1057,7 @@ struct DailyOperationsEditorView: View {
             }
             
             // Stable Add Row Button
-            if !isReadOnly && authManager.currentUsername == "admin" {
+            if !isReadOnly && authManager.currentUsername == "mert" {
                 StableAddRowButton(title: "Satır Ekle", action: addAction)
             }
         }
@@ -1083,7 +1083,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ))
-                .disabled(isReadOnly || authManager.currentUsername != "admin")
+                .disabled(isReadOnly || authManager.currentUsername != "mert")
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -1100,7 +1100,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -1118,7 +1118,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ),
-                isEnabled: !isReadOnly && authManager.currentUsername == "admin"
+                isEnabled: !isReadOnly && authManager.currentUsername == "mert"
             )
             .luxuryTableCell()
             
@@ -1131,7 +1131,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ),
-                isEnabled: !isReadOnly && authManager.currentUsername == "admin"
+                isEnabled: !isReadOnly && authManager.currentUsername == "mert"
             )
             .luxuryTableCell()
             
@@ -1153,7 +1153,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ))
-                .disabled(isReadOnly || authManager.currentUsername != "admin")
+                .disabled(isReadOnly || authManager.currentUsername != "mert")
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -1170,7 +1170,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -1195,7 +1195,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ))
-                .disabled(isReadOnly || authManager.currentUsername != "admin")
+                .disabled(isReadOnly || authManager.currentUsername != "mert")
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -1212,7 +1212,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -1230,7 +1230,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ),
-                isEnabled: !isReadOnly && authManager.currentUsername == "admin"
+                isEnabled: !isReadOnly && authManager.currentUsername == "mert"
             )
             .luxuryTableCell()
             
@@ -1243,7 +1243,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ),
-                isEnabled: !isReadOnly && authManager.currentUsername == "admin"
+                isEnabled: !isReadOnly && authManager.currentUsername == "mert"
             )
             .luxuryTableCell()
             
@@ -1265,7 +1265,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ))
-                .disabled(isReadOnly || authManager.currentUsername != "admin")
+                .disabled(isReadOnly || authManager.currentUsername != "mert")
                 .font(.system(size: NomisTheme.bodySize))
                 .foregroundColor(NomisTheme.primary)
                 .multilineTextAlignment(.center)
@@ -1282,7 +1282,7 @@ struct DailyOperationsEditorView: View {
                             .font(.caption.weight(.bold))
                             .foregroundColor(.blue)
                     }
-                    .disabled(isReadOnly || authManager.currentUsername != "admin")
+                    .disabled(isReadOnly || authManager.currentUsername != "mert")
                     .padding(.trailing, 4)
                 } else {
                     Spacer()
@@ -1305,7 +1305,7 @@ struct DailyOperationsEditorView: View {
                 Text("21").tag(21)
                 Text("22").tag(22)
             }
-            .disabled(isReadOnly || authManager.currentUsername != "admin")
+            .disabled(isReadOnly || authManager.currentUsername != "mert")
             .font(.system(size: NomisTheme.bodySize, weight: .semibold))
             .foregroundColor(NomisTheme.prominentText)
             .pickerStyle(MenuPickerStyle())

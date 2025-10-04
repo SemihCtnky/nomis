@@ -19,7 +19,7 @@ class AuthenticationManager: ObservableObject {
     func login(username: String, password: String) -> Bool {
         // Simple authentication logic
         // In a real app, this would validate against a secure backend
-        if username == "admin" && password == "9023" {
+        if username == "mert" && password == "9023" {
             isAuthenticated = true
             canEdit = true
             canDelete = true

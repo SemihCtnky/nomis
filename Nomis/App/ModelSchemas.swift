@@ -85,7 +85,7 @@ class Note {
     var createdByUsername: String
     var lastEditedByUsername: String
     
-    init(title: String = "Yeni Not", text: String, createdByUsername: String = "admin") {
+    init(title: String = "Yeni Not", text: String, createdByUsername: String = "mert") {
         self.id = UUID()
         self.title = title
         self.text = text
@@ -922,12 +922,12 @@ public class BackupService: ObservableObject {
                 ))
                 
                 if existingNotes.isEmpty {
-                    let createdByUsername = noteData["createdByUsername"] as? String ?? "admin"
+                    let createdByUsername = noteData["createdByUsername"] as? String ?? "mert"
                     let newNote = Note(title: title, text: text, createdByUsername: createdByUsername)
                     newNote.id = id
                     newNote.createdAt = createdAt
                     newNote.lastEditedAt = lastEditedAt
-                    newNote.lastEditedByUsername = noteData["lastEditedByUsername"] as? String ?? "admin"
+                    newNote.lastEditedByUsername = noteData["lastEditedByUsername"] as? String ?? "mert"
                     
                     modelContext.insert(newNote)
                 }

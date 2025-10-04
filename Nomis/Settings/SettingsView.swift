@@ -37,7 +37,7 @@ struct SettingsView: View {
                         }
                     }
                     
-                    if authManager.currentUsername == "admin" {
+                    if authManager.currentUsername == "mert" {
                         NavigationLink(destination: AdminPanelView()) {
                             HStack {
                                 Image(systemName: "person.3.fill")
