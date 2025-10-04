@@ -803,7 +803,7 @@ struct StableNumberCell: View {
 
 // MARK: - Fire Summary Table
 struct FireSummaryTable: View {
-    let fireData: [AyarFireData]
+    let fireData: [SimpleAyarFireData]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -910,93 +910,275 @@ struct WeeklyFireSummaryTable: View {
                     .stroke(NomisTheme.primaryGreen, lineWidth: 2)
             )
             
-            // Column headers
-            HStack(spacing: 0) {
-                Text("Ayar")
-                    .font(.system(size: NomisTheme.headlineSize, weight: NomisTheme.headlineWeight))
-                    .foregroundColor(NomisTheme.prominentText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(NomisTheme.goldAccent.opacity(0.1))
-                
-                Rectangle()
-                    .fill(NomisTheme.primaryGreen.opacity(0.8))
-                    .frame(width: 2)
-                
-                Text("Toplam Fire")
-                    .font(.system(size: NomisTheme.headlineSize, weight: NomisTheme.headlineWeight))
-                    .foregroundColor(NomisTheme.prominentText)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(NomisTheme.goldAccent.opacity(0.1))
-            }
-            .overlay(
-                Rectangle()
-                    .stroke(NomisTheme.primaryGreen.opacity(0.8), lineWidth: 1.5)
-            )
-            
-            // Fire rows - Haftalık değerler
-            ForEach(Array(fireData.enumerated()), id: \.element.ayar) { index, data in
-                HStack(spacing: 0) {
-                    // Ayar hücresi
-                    Text("\(data.ayar)k")
-                        .font(.system(size: NomisTheme.bodySize + 2, weight: .bold))
-                        .foregroundColor(NomisTheme.darkText)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            index % 2 == 0 
-                            ? NomisTheme.lightCream 
-                            : NomisTheme.creamBackground
-                        )
-                    
-                    // Dikey ayırıcı çizgi - kalın
-                    Rectangle()
-                        .fill(NomisTheme.primaryGreen.opacity(0.8))
-                        .frame(width: 2)
-                    
-                    // Fire miktarı hücresi - vurgulu
-                    Text("\(NomisFormatters.safeFormat(data.fire)) gr")
-                        .font(.system(size: NomisTheme.bodySize + 2, weight: .bold))
-                        .foregroundColor(data.fire > 0 ? .red : NomisTheme.secondaryText)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(
-                            index % 2 == 0 
-                            ? (data.fire > 0 ? Color.red.opacity(0.05) : NomisTheme.lightCream)
-                            : (data.fire > 0 ? Color.red.opacity(0.1) : NomisTheme.creamBackground)
-                        )
-                }
-                .overlay(
-                    VStack {
-                        Spacer()
+            // Scrollable table content
+            ScrollView(.horizontal, showsIndicators: true) {
+                VStack(spacing: 0) {
+                    // Column headers
+                    HStack(spacing: 0) {
+                        // Ayar kolonu - sabit genişlik
+                        Text("Ayar")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 70)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
                         Rectangle()
                             .fill(NomisTheme.primaryGreen.opacity(0.8))
-                            .frame(height: 1)
+                            .frame(width: 2)
+                        
+                        // Tezgah 1
+                        Text("Tezgah 1")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Tezgah 2
+                        Text("Tezgah 2")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Cila
+                        Text("Cila")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Ocak
+                        Text("Ocak")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Patlatma
+                        Text("Patlatma")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Tambur
+                        Text("Tambur")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Makine
+                        Text("Makine")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
+                        
+                        Rectangle()
+                            .fill(NomisTheme.primaryGreen.opacity(0.8))
+                            .frame(width: 2)
+                        
+                        // Testere
+                        Text("Testere")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: NomisTheme.headlineWeight))
+                            .foregroundColor(NomisTheme.prominentText)
+                            .frame(width: 90)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.goldAccent.opacity(0.1))
                     }
-                )
-            }
-            
-            // Total row - Genel toplam
-            let totalFire = fireData.reduce(0.0) { $0 + $1.fire }
-            HStack(spacing: 0) {
-                Text("TOPLAM")
-                    .font(.system(size: NomisTheme.headlineSize, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(NomisTheme.primaryGreen)
-                
-                Rectangle()
-                    .fill(.white)
-                    .frame(width: 2)
-                
-                Text("\(NomisFormatters.safeFormat(totalFire)) gr")
-                    .font(.system(size: NomisTheme.headlineSize, weight: .bold))
-                    .foregroundColor(.white) // Yeşil arkaplan üzerinde beyaz daha uygun
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(NomisTheme.primaryGreen)
+                    .overlay(
+                        Rectangle()
+                            .stroke(NomisTheme.primaryGreen.opacity(0.8), lineWidth: 1.5)
+                    )
+                    
+                    // Fire rows - Haftalık değerler
+                    ForEach(Array(fireData.enumerated()), id: \.element.ayar) { index, data in
+                        HStack(spacing: 0) {
+                            // Ayar hücresi
+                            Text("\(data.ayar)k")
+                                .font(.system(size: NomisTheme.bodySize + 1, weight: .bold))
+                                .foregroundColor(NomisTheme.darkText)
+                                .frame(width: 70)
+                                .padding(.vertical, 12)
+                                .background(
+                                    index % 2 == 0 
+                                    ? NomisTheme.lightCream 
+                                    : NomisTheme.creamBackground
+                                )
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Tezgah 1
+                            FireCell(fire: data.tezgah1Fire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Tezgah 2
+                            FireCell(fire: data.tezgah2Fire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Cila
+                            FireCell(fire: data.cilaFire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Ocak
+                            FireCell(fire: data.ocakFire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Patlatma
+                            FireCell(fire: data.patlatmaFire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Tambur
+                            FireCell(fire: data.tamburFire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Makine
+                            FireCell(fire: data.makineFire, isEvenRow: index % 2 == 0)
+                            
+                            Rectangle()
+                                .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                .frame(width: 2)
+                            
+                            // Testere
+                            FireCell(fire: data.testereFire, isEvenRow: index % 2 == 0)
+                        }
+                        .overlay(
+                            VStack {
+                                Spacer()
+                                Rectangle()
+                                    .fill(NomisTheme.primaryGreen.opacity(0.8))
+                                    .frame(height: 1)
+                            }
+                        )
+                    }
+                    
+                    // Total row - Genel toplam
+                    HStack(spacing: 0) {
+                        Text("TOPLAM")
+                            .font(.system(size: NomisTheme.headlineSize - 1, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 70)
+                            .padding(.vertical, 12)
+                            .background(NomisTheme.primaryGreen)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Tezgah 1 toplam
+                        let tezgah1Total = fireData.reduce(0.0) { $0 + $1.tezgah1Fire }
+                        TotalFireCell(fire: tezgah1Total)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Tezgah 2 toplam
+                        let tezgah2Total = fireData.reduce(0.0) { $0 + $1.tezgah2Fire }
+                        TotalFireCell(fire: tezgah2Total)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Cila toplam
+                        let cilaTotal = fireData.reduce(0.0) { $0 + $1.cilaFire }
+                        TotalFireCell(fire: cilaTotal)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Ocak toplam
+                        let ocakTotal = fireData.reduce(0.0) { $0 + $1.ocakFire }
+                        TotalFireCell(fire: ocakTotal)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Patlatma toplam
+                        let patlatmaTotal = fireData.reduce(0.0) { $0 + $1.patlatmaFire }
+                        TotalFireCell(fire: patlatmaTotal)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Tambur toplam
+                        let tamburTotal = fireData.reduce(0.0) { $0 + $1.tamburFire }
+                        TotalFireCell(fire: tamburTotal)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Makine toplam
+                        let makineTotal = fireData.reduce(0.0) { $0 + $1.makineFire }
+                        TotalFireCell(fire: makineTotal)
+                        
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 2)
+                        
+                        // Testere toplam
+                        let testereTotal = fireData.reduce(0.0) { $0 + $1.testereFire }
+                        TotalFireCell(fire: testereTotal)
+                    }
+                }
             }
         }
         .background(NomisTheme.cardBackground)
@@ -1009,8 +1191,59 @@ struct WeeklyFireSummaryTable: View {
     }
 }
 
-// MARK: - Ayar Fire Data Model
+// Helper view for fire cells
+private struct FireCell: View {
+    let fire: Double
+    let isEvenRow: Bool
+    
+    var body: some View {
+        Text(fire > 0 ? "\(NomisFormatters.safeFormat(fire))" : "-")
+            .font(.system(size: NomisTheme.bodySize, weight: fire > 0 ? .semibold : .regular))
+            .foregroundColor(fire > 0 ? .red : NomisTheme.secondaryText)
+            .frame(width: 90)
+            .padding(.vertical, 12)
+            .background(
+                isEvenRow 
+                ? (fire > 0 ? Color.red.opacity(0.05) : NomisTheme.lightCream)
+                : (fire > 0 ? Color.red.opacity(0.1) : NomisTheme.creamBackground)
+            )
+    }
+}
+
+// Helper view for total fire cells
+private struct TotalFireCell: View {
+    let fire: Double
+    
+    var body: some View {
+        Text(fire > 0 ? "\(NomisFormatters.safeFormat(fire))" : "-")
+            .font(.system(size: NomisTheme.headlineSize - 1, weight: .bold))
+            .foregroundColor(.white)
+            .frame(width: 90)
+            .padding(.vertical, 12)
+            .background(NomisTheme.primaryGreen)
+    }
+}
+
+// MARK: - Ayar Fire Data Models
+// Haftalık fire özeti için detaylı model
 struct AyarFireData {
+    let ayar: Int
+    let tezgah1Fire: Double
+    let tezgah2Fire: Double
+    let cilaFire: Double
+    let ocakFire: Double
+    let patlatmaFire: Double
+    let tamburFire: Double
+    let makineFire: Double
+    let testereFire: Double
+    
+    var totalFire: Double {
+        tezgah1Fire + tezgah2Fire + cilaFire + ocakFire + patlatmaFire + tamburFire + makineFire + testereFire
+    }
+}
+
+// Tek kart için basit fire modeli
+struct SimpleAyarFireData {
     let ayar: Int
     let fire: Double
 }

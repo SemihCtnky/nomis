@@ -1724,15 +1724,33 @@ struct DailyOperationsEditorView: View {
     
     // MARK: - Fire Calculation Helpers
     private func calculateWeeklyFireSummary() -> [AyarFireData] {
-        var weeklyFireByAyar: [Int: Double] = [:]
+        // Her kart için ayrı fire toplamları
+        var tezgah1FireByAyar: [Int: Double] = [:]
+        var tezgah2FireByAyar: [Int: Double] = [:]
+        var cilaFireByAyar: [Int: Double] = [:]
+        var ocakFireByAyar: [Int: Double] = [:]
+        var patlatmaFireByAyar: [Int: Double] = [:]
+        var tamburFireByAyar: [Int: Double] = [:]
+        var makineFireByAyar: [Int: Double] = [:]
+        var testereFireByAyar: [Int: Double] = [:]
         
         // Tüm günlerin tüm kartlarından fire topla
         for gunVerisi in form.gunlukVeriler {
+            // Tezgah 1 kartı
+            if let tezgahKarti1 = gunVerisi.tezgahKarti1, let ayar = tezgahKarti1.ayar, ayar > 0 {
+                tezgah1FireByAyar[ayar] = (tezgah1FireByAyar[ayar] ?? 0.0) + tezgahKarti1.fire
+            }
+            
+            // Tezgah 2 kartı
+            if let tezgahKarti2 = gunVerisi.tezgahKarti2, let ayar = tezgahKarti2.ayar, ayar > 0 {
+                tezgah2FireByAyar[ayar] = (tezgah2FireByAyar[ayar] ?? 0.0) + tezgahKarti2.fire
+            }
+            
             // Cila kartı
             if let cilaKarti = gunVerisi.cilaKarti {
                 for satir in cilaKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        cilaFireByAyar[ayar] = (cilaFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
             }
@@ -1741,7 +1759,7 @@ struct DailyOperationsEditorView: View {
             if let ocakKarti = gunVerisi.ocakKarti {
                 for satir in ocakKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        ocakFireByAyar[ayar] = (ocakFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
             }
@@ -1750,7 +1768,7 @@ struct DailyOperationsEditorView: View {
             if let patlatmaKarti = gunVerisi.patlatmaKarti {
                 for satir in patlatmaKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        patlatmaFireByAyar[ayar] = (patlatmaFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
             }
@@ -1759,7 +1777,7 @@ struct DailyOperationsEditorView: View {
             if let tamburKarti = gunVerisi.tamburKarti {
                 for satir in tamburKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        tamburFireByAyar[ayar] = (tamburFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
             }
@@ -1768,7 +1786,7 @@ struct DailyOperationsEditorView: View {
             if let makineKesmeKarti = gunVerisi.makineKesmeKarti1 {
                 for satir in makineKesmeKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        makineFireByAyar[ayar] = (makineFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
             }
@@ -1777,30 +1795,30 @@ struct DailyOperationsEditorView: View {
             if let testereKesmeKarti = gunVerisi.testereKesmeKarti1 {
                 for satir in testereKesmeKarti.satirlar {
                     if let ayar = satir.ayar, ayar > 0 {
-                        weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + satir.fire
+                        testereFireByAyar[ayar] = (testereFireByAyar[ayar] ?? 0.0) + satir.fire
                     }
                 }
-            }
-            
-            // Tezgah kartları (tek ayar sistemi) - computed fire property kullan
-            if let tezgahKarti1 = gunVerisi.tezgahKarti1, let ayar = tezgahKarti1.ayar, ayar > 0 {
-                weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + tezgahKarti1.fire
-            }
-            
-            if let tezgahKarti2 = gunVerisi.tezgahKarti2, let ayar = tezgahKarti2.ayar, ayar > 0 {
-                weeklyFireByAyar[ayar] = (weeklyFireByAyar[ayar] ?? 0.0) + tezgahKarti2.fire
             }
         }
         
         // Tüm ayarları göster (0 olanları da)
         let ayarlar = [14, 18, 21, 22]
         return ayarlar.map { ayar in
-            let fire = weeklyFireByAyar[ayar] ?? 0.0
-            return AyarFireData(ayar: ayar, fire: fire)
+            AyarFireData(
+                ayar: ayar,
+                tezgah1Fire: tezgah1FireByAyar[ayar] ?? 0.0,
+                tezgah2Fire: tezgah2FireByAyar[ayar] ?? 0.0,
+                cilaFire: cilaFireByAyar[ayar] ?? 0.0,
+                ocakFire: ocakFireByAyar[ayar] ?? 0.0,
+                patlatmaFire: patlatmaFireByAyar[ayar] ?? 0.0,
+                tamburFire: tamburFireByAyar[ayar] ?? 0.0,
+                makineFire: makineFireByAyar[ayar] ?? 0.0,
+                testereFire: testereFireByAyar[ayar] ?? 0.0
+            )
         }
     }
     
-    private func calculateFireByAyar(for satirlar: [IslemSatiri]) -> [AyarFireData] {
+    private func calculateFireByAyar(for satirlar: [IslemSatiri]) -> [SimpleAyarFireData] {
         var fireByAyar: [Int: Double] = [:]
         
         for satir in satirlar {
@@ -1814,7 +1832,7 @@ struct DailyOperationsEditorView: View {
         let ayarlar = [14, 18, 21, 22]
         return ayarlar.map { ayar in
             let fire = fireByAyar[ayar] ?? 0.0
-            return AyarFireData(ayar: ayar, fire: fire)
+            return SimpleAyarFireData(ayar: ayar, fire: fire)
         }
     }
     
@@ -2103,3 +2121,4 @@ struct WeeklyFinishSheet: View {
     DailyOperationsEditorView()
         .environmentObject(AuthenticationManager())
 }
+

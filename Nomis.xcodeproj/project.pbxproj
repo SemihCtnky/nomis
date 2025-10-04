@@ -66,6 +66,7 @@
 		7F5451242E8F03D1002F54C9 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7F5451282E8F03D1002F54C9 /* support.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = support.html; sourceTree = "<group>"; };
 		7F54512A2E8F0699002F54C9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7F54512C2E8FFF98002F54C9 /* increment_build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = increment_build.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +89,7 @@
 				7F5451242E8F03D1002F54C9 /* README.md */,
 				7F5451282E8F03D1002F54C9 /* support.html */,
 				2A1A2A272C1A2A2A2A2A2A27 /* Products */,
+				7F54512D2E8FFF98002F54C9 /* scripts */,
 			);
 			sourceTree = "<group>";
 		};
@@ -267,6 +269,14 @@
 			path = screenshots;
 			sourceTree = "<group>";
 		};
+		7F54512D2E8FFF98002F54C9 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				7F54512C2E8FFF98002F54C9 /* increment_build.sh */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -274,6 +284,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2A1A2A342C1A2A2A2A2A2A34 /* Build configuration list for PBXNativeTarget "Nomis" */;
 			buildPhases = (
+				7F54512E2E900018002F54C9 /* ShellScript */,
 				2A1A2A222C1A2A2A2A2A2A22 /* Sources */,
 				2A1A2A232C1A2A2A2A2A2A23 /* Frameworks */,
 				2A1A2A242C1A2A2A2A2A2A24 /* Resources */,
@@ -332,6 +343,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7F54512E2E900018002F54C9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       xcrun agvtool next-version -all\n   fi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2A1A2A222C1A2A2A2A2A2A22 /* Sources */ = {
@@ -500,6 +531,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kilitçim";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -531,6 +563,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kilitçim";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
