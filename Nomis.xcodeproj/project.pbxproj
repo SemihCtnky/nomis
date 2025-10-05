@@ -361,7 +361,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n   if [ \"$CONFIGURATION\" = \"Release\" ]; then\n       xcrun agvtool next-version -all\n   fi\n";
+			shellScript = "# Auto-increment disabled due to sandbox restrictions\n# Manually run: xcrun agvtool next-version -all\necho \"Build number: Current\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
