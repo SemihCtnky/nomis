@@ -157,13 +157,19 @@ struct LoginView: View {
                             }
                             
                             // Login Button
-                            Button("Giriş") {
-                                performLogin()
+                            Button {
+                                if username.isEmpty || password.isEmpty {
+                                    showError(message: "Lütfen kullanıcı adı ve şifre giriniz")
+                                } else {
+                                    performLogin()
+                                }
+                            } label: {
+                                Text("Giriş")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
                             }
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
                                     .fill(
@@ -194,7 +200,6 @@ struct LoginView: View {
                                     )
                             )
                             .shadow(color: NomisTheme.primary.opacity(0.3), radius: 12, x: 0, y: 6)
-                            .disabled(username.isEmpty || password.isEmpty)
                             .scaleEffect(username.isEmpty || password.isEmpty ? 0.98 : 1.0)
                             .animation(.easeInOut(duration: 0.2), value: username.isEmpty || password.isEmpty)
                         }
