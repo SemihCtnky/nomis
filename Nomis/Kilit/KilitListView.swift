@@ -27,6 +27,19 @@ struct KilitListView: View {
                     List {
                         ForEach(forms) { form in
                             formRowView(for: form)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    if authManager.canDelete {
+                                        Button(role: .destructive) {
+                                            pendingAction = {
+                                                formToDelete = form
+                                                showingDeleteAlert = true
+                                            }
+                                            showingAdminAuth = true
+                                        } label: {
+                                            Label("Sil", systemImage: "trash")
+                                        }
+                                    }
+                                }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -104,13 +117,6 @@ struct KilitListView: View {
                     selectedForm = form
                 }
                 showingAdminAuth = true
-            } : nil,
-            onDelete: authManager.canDelete ? {
-                pendingAction = {
-                    formToDelete = form
-                    showingDeleteAlert = true
-                }
-                showingAdminAuth = true
             } : nil
         )
     }
@@ -122,7 +128,6 @@ struct KilitFormRowView: View {
     let form: KilitToplamaForm
     let onTap: () -> Void
     let onEdit: (() -> Void)?
-    let onDelete: (() -> Void)?
     
     private var isCompleted: Bool {
         form.endedAt != nil
@@ -182,30 +187,16 @@ struct KilitFormRowView: View {
                             .font(.caption2)
                             .foregroundColor(NomisTheme.secondaryText)
                         
-                        HStack(spacing: 8) {
-                            if let onEdit = onEdit {
-                                Button(action: onEdit) {
-                                    Image(systemName: "pencil")
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(NomisTheme.primaryGreen)
-                                        .cornerRadius(6)
-                                }
-                                .buttonStyle(PlainButtonStyle())
+                        if let onEdit = onEdit {
+                            Button(action: onEdit) {
+                                Image(systemName: "pencil")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(NomisTheme.primaryGreen)
+                                    .cornerRadius(12)
                             }
-                            
-                            if let onDelete = onDelete {
-                                Button(action: onDelete) {
-                                    Image(systemName: "trash")
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(NomisTheme.destructive)
-                                        .cornerRadius(6)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
@@ -276,12 +267,6 @@ struct KilitFormRowView: View {
             if let onEdit = onEdit {
                 Button(action: onEdit) {
                     Label("Düzenle", systemImage: "pencil")
-                }
-            }
-            
-            if let onDelete = onDelete {
-                Button(role: .destructive, action: onDelete) {
-                    Label("Sil", systemImage: "trash")
                 }
             }
         }

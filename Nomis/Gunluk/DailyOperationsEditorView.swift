@@ -37,17 +37,6 @@ struct DailyOperationsEditorView: View {
         case sagAciklama(cardIndex: Int, satirIndex: Int)
     }
     
-    // Tezgah onay mekanizması için state
-    @State private var showingTezgahConfirmation = false
-    @State private var confirmationType: TezgahConfirmationType?
-    @State private var pendingTezgahSatir: TezgahSatiri?
-    @State private var pendingTezgahIndex: Int?
-    
-    enum TezgahConfirmationType {
-        case giris
-        case cikis
-    }
-    
     // Local arrays for stable sorting - SwiftData array sıralaması sorununu tamamen bypass et
     @State private var localTezgahSatirlar1: [TezgahSatiri] = []
     @State private var localTezgahSatirlar2: [TezgahSatiri] = []
@@ -199,22 +188,6 @@ struct DailyOperationsEditorView: View {
                     finishWeeklyForm()
                 }
             )
-        }
-        .alert("İşlem Onayı", isPresented: $showingTezgahConfirmation) {
-            Button("Evet") {
-                // Değerler kalır
-                confirmTezgahEntry()
-            }
-            Button("Hayır", role: .destructive) {
-                // Değerleri sil
-                cancelTezgahEntry()
-            }
-        } message: {
-            Text("Bu işlemi yapmak istediğinizden emin misiniz?")
-        }
-        .onChange(of: focusedTezgahField) { oldValue, newValue in
-            // Focus değiştiğinde onay kontrolü yap
-            handleFocusChange(from: oldValue, to: newValue)
         }
         .onAppear {
             if !isNewForm {
@@ -1840,102 +1813,6 @@ struct DailyOperationsEditorView: View {
     private func isFriday(_ date: Date) -> Bool {
         let calendar = Calendar.current
         return calendar.component(.weekday, from: date) == 6 // 6 = Friday
-    }
-    
-    // MARK: - Tezgah Onay Fonksiyonları
-    private func confirmTezgahEntry() {
-        // Evet seçildi, değerler kalır - hiçbir şey yapma
-        pendingTezgahSatir = nil
-        pendingTezgahIndex = nil
-        confirmationType = nil
-    }
-    
-    private func cancelTezgahEntry() {
-        // Hayır seçildi, değerleri sil
-        guard let satir = pendingTezgahSatir else { return }
-        
-        switch confirmationType {
-        case .giris:
-            // Giriş ve giriş açıklamasını sil
-            satir.girisValue = nil
-            satir.aciklamaGiris = ""
-            satir.aciklamaGirisTarihi = nil
-        case .cikis:
-            // Çıkış ve çıkış açıklamasını sil
-            satir.cikisValue = nil
-            satir.aciklamaCikis = ""
-            satir.aciklamaCikisTarihi = nil
-        case .none:
-            break
-        }
-        
-        // State'leri temizle
-        pendingTezgahSatir = nil
-        pendingTezgahIndex = nil
-        confirmationType = nil
-        
-        // Auto-save zaten çalışıyor, manuel save yapmaya gerek yok
-    }
-    
-    private func handleFocusChange(from oldValue: TezgahFocusedField?, to newValue: TezgahFocusedField?) {
-        // Eğer zaten bir onay bekleniyorsa, işlem yapma
-        guard !showingTezgahConfirmation else { return }
-        
-        // Eski focus'tan çıkıyoruz - açıklama alanından mı?
-        guard let oldFocus = oldValue else { return }
-        
-        // Yeni focus farklı olmalı (aynı alandan çıkmıyorsak kontrol etmeye gerek yok)
-        guard oldValue != newValue else { return }
-        
-        // Hangi açıklama alanından çıkıldı?
-        switch oldFocus {
-        case .solAciklama(let cardIndex, let satirIndex):
-            // Giriş açıklamasından çıkıldı
-            checkAndConfirmGirisAciklama(cardIndex: cardIndex, satirIndex: satirIndex)
-            
-        case .sagAciklama(let cardIndex, let satirIndex):
-            // Çıkış açıklamasından çıkıldı
-            checkAndConfirmCikisAciklama(cardIndex: cardIndex, satirIndex: satirIndex)
-            
-        default:
-            break
-        }
-    }
-    
-    private func checkAndConfirmGirisAciklama(cardIndex: Int, satirIndex: Int) {
-        guard let gunVerisi = form.gunlukVeriler.first else { return }
-        guard let tezgahKarti = getTezgahKarti(for: gunVerisi, cardIndex: cardIndex) else { return }
-        
-        let stableSatirlar = tezgahKarti.satirlar.sorted { $0.orderIndex < $1.orderIndex }
-        guard satirIndex < stableSatirlar.count else { return }
-        
-        let satir = stableSatirlar[satirIndex]
-        
-        // Açıklama dolu mu ve giriş değeri var mı?
-        if !satir.aciklamaGiris.isEmpty && (satir.girisValue ?? 0) > 0 {
-            pendingTezgahSatir = satir
-            pendingTezgahIndex = satirIndex
-            confirmationType = .giris
-            showingTezgahConfirmation = true
-        }
-    }
-    
-    private func checkAndConfirmCikisAciklama(cardIndex: Int, satirIndex: Int) {
-        guard let gunVerisi = form.gunlukVeriler.first else { return }
-        guard let tezgahKarti = getTezgahKarti(for: gunVerisi, cardIndex: cardIndex) else { return }
-        
-        let stableSatirlar = tezgahKarti.satirlar.sorted { $0.orderIndex < $1.orderIndex }
-        guard satirIndex < stableSatirlar.count else { return }
-        
-        let satir = stableSatirlar[satirIndex]
-        
-        // Açıklama dolu mu ve çıkış değeri var mı?
-        if !satir.aciklamaCikis.isEmpty && (satir.cikisValue ?? 0) > 0 {
-            pendingTezgahSatir = satir
-            pendingTezgahIndex = satirIndex
-            confirmationType = .cikis
-            showingTezgahConfirmation = true
-        }
     }
     
     private func hasUserInput() -> Bool {

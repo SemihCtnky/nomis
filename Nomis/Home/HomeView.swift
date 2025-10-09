@@ -94,11 +94,10 @@ struct HomeCard: View {
             }
             .frame(maxWidth: .infinity, minHeight: 120)
             .padding(16)
+            .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
         .nomisCard()
-        .scaleEffect(1.0)
-        .animation(.easeInOut(duration: 0.1), value: false)
     }
 }
 

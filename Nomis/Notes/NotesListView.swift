@@ -27,12 +27,18 @@ struct NotesListView: View {
                             NoteRowView(
                                 note: note,
                                 onTap: { selectedNote = note },
-                                onEdit: { selectedNote = note },
-                                onDelete: authManager.currentUsername == "mert" ? {
-                                    noteToDelete = note
-                                    showingAdminAuth = true
-                                } : nil
+                                onEdit: authManager.canEdit ? { selectedNote = note } : nil
                             )
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                if authManager.canDelete {
+                                    Button(role: .destructive) {
+                                        noteToDelete = note
+                                        showingAdminAuth = true
+                                    } label: {
+                                        Label("Sil", systemImage: "trash")
+                                    }
+                                }
+                            }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -98,7 +104,6 @@ struct NoteRowView: View {
     let note: Note
     let onTap: () -> Void
     let onEdit: (() -> Void)?
-    let onDelete: (() -> Void)?
     
     var body: some View {
         Button(action: onTap) {
@@ -147,32 +152,16 @@ struct NoteRowView: View {
                     
                     Spacer()
                     
-                    VStack(alignment: .trailing, spacing: 4) {
-                        HStack(spacing: 8) {
-                            if let onEdit = onEdit {
-                                Button(action: onEdit) {
-                                    Image(systemName: "pencil")
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(NomisTheme.primaryGreen)
-                                        .cornerRadius(6)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                            
-                            if let onDelete = onDelete {
-                                Button(action: onDelete) {
-                                    Image(systemName: "trash")
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(NomisTheme.destructive)
-                                        .cornerRadius(6)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
+                    if let onEdit = onEdit {
+                        Button(action: onEdit) {
+                            Image(systemName: "pencil")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(24)
+                                .background(NomisTheme.primaryGreen)
+                                .cornerRadius(12)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }

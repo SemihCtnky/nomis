@@ -26,6 +26,19 @@ struct DailyOperationsListView: View {
                     List {
                         ForEach(forms) { form in
                             formRowView(for: form)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    if authManager.canDelete {
+                                        Button(role: .destructive) {
+                                            formToDelete = form
+                                            pendingAction = {
+                                                deleteForm(form)
+                                            }
+                                            showingAdminAuth = true
+                                        } label: {
+                                            Label("Sil", systemImage: "trash")
+                                        }
+                                    }
+                                }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -117,46 +130,27 @@ struct DailyOperationsListView: View {
                 }
             }
             
-            // Edit/Delete buttons - Sadece admin görebilir
-            if authManager.canEdit {
-                HStack(spacing: 12) {
-                    // Tamamlanmış formlar düzenlenemez
-                    if !form.isWeeklyCompleted {
-                        Button(action: {
-                            pendingAction = {
-                                selectedForm = form
-                            }
-                            showingAdminAuth = true
-                        }) {
-                            Text("Düzenle")
-                                .font(.caption.weight(.medium))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(NomisTheme.primaryGreen)
-                                .cornerRadius(6)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+            // Edit button - Sadece düzenleme yetkisi olanlar görebilir
+            if authManager.canEdit && !form.isWeeklyCompleted {
+                Button(action: {
+                    pendingAction = {
+                        selectedForm = form
                     }
-                    
-                    Button(action: {
-                        pendingAction = {
-                            deleteForm(form)
-                        }
-                        showingAdminAuth = true
-                    }) {
-                        Text("Sil")
-                            .font(.caption.weight(.medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(NomisTheme.destructive)
-                            .cornerRadius(6)
+                    showingAdminAuth = true
+                }) {
+                    HStack {
+                        Image(systemName: "pencil")
+                            .font(.title3)
+                        Text("Düzenle")
+                            .font(.title3.weight(.semibold))
                     }
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    Spacer()
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(NomisTheme.primaryGreen)
+                    .cornerRadius(12)
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.vertical, 8)
