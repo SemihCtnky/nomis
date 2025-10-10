@@ -74,7 +74,7 @@ struct DailyOperationsEditorView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: true) {
                 LazyVStack(spacing: 0, pinnedViews: []) {
                     // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
                     ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { index, gunVerisi in
@@ -83,7 +83,7 @@ struct DailyOperationsEditorView: View {
                             gunBasligi(for: gunVerisi)
                             
                             // Kartlar - Yatay scroll
-                            ScrollView(.horizontal, showsIndicators: false) {
+                            ScrollView(.horizontal, showsIndicators: true) {
                                 LazyHStack(alignment: .top, spacing: 16) {
                                     // Tezgah kartları (ikişer tane)
                                     tezgahCard(for: gunVerisi, cardIndex: 1)
@@ -1132,12 +1132,14 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .disabled(isReadOnly || authManager.currentUsername != "mert")
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaCikis.isEmpty {
                     Button(action: {
@@ -1174,12 +1176,14 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .disabled(isReadOnly || authManager.currentUsername != "mert")
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaGiris.isEmpty {
                     Button(action: {
@@ -1244,12 +1248,14 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .disabled(isReadOnly || authManager.currentUsername != "mert")
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaCikis.isEmpty {
                     Button(action: {

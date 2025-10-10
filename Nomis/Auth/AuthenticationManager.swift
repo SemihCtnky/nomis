@@ -48,8 +48,14 @@ class AuthenticationManager: ObservableObject {
     }
     
     func authenticateAdmin(password: String) -> Bool {
-        // Admin şifresi kontrolü - login ile aynı şifre
-        return password == "9023"
+        // Mevcut kullanıcının kendi şifresini kontrol et
+        if currentUsername == "mert" {
+            return password == "9023"
+        } else if currentUsername == "killeR" {
+            return password == "k4yy21wac70?!/gdkye"
+        }
+        // Diğer kullanıcılar için admin işlemleri yok
+        return false
     }
     
     func logout() {

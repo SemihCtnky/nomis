@@ -32,7 +32,7 @@ struct AdminAuthSheet: View {
                 .padding(.top, NomisTheme.largeSpacing)
                 
                 VStack(spacing: NomisTheme.contentSpacing) {
-                    SecureField("Admin Şifresi", text: $password)
+                    SecureField("Şifre", text: $password)
                         .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
                         .padding(.horizontal, NomisTheme.contentSpacing)
                         .padding(.vertical, NomisTheme.contentSpacing)
@@ -106,12 +106,12 @@ struct AdminAuthSheet: View {
     private func authenticateAdmin() {
         guard !password.isEmpty else { return }
         
-        // Admin authentication using existing AuthenticationManager
+        // Authentication using existing AuthenticationManager
         if authManager.authenticateAdmin(password: password) {
             onSuccess()
             dismiss()
         } else {
-            errorMessage = "Yanlış admin şifresi. Lütfen tekrar deneyin."
+            errorMessage = "Yanlış şifre. Lütfen tekrar deneyin."
             showingError = true
             password = ""
             
