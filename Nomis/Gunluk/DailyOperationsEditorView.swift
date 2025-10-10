@@ -258,25 +258,33 @@ struct DailyOperationsEditorView: View {
     
     private func ensureCilaKarti(for gunVerisi: GunlukGunVerisi) {
         if gunVerisi.cilaKarti == nil {
-            gunVerisi.cilaKarti = CilaKarti()
+            let kart = CilaKarti()
+            kart.ensureRows() // Satırları oluştur
+            gunVerisi.cilaKarti = kart
         }
     }
     
     private func ensureOcakKarti(for gunVerisi: GunlukGunVerisi) {
         if gunVerisi.ocakKarti == nil {
-            gunVerisi.ocakKarti = OcakKarti()
+            let kart = OcakKarti()
+            kart.ensureRows() // Satırları oluştur
+            gunVerisi.ocakKarti = kart
         }
     }
     
     private func ensurePatlatmaKarti(for gunVerisi: GunlukGunVerisi) {
         if gunVerisi.patlatmaKarti == nil {
-            gunVerisi.patlatmaKarti = PatlatmaKarti()
+            let kart = PatlatmaKarti()
+            kart.ensureRows() // Satırları oluştur
+            gunVerisi.patlatmaKarti = kart
         }
     }
     
     private func ensureTamburKarti(for gunVerisi: GunlukGunVerisi) {
         if gunVerisi.tamburKarti == nil {
-            gunVerisi.tamburKarti = TamburKarti()
+            let kart = TamburKarti()
+            kart.ensureRows() // Satırları oluştur
+            gunVerisi.tamburKarti = kart
         }
     }
     
@@ -984,11 +992,15 @@ struct DailyOperationsEditorView: View {
         switch cardIndex {
         case 1:
             if gunVerisi.tezgahKarti1 == nil {
-                gunVerisi.tezgahKarti1 = TezgahKarti()
+                let kart = TezgahKarti()
+                kart.ensureRows() // Satırları oluştur
+                gunVerisi.tezgahKarti1 = kart
             }
         case 2:
             if gunVerisi.tezgahKarti2 == nil {
-                gunVerisi.tezgahKarti2 = TezgahKarti()
+                let kart = TezgahKarti()
+                kart.ensureRows() // Satırları oluştur
+                gunVerisi.tezgahKarti2 = kart
             }
         default:
             break

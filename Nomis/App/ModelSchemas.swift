@@ -1182,12 +1182,18 @@ class TezgahKarti {
     
     init() {
         self.id = UUID()
-        // 5 satır varsayılan olarak oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = TezgahSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = TezgahSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+            }
         }
     }
 }
@@ -1300,9 +1306,17 @@ class IslemSatiri {
         self.createdAt = Date()
         // Daha unique order index - microsecond precision
         self.orderIndex = Int(Date().timeIntervalSince1970 * 1000000) // Microsecond precision
-        // Başlangıçta birer tane boş değer ekle
-        girisValues.append(GenisletilebilirDeger())
-        cikisValues.append(GenisletilebilirDeger())
+        // Değerler lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureValues() {
+        // Değerler yoksa oluştur
+        if girisValues.isEmpty {
+            girisValues.append(GenisletilebilirDeger())
+        }
+        if cikisValues.isEmpty {
+            cikisValues.append(GenisletilebilirDeger())
+        }
     }
 }
 
@@ -1317,12 +1331,20 @@ class CilaKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
@@ -1338,12 +1360,20 @@ class OcakKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
@@ -1359,12 +1389,20 @@ class PatlatmaKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
@@ -1380,12 +1418,20 @@ class TamburKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
@@ -1415,12 +1461,20 @@ class MakineKesmeKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
@@ -1450,12 +1504,20 @@ class TestereKesmeKarti: IslemKartiProtocol {
     
     init() {
         self.id = UUID()
-        // Başlangıçta 5 satır oluştur - Her satıra benzersiz orderIndex ata
-        let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
-        for i in 0..<5 {
-            let satir = IslemSatiri()
-            satir.orderIndex = baseTime + i // Her satır farklı orderIndex
-            satirlar.append(satir)
+        // Satırlar lazy oluşturulacak - init'te @Relationship'e ekleme SwiftData crash yapar
+    }
+    
+    func ensureRows() {
+        // Satırlar yoksa oluştur
+        if satirlar.isEmpty {
+            let baseTime = Int(Date().timeIntervalSince1970 * 1000000)
+            for i in 0..<5 {
+                let satir = IslemSatiri()
+                satir.orderIndex = baseTime + i
+                satirlar.append(satir)
+                // Her satır için değerleri oluştur (artık güvenli - satır append edildi)
+                satir.ensureValues()
+            }
         }
     }
 }
