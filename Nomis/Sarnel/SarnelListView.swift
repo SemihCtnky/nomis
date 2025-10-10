@@ -167,92 +167,91 @@ struct SarnelFormRowView: View {
                     Text("\(form.karatAyar) Ayar Şarnel")
                         .font(.headline.weight(NomisTheme.headlineWeight))
                         .foregroundColor(NomisTheme.text)
+                    
+                    if let startTime = form.startedAt {
+                        Text("Başlangıç: \(Formatters.formatDateTime(startTime))")
+                            .font(.caption)
+                            .foregroundColor(NomisTheme.secondaryText)
                         
-                        if let startTime = form.startedAt {
-                            Text("Başlangıç: \(Formatters.formatDateTime(startTime))")
-                                .font(.caption)
-                                .foregroundColor(NomisTheme.secondaryText)
-                            
-                            if let endTime = form.endedAt {
-                                Text("Bitiş: \(Formatters.formatDateTime(endTime))")
-                                    .font(.caption)
-                                    .foregroundColor(NomisTheme.secondaryText)
-                            }
-                        } else {
-                            Text("Oluşturulma: \(Formatters.formatDateTime(form.createdAt))")
+                        if let endTime = form.endedAt {
+                            Text("Bitiş: \(Formatters.formatDateTime(endTime))")
                                 .font(.caption)
                                 .foregroundColor(NomisTheme.secondaryText)
                         }
+                    } else {
+                        Text("Oluşturulma: \(Formatters.formatDateTime(form.createdAt))")
+                            .font(.caption)
+                            .foregroundColor(NomisTheme.secondaryText)
                     }
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 4) {
+                    // Status Badge
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(statusColor)
+                            .frame(width: 8, height: 8)
+                        Text(statusText)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(statusColor)
+                    }
+                    
+                    if let onEdit = onEdit {
+                        Button(action: onEdit) {
+                            Image(systemName: "pencil")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(24)
+                                .background(NomisTheme.primaryGreen)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                    
+                    
+                    if let duration = formDuration {
+                        Text(duration)
+                            .font(.caption2)
+                            .foregroundColor(NomisTheme.secondaryText)
+                    }
+                }
+            }
+            
+            if let girisAltin = form.girisAltin {
+                HStack {
+                    Text("Giriş Altın:")
+                        .font(.caption)
+                        .foregroundColor(NomisTheme.secondaryText)
+                    Text(Formatters.formatGrams(girisAltin))
+                        .font(.caption.weight(NomisTheme.headlineWeight))
+                        .foregroundColor(NomisTheme.text)
                     
                     Spacer()
                     
-                    VStack(alignment: .trailing, spacing: 4) {
-                        // Status Badge
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(statusColor)
-                                .frame(width: 8, height: 8)
-                            Text(statusText)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(statusColor)
-                        }
-                        
-                        if let onEdit = onEdit {
-                            Button(action: onEdit) {
-                                Image(systemName: "pencil")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
-                                    .padding(24)
-                                    .background(NomisTheme.primaryGreen)
-                                    .cornerRadius(12)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                        
-                        
-                        if let duration = formDuration {
-                            Text(duration)
-                                .font(.caption2)
-                                .foregroundColor(NomisTheme.secondaryText)
-                        }
-                    }
-                }
-                
-                if let girisAltin = form.girisAltin {
-                    HStack {
-                        Text("Giriş Altın:")
+                    if let fire = form.totalFinalFire {
+                        Text("Fire:")
                             .font(.caption)
                             .foregroundColor(NomisTheme.secondaryText)
-                        Text(Formatters.formatGrams(girisAltin))
+                        Text(Formatters.formatGrams(fire))
                             .font(.caption.weight(NomisTheme.headlineWeight))
-                            .foregroundColor(NomisTheme.text)
-                        
-                        Spacer()
-                        
-                        if let fire = form.totalFinalFire {
-                            Text("Fire:")
-                                .font(.caption)
-                                .foregroundColor(NomisTheme.secondaryText)
-                            Text(Formatters.formatGrams(fire))
-                                .font(.caption.weight(NomisTheme.headlineWeight))
-                                .foregroundColor(fire > 0 ? NomisTheme.destructive : NomisTheme.primary)
-                        }
+                            .foregroundColor(fire > 0 ? NomisTheme.destructive : NomisTheme.primary)
                     }
                 }
-                
-                if let altinOrani = form.altinOrani {
-                    HStack {
-                        Text("Altın Oranı:")
-                            .font(.caption)
-                            .foregroundColor(NomisTheme.secondaryText)
-                        Text(Formatters.formatNumber(altinOrani))
-                            .font(.caption.weight(NomisTheme.headlineWeight))
-                            .foregroundColor(NomisTheme.primary)
-                        
-                        Spacer()
-                    }
+            }
+            
+            if let altinOrani = form.altinOrani {
+                HStack {
+                    Text("Altın Oranı:")
+                        .font(.caption)
+                        .foregroundColor(NomisTheme.secondaryText)
+                    Text(Formatters.formatNumber(altinOrani))
+                        .font(.caption.weight(NomisTheme.headlineWeight))
+                        .foregroundColor(NomisTheme.primary)
+                    
+                    Spacer()
                 }
             }
         }

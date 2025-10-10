@@ -117,55 +117,54 @@ struct NoteRowView: View {
                         .font(.headline)
                         .foregroundColor(NomisTheme.text)
                         .lineLimit(1)
+                    
+                    Text(note.text)
+                        .font(.body)
+                        .foregroundColor(NomisTheme.secondaryText)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text("Oluşturan: \(note.createdByUsername)")
+                                .font(.caption2)
+                                .foregroundColor(NomisTheme.primary)
+                            
+                            Spacer()
+                            
+                            Text(Formatters.formatDateTime(note.createdAt))
+                                .font(.caption2)
+                                .foregroundColor(NomisTheme.secondaryText)
+                        }
                         
-                        Text(note.text)
-                            .font(.body)
-                            .foregroundColor(NomisTheme.secondaryText)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                        
-                        VStack(alignment: .leading, spacing: 2) {
+                        if note.lastEditedAt != note.createdAt {
                             HStack {
-                                Text("Oluşturan: \(note.createdByUsername)")
+                                Text("Son düzenleyen: \(note.lastEditedByUsername)")
                                     .font(.caption2)
                                     .foregroundColor(NomisTheme.primary)
                                 
                                 Spacer()
                                 
-                                Text(Formatters.formatDateTime(note.createdAt))
+                                Text(Formatters.formatDateTime(note.lastEditedAt))
                                     .font(.caption2)
                                     .foregroundColor(NomisTheme.secondaryText)
                             }
-                            
-                            if note.lastEditedAt != note.createdAt {
-                                HStack {
-                                    Text("Son düzenleyen: \(note.lastEditedByUsername)")
-                                        .font(.caption2)
-                                        .foregroundColor(NomisTheme.primary)
-                                    
-                                    Spacer()
-                                    
-                                    Text(Formatters.formatDateTime(note.lastEditedAt))
-                                        .font(.caption2)
-                                        .foregroundColor(NomisTheme.secondaryText)
-                                }
-                            }
                         }
                     }
-                    
-                    Spacer()
-                    
-                    if let onEdit = onEdit {
-                        Button(action: onEdit) {
-                            Image(systemName: "pencil")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(24)
-                                .background(NomisTheme.primaryGreen)
-                                .cornerRadius(12)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                }
+                
+                Spacer()
+                
+                if let onEdit = onEdit {
+                    Button(action: onEdit) {
+                        Image(systemName: "pencil")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(24)
+                            .background(NomisTheme.primaryGreen)
+                            .cornerRadius(12)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }
