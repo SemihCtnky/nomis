@@ -105,7 +105,7 @@ struct HomeView: View {
                         .font(.caption)
                         .foregroundColor(NomisTheme.secondaryText)
                 }
-            case .error(let message):
+            case .error:
                 HStack(spacing: 4) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(.red)

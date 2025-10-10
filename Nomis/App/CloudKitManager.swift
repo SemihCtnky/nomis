@@ -73,11 +73,12 @@ class CloudKitManager: ObservableObject {
             operation.qualityOfService = .userInitiated
             
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                operation.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                    } else {
+                operation.modifyRecordsResultBlock = { result in
+                    switch result {
+                    case .success:
                         continuation.resume()
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
                     }
                 }
                 publicDatabase.add(operation)
@@ -120,15 +121,21 @@ class CloudKitManager: ObservableObject {
             operation.resultsLimit = 100
             var fetchedRecords: [CKRecord] = []
             
-            operation.recordFetchedBlock = { record in
-                fetchedRecords.append(record)
+            operation.recordMatchedBlock = { recordID, result in
+                switch result {
+                case .success(let record):
+                    fetchedRecords.append(record)
+                case .failure:
+                    break
+                }
             }
             
-            operation.queryCompletionBlock = { cursor, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else {
+            operation.queryResultBlock = { result in
+                switch result {
+                case .success(let cursor):
                     continuation.resume(returning: (fetchedRecords, cursor))
+                case .failure(let error):
+                    continuation.resume(throwing: error)
                 }
             }
             
@@ -167,11 +174,12 @@ class CloudKitManager: ObservableObject {
             operation.qualityOfService = .userInitiated
             
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                operation.modifyRecordsCompletionBlock = { _, _, error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                    } else {
+                operation.modifyRecordsResultBlock = { result in
+                    switch result {
+                    case .success:
                         continuation.resume()
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
                     }
                 }
                 publicDatabase.add(operation)
