@@ -11,6 +11,7 @@ class CloudKitManager: ObservableObject {
     // CloudKit Container and Database
     private let container: CKContainer
     private let publicDatabase: CKDatabase
+    private var isAvailable = false
     
     // Sync state
     @Published var isSyncing = false
@@ -31,12 +32,39 @@ class CloudKitManager: ObservableObject {
         // Use your Bundle ID as container identifier
         self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim")
         self.publicDatabase = container.publicCloudDatabase
+        // isAvailable will be checked when first operation is called
+    }
+    
+    // Lazy check availability on first use
+    private func checkAndUpdateAvailability() async {
+        guard !isAvailable else { return } // Already checked
+        
+        do {
+            let status = try await container.accountStatus()
+            await MainActor.run {
+                self.isAvailable = (status == .available)
+            }
+        } catch {
+            await MainActor.run {
+                self.isAvailable = false
+            }
+        }
+    }
+    
+    // Check if CloudKit is available (simulator might not have iCloud)
+    private func ensureAvailable() throws {
+        guard isAvailable else {
+            throw NSError(domain: "CloudKit", code: -1, userInfo: [
+                NSLocalizedDescriptionKey: "iCloud hesabınız bulunamadı. Lütfen Ayarlar > iCloud'dan oturum açın."
+            ])
+        }
     }
     
     // MARK: - Account Status
     
     /// Check if user is signed in to iCloud
     func checkAccountStatus() async throws -> CKAccountStatus {
+        await checkAndUpdateAvailability()
         return try await container.accountStatus()
     }
     
@@ -44,6 +72,9 @@ class CloudKitManager: ObservableObject {
     
     /// Upload a record to CloudKit
     func uploadRecord(_ record: CKRecord) async throws {
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
+        
         isSyncing = true
         defer { isSyncing = false }
         
@@ -60,6 +91,8 @@ class CloudKitManager: ObservableObject {
     /// Upload multiple records in batch
     func uploadRecords(_ records: [CKRecord]) async throws {
         guard !records.isEmpty else { return }
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
         
         isSyncing = true
         defer { isSyncing = false }
@@ -93,6 +126,9 @@ class CloudKitManager: ObservableObject {
     
     /// Fetch all records of a specific type
     func fetchRecords(ofType recordType: RecordType) async throws -> [CKRecord] {
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
+        
         let query = CKQuery(recordType: recordType.rawValue, predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
@@ -147,6 +183,9 @@ class CloudKitManager: ObservableObject {
     
     /// Delete a record from CloudKit
     func deleteRecord(withID recordID: CKRecord.ID) async throws {
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
+        
         isSyncing = true
         defer { isSyncing = false }
         
@@ -163,6 +202,8 @@ class CloudKitManager: ObservableObject {
     /// Delete multiple records
     func deleteRecords(withIDs recordIDs: [CKRecord.ID]) async throws {
         guard !recordIDs.isEmpty else { return }
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
         
         isSyncing = true
         defer { isSyncing = false }
@@ -194,6 +235,9 @@ class CloudKitManager: ObservableObject {
     
     /// Fetch only records modified after a certain date
     func fetchRecordsModifiedAfter(_ date: Date, ofType recordType: RecordType) async throws -> [CKRecord] {
+        await checkAndUpdateAvailability()
+        try ensureAvailable()
+        
         let predicate = NSPredicate(format: "modificationDate > %@", date as NSDate)
         let query = CKQuery(recordType: recordType.rawValue, predicate: predicate)
         query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
