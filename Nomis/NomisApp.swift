@@ -104,6 +104,26 @@ class ModelContainerManager: ObservableObject {
     }
     
     private func createContainer() async {
+        // Try with minimal schema first
+        print("🔍 Attempting to create ModelContainer...")
+        
+        // ATTEMPT 1: Minimal User-only schema (most likely to work)
+        do {
+            let minimalSchema = Schema([User.self])
+            let minimalConfig = ModelConfiguration(
+                schema: minimalSchema,
+                isStoredInMemoryOnly: true,
+                allowsSave: false
+            )
+            let container = try ModelContainer(for: minimalSchema, configurations: [minimalConfig])
+            print("✅ MINIMAL User-only container created!")
+            self.container = container
+            return
+        } catch {
+            print("❌ Minimal container failed: \(error)")
+        }
+        
+        // ATTEMPT 2: Try with full schema
         let schema = Schema([
             // Core Models
             User.self,
@@ -141,6 +161,8 @@ class ModelContainerManager: ObservableObject {
             IslemSatiri.self
         ])
         
+        print("🔍 Full schema created, attempting container...")
+        
         // STRATEGY 1: Clean corrupted stores first
         if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             let storeURL = appSupport.appendingPathComponent("default.store")
@@ -151,56 +173,50 @@ class ModelContainerManager: ObservableObject {
             try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
         }
         
-        // STRATEGY 2: Try in-memory container (SAFEST - always works)
-        let memoryConfig = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: true,
-            allowsSave: true
-        )
-        
-        if let container = try? ModelContainer(for: schema, configurations: [memoryConfig]) {
+        // STRATEGY 2: Try in-memory container with full schema
+        do {
+            let memoryConfig = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true,
+                allowsSave: true
+            )
+            let container = try ModelContainer(for: schema, configurations: [memoryConfig])
             print("✅ ModelContainer: In-memory mode (data temporary)")
             self.container = container
             return
+        } catch {
+            print("❌ In-memory container failed: \(error.localizedDescription)")
         }
         
         // STRATEGY 3: Try persistent container
-        let persistentConfig = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true
-        )
-        
-        if let container = try? ModelContainer(for: schema, configurations: [persistentConfig]) {
+        do {
+            let persistentConfig = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: false,
+                allowsSave: true
+            )
+            let container = try ModelContainer(for: schema, configurations: [persistentConfig])
             print("✅ ModelContainer: Persistent mode (data saved)")
             self.container = container
             return
+        } catch {
+            print("❌ Persistent container failed: \(error.localizedDescription)")
         }
         
-        // STRATEGY 4: Try minimal User-only schema in-memory
-        let minimalSchema = Schema([User.self])
-        let minimalConfig = ModelConfiguration(
-            schema: minimalSchema,
-            isStoredInMemoryOnly: true,
-            allowsSave: false
-        )
-        
-        if let container = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
-            print("⚠️ ModelContainer: Minimal User-only mode")
+        // STRATEGY 4: Simple default container
+        do {
+            let container = try ModelContainer(for: schema)
+            print("✅ ModelContainer: Default mode")
             self.container = container
             return
-        }
-        
-        // STRATEGY 5: Try simplest possible container
-        if let container = try? ModelContainer(for: Schema([User.self])) {
-            print("⚠️ ModelContainer: Emergency User mode")
-            self.container = container
-            return
+        } catch {
+            print("❌ Default container failed: \(error.localizedDescription)")
         }
         
         // If ALL strategies fail, set error but DON'T crash
         print("❌ ModelContainer: Failed to create - App will show error screen")
-        self.error = "Veri yöneticisi başlatılamadı. Lütfen uygulamayı yeniden başlatın."
+        print("❌ Error details logged above")
+        self.error = "Veri yöneticisi başlatılamadı. Lütfen uygulamayı silin ve yeniden yükleyin."
         self.container = nil
     }
 }
