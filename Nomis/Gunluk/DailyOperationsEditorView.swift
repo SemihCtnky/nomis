@@ -31,10 +31,10 @@ struct DailyOperationsEditorView: View {
     @FocusState private var focusedTezgahField: TezgahFocusedField?
     
     enum TezgahFocusedField: Hashable {
-        case giris(cardIndex: Int, satirIndex: Int)
-        case solAciklama(cardIndex: Int, satirIndex: Int)
-        case cikis(cardIndex: Int, satirIndex: Int)
-        case sagAciklama(cardIndex: Int, satirIndex: Int)
+        case giris(gunIndex: Int, cardIndex: Int, satirIndex: Int)
+        case solAciklama(gunIndex: Int, cardIndex: Int, satirIndex: Int)
+        case cikis(gunIndex: Int, cardIndex: Int, satirIndex: Int)
+        case sagAciklama(gunIndex: Int, cardIndex: Int, satirIndex: Int)
     }
     
     // Local arrays for stable sorting - SwiftData array sıralaması sorununu tamamen bypass et
@@ -77,7 +77,7 @@ struct DailyOperationsEditorView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 LazyVStack(spacing: 0, pinnedViews: []) {
                     // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
-                    ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { index, gunVerisi in
+                    ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { gunIndex, gunVerisi in
                         VStack(spacing: 0) {
                             // Gün başlığı
                             gunBasligi(for: gunVerisi)
@@ -86,8 +86,8 @@ struct DailyOperationsEditorView: View {
                             ScrollView(.horizontal, showsIndicators: true) {
                                 LazyHStack(alignment: .top, spacing: 16) {
                                     // Tezgah kartları (ikişer tane)
-                                    tezgahCard(for: gunVerisi, cardIndex: 1)
-                                    tezgahCard(for: gunVerisi, cardIndex: 2)
+                                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
+                                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
                                     
                                     // Cila kartı (birer tane)
                                     cilaCard(for: gunVerisi)
@@ -114,7 +114,7 @@ struct DailyOperationsEditorView: View {
                         }
                         
                         // Haftalık Fire Özeti - sadece son gün (Cuma) için
-                        if index == form.gunlukVeriler.count - 1 || isFriday(gunVerisi.tarih) {
+                        if gunIndex == form.gunlukVeriler.count - 1 || isFriday(gunVerisi.tarih) {
                             VStack(spacing: 16) {
                                 Spacer()
                                     .frame(height: 40)
@@ -270,7 +270,7 @@ struct DailyOperationsEditorView: View {
     }
     
     // MARK: - Tezgah Kartı
-    private func tezgahCard(for gunVerisi: GunlukGunVerisi, cardIndex: Int) -> some View {
+    private func tezgahCard(for gunVerisi: GunlukGunVerisi, gunIndex: Int, cardIndex: Int) -> some View {
         VStack(spacing: 0) {
             // Header
             Text("TEZGAH \(cardIndex)")
@@ -320,7 +320,7 @@ struct DailyOperationsEditorView: View {
             }
             
             // Tablo
-            tezgahTable(for: gunVerisi, cardIndex: cardIndex)
+            tezgahTable(for: gunVerisi, gunIndex: gunIndex, cardIndex: cardIndex)
             
             // Fire section
             tezgahFireSection(for: gunVerisi, cardIndex: cardIndex)
@@ -332,7 +332,7 @@ struct DailyOperationsEditorView: View {
         }
     }
     
-    private func tezgahTable(for gunVerisi: GunlukGunVerisi, cardIndex: Int) -> some View {
+    private func tezgahTable(for gunVerisi: GunlukGunVerisi, gunIndex: Int, cardIndex: Int) -> some View {
         VStack(spacing: 0) {
             // Stable Header
             StableTableHeader(columns: ["Açıklama", "Giriş", "Çıkış", "Açıklama"])
@@ -343,7 +343,7 @@ struct DailyOperationsEditorView: View {
                 let stableSatirlar = tezgahKarti.satirlar.sorted { $0.orderIndex < $1.orderIndex }
                 
                 ForEach(Array(stableSatirlar.enumerated()), id: \.element.id) { index, satir in
-                    tezgahTableRow(satir: satir, index: index, cardIndex: cardIndex)
+                    tezgahTableRow(satir: satir, gunIndex: gunIndex, index: index, cardIndex: cardIndex)
                         .id(satir.id) // UUID bazlı stable ID
                 }
                 
@@ -366,7 +366,7 @@ struct DailyOperationsEditorView: View {
         .animation(.none, value: UUID()) // Disable table animations completely
     }
     
-    private func tezgahTableRow(satir: TezgahSatiri, index: Int, cardIndex: Int) -> some View {
+    private func tezgahTableRow(satir: TezgahSatiri, gunIndex: Int, index: Int, cardIndex: Int) -> some View {
         HStack(spacing: 0) {
             // Açıklama (Giriş) - Giriş değeri girilmedikçe disabled
             HStack(spacing: 4) {
@@ -380,7 +380,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ), axis: .vertical)
-                .focused($focusedTezgahField, equals: .solAciklama(cardIndex: cardIndex, satirIndex: index))
+                .focused($focusedTezgahField, equals: .solAciklama(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index))
                 .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasGirisValue(satir))
                 .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
@@ -422,14 +422,14 @@ struct DailyOperationsEditorView: View {
             ), format: .number)
             .keyboardType(.numbersAndPunctuation)
             .submitLabel(.next)
-            .focused($focusedTezgahField, equals: .giris(cardIndex: cardIndex, satirIndex: index))
+            .focused($focusedTezgahField, equals: .giris(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index))
             .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
             .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
             .foregroundColor(NomisTheme.darkText)
             .onSubmit {
                 // Giriş değeri girildikten sonra hemen SOLUNDAKİ açıklamaya geç
-                focusedTezgahField = .solAciklama(cardIndex: cardIndex, satirIndex: index)
+                focusedTezgahField = .solAciklama(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index)
             }
             .luxuryTableCell()
             
@@ -446,14 +446,14 @@ struct DailyOperationsEditorView: View {
             ), format: .number)
             .keyboardType(.numbersAndPunctuation)
             .submitLabel(.next)
-            .focused($focusedTezgahField, equals: .cikis(cardIndex: cardIndex, satirIndex: index))
+            .focused($focusedTezgahField, equals: .cikis(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index))
             .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
             .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
             .foregroundColor(NomisTheme.darkText)
             .onSubmit {
                 // Çıkış değeri girildikten sonra sağ açıklamaya geç
-                focusedTezgahField = .sagAciklama(cardIndex: cardIndex, satirIndex: index)
+                focusedTezgahField = .sagAciklama(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index)
             }
             .luxuryTableCell()
             
@@ -469,7 +469,7 @@ struct DailyOperationsEditorView: View {
                         triggerAutoSave()
                     }
                 ), axis: .vertical)
-                .focused($focusedTezgahField, equals: .sagAciklama(cardIndex: cardIndex, satirIndex: index))
+                .focused($focusedTezgahField, equals: .sagAciklama(gunIndex: gunIndex, cardIndex: cardIndex, satirIndex: index))
                 .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasCikisValue(satir))
                 .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)

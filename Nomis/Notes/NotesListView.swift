@@ -110,14 +110,13 @@ struct NoteRowView: View {
     let onEdit: (() -> Void)?
     
     var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
-                HStack {
-                    VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
-                        Text(note.title)
-                            .font(.headline)
-                            .foregroundColor(NomisTheme.text)
-                            .lineLimit(1)
+        VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
+            HStack {
+                VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
+                    Text(note.title)
+                        .font(.headline)
+                        .foregroundColor(NomisTheme.text)
+                        .lineLimit(1)
                         
                         Text(note.text)
                             .font(.body)
@@ -169,10 +168,12 @@ struct NoteRowView: View {
                     }
                 }
             }
-            .padding(.vertical, NomisTheme.smallSpacing)
         }
+        .padding(.vertical, NomisTheme.smallSpacing)
         .contentShape(Rectangle())
-        .buttonStyle(PlainButtonStyle())
+        .onTapGesture {
+            onTap()
+        }
     }
 }
 

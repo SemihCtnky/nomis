@@ -161,13 +161,12 @@ struct SarnelFormRowView: View {
     }
     
     var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("\(form.karatAyar) Ayar Şarnel")
-                            .font(.headline.weight(NomisTheme.headlineWeight))
-                            .foregroundColor(NomisTheme.text)
+        VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(form.karatAyar) Ayar Şarnel")
+                        .font(.headline.weight(NomisTheme.headlineWeight))
+                        .foregroundColor(NomisTheme.text)
                         
                         if let startTime = form.startedAt {
                             Text("Başlangıç: \(Formatters.formatDateTime(startTime))")
@@ -256,10 +255,12 @@ struct SarnelFormRowView: View {
                     }
                 }
             }
-            .padding(.vertical, NomisTheme.smallSpacing)
         }
+        .padding(.vertical, NomisTheme.smallSpacing)
         .contentShape(Rectangle())
-        .buttonStyle(PlainButtonStyle())
+        .onTapGesture {
+            onTap()
+        }
     }
     
     private var formDuration: String? {
