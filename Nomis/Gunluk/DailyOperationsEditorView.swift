@@ -132,9 +132,8 @@ struct DailyOperationsEditorView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 20)
                                 .padding(.top, 20)
-                                .animation(.none, value: UUID()) // Disable animations
                             }
-                            .drawingGroup() // Metal rendering for horizontal scroll performance
+                            .animation(.none, value: UUID()) // Disable animations for smooth scroll
                         }
                         
                         // Haftalık Fire Özeti - sadece son gün (Cuma) için
