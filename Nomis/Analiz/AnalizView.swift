@@ -1234,7 +1234,7 @@ struct CSVDocument: FileDocument {
     }
     
     init(configuration: ReadConfiguration) throws {
-        fatalError("Reading not supported")
+        throw CocoaError(.fileReadCorruptFile)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
@@ -1252,7 +1252,7 @@ struct DocumentWrapper: FileDocument {
     }
     
     init(configuration: ReadConfiguration) throws {
-        fatalError("Reading not supported")
+        throw CocoaError(.fileReadCorruptFile)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {

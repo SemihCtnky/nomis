@@ -247,7 +247,7 @@ struct BackupDocument: FileDocument {
     }
     
     init(configuration: ReadConfiguration) throws {
-        fatalError("Reading not supported")
+        throw CocoaError(.fileReadCorruptFile)
     }
     
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
