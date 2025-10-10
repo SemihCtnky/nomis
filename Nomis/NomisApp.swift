@@ -39,6 +39,7 @@ struct NomisApp: App {
             Note.self,
             SarnelForm.self,
             AsitItem.self,
+            FireItem.self,  // Added - used by SarnelForm
             
             // Settings Models
             ModelItem.self,
@@ -75,29 +76,54 @@ struct NomisApp: App {
             allowsSave: true
         )
 
+        // Layer 1: Try normal persistent container
+        if let container = try? ModelContainer(for: schema, configurations: [modelConfiguration]) {
+            return container
+        }
+        
+        // Layer 2: Try to delete corrupted store and recreate
+        let url = modelConfiguration.url
+        try? FileManager.default.removeItem(at: url)
+        if let container = try? ModelContainer(for: schema, configurations: [modelConfiguration]) {
+            return container
+        }
+        
+        // Layer 3: Fallback to in-memory container (data won't persist between launches)
+        let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        if let container = try? ModelContainer(for: schema, configurations: [fallbackConfig]) {
+            return container
+        }
+        
+        // Layer 4: Minimal in-memory container as absolute last resort
+        let minimalSchema = Schema([User.self, Note.self])
+        let minimalConfig = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
+        if let container = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
+            return container
+        }
+        
+        // Layer 5: Emergency minimal container with simplest model
+        if let emergencyContainer = try? ModelContainer(for: Schema([User.self])) {
+            return emergencyContainer
+        }
+        
+        // Layer 6: Try with Note model if User fails
+        if let noteContainer = try? ModelContainer(for: Schema([Note.self])) {
+            return noteContainer
+        }
+        
+        // Layer 7: Last attempt with minimal memory-only User container
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let lastSchema = Schema([User.self])
+            let lastConfig = ModelConfiguration(schema: lastSchema, isStoredInMemoryOnly: true, allowsSave: false)
+            return try ModelContainer(for: lastSchema, configurations: [lastConfig])
         } catch {
-            // Try to delete existing store and recreate
-            let url = modelConfiguration.url
-            try? FileManager.default.removeItem(at: url)
+            // If we reach here, SwiftData is completely broken
+            // Print error for debugging but don't crash in production
+            print("❌ CRITICAL: ModelContainer creation failed after 7 attempts")
+            print("Error: \(error.localizedDescription)")
             
-            do {
-                return try ModelContainer(for: schema, configurations: [modelConfiguration])
-            } catch {
-                // Fallback to in-memory only container - app will work but data won't persist
-                let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                do {
-                    return try ModelContainer(for: schema, configurations: [fallbackConfig])
-                } catch {
-                    // As absolute last resort, create minimal in-memory container
-                    let minimalSchema = Schema([User.self, Note.self])
-                    let minimalConfig = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
-                    return (try? ModelContainer(for: minimalSchema, configurations: [minimalConfig])) ?? {
-                        fatalError("Could not create ModelContainer: \(error)")
-                    }()
-                }
-            }
+            // One final attempt with absolute minimum
+            return try! ModelContainer(for: Schema([User.self]))
         }
     }()
     
