@@ -77,7 +77,7 @@ enum FormState: String, Codable, CaseIterable {
 // MARK: - Note Model
 @Model
 class Note {
-    var id: UUID
+    @Attribute(.unique) var id: UUID
     var title: String
     var text: String
     var createdAt: Date
