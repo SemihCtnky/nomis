@@ -1,19 +1,43 @@
 import SwiftUI
 
+// MARK: - Color Extension for Dark Mode Support
+extension Color {
+    init(light: Color, dark: Color) {
+        self.init(uiColor: UIColor(dynamicProvider: { traits in
+            switch traits.userInterfaceStyle {
+            case .dark:
+                return UIColor(dark)
+            default:
+                return UIColor(light)
+            }
+        }))
+    }
+}
+
 struct NomisTheme {
-    // MARK: - Colors (Rolex inspired luxury palette)
-    static let primaryGreen = Color(red: 0.004, green: 0.341, blue: 0.235) // Rolex Green
-    static let goldAccent = Color(red: 1.0, green: 0.788, blue: 0.055) // Rolex Gold
-    static let creamBackground = Color(red: 0.988, green: 0.984, blue: 0.976) // Luxury cream
-    static let lightCream = Color(red: 0.996, green: 0.992, blue: 0.988) // Lighter cream variant
-    static let darkText = Color(red: 0.133, green: 0.133, blue: 0.133) // Rich charcoal
-    static let borderGray = Color(red: 0.627, green: 0.627, blue: 0.627) // Premium border - more visible
-    static let shadowColor = Color.black.opacity(0.12) // Deeper shadow for luxury feel
+    // MARK: - Colors (Rolex inspired luxury palette) - Now with Dark Mode support
+    static let primaryGreen = Color(light: Color(red: 0.004, green: 0.341, blue: 0.235), 
+                                     dark: Color(red: 0.1, green: 0.5, blue: 0.35))
+    static let goldAccent = Color(light: Color(red: 1.0, green: 0.788, blue: 0.055), 
+                                   dark: Color(red: 1.0, green: 0.85, blue: 0.3))
+    static let creamBackground = Color(light: Color(red: 0.988, green: 0.984, blue: 0.976), 
+                                        dark: Color(red: 0.1, green: 0.1, blue: 0.1))
+    static let lightCream = Color(light: Color(red: 0.996, green: 0.992, blue: 0.988), 
+                                   dark: Color(red: 0.15, green: 0.15, blue: 0.15))
+    static let darkText = Color(light: Color(red: 0.133, green: 0.133, blue: 0.133), 
+                                 dark: Color(red: 0.9, green: 0.9, blue: 0.9))
+    static let borderGray = Color(light: Color(red: 0.627, green: 0.627, blue: 0.627), 
+                                   dark: Color(red: 0.4, green: 0.4, blue: 0.4))
+    static let shadowColor = Color(light: Color.black.opacity(0.12), 
+                                    dark: Color.black.opacity(0.4))
     
     // MARK: - Premium accent colors
-    static let platinumGray = Color(red: 0.706, green: 0.706, blue: 0.706) // Platinum
-    static let champagneGold = Color(red: 0.976, green: 0.918, blue: 0.722) // Champagne
-    static let blackNight = Color(red: 0.067, green: 0.067, blue: 0.067) // Deep black
+    static let platinumGray = Color(light: Color(red: 0.706, green: 0.706, blue: 0.706), 
+                                     dark: Color(red: 0.5, green: 0.5, blue: 0.5))
+    static let champagneGold = Color(light: Color(red: 0.976, green: 0.918, blue: 0.722), 
+                                      dark: Color(red: 0.8, green: 0.75, blue: 0.5))
+    static let blackNight = Color(light: Color(red: 0.067, green: 0.067, blue: 0.067), 
+                                   dark: Color(red: 0.9, green: 0.9, blue: 0.9))
     
     // MARK: - Semantic Colors
     static let background = creamBackground
@@ -21,15 +45,19 @@ struct NomisTheme {
     static let primary = primaryGreen
     static let accent = goldAccent
     static let text = darkText
-    static let secondary = Color(red: 0.4, green: 0.4, blue: 0.4)
-    static let secondaryText = Color(red: 0.4, green: 0.4, blue: 0.4)
+    static let secondary = Color(light: Color(red: 0.4, green: 0.4, blue: 0.4), 
+                                  dark: Color(red: 0.7, green: 0.7, blue: 0.7))
+    static let secondaryText = Color(light: Color(red: 0.4, green: 0.4, blue: 0.4), 
+                                      dark: Color(red: 0.7, green: 0.7, blue: 0.7))
     static let border = borderGray
-    static let destructive = Color(red: 0.8, green: 0.2, blue: 0.2)
+    static let destructive = Color(light: Color(red: 0.8, green: 0.2, blue: 0.2), 
+                                    dark: Color(red: 1.0, green: 0.3, blue: 0.3))
     static let shadow = shadowColor
     
     // MARK: - Enhanced Visibility Colors
-    static let prominentText = Color(red: 0.067, green: 0.067, blue: 0.067) // Very dark for important text
-    static let ayarHighlight = Color(red: 0.004, green: 0.341, blue: 0.235) // Primary green for ayar values
+    static let prominentText = Color(light: Color(red: 0.067, green: 0.067, blue: 0.067), 
+                                      dark: Color(red: 1.0, green: 1.0, blue: 1.0))
+    static let ayarHighlight = primaryGreen
     
     // MARK: - Spacing (Luxury proportions)
     static let cardCornerRadius: CGFloat = 20

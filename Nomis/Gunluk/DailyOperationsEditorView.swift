@@ -378,13 +378,15 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .focused($focusedTezgahField, equals: .solAciklama(cardIndex: cardIndex, satirIndex: index))
                 .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasGirisValue(satir))
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaGiris.isEmpty {
                     Button(action: {
@@ -467,13 +469,15 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .focused($focusedTezgahField, equals: .sagAciklama(cardIndex: cardIndex, satirIndex: index))
                 .disabled(isReadOnly || authManager.currentUsername != "mert" || !hasCikisValue(satir))
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaCikis.isEmpty {
                     Button(action: {
@@ -1055,12 +1059,14 @@ struct DailyOperationsEditorView: View {
                         }
                         triggerAutoSave()
                     }
-                ))
+                ), axis: .vertical)
                 .disabled(isReadOnly || authManager.currentUsername != "mert")
-                .font(.system(size: NomisTheme.bodySize))
+                .font(.system(size: 13))
                 .foregroundColor(NomisTheme.primary)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2...4)
                 .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 
                 if !satir.aciklamaGiris.isEmpty {
                     Button(action: {

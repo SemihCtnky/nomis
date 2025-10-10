@@ -7,6 +7,7 @@ struct NoteEditorView: View {
     @EnvironmentObject private var authManager: AuthenticationManager
     
     let note: Note?
+    let isReadOnly: Bool
     @State private var title: String = ""
     @State private var text: String = ""
     @State private var showingSaveAlert = false
@@ -15,8 +16,9 @@ struct NoteEditorView: View {
     // Auto-save timer
     @State private var autoSaveTimer: Timer?
     
-    init(note: Note? = nil) {
+    init(note: Note? = nil, isReadOnly: Bool = false) {
         self.note = note
+        self.isReadOnly = isReadOnly
     }
     
     var body: some View {
@@ -28,6 +30,7 @@ struct NoteEditorView: View {
                     .fontWeight(.medium)
                     .padding(NomisTheme.contentSpacing)
                     .background(NomisTheme.cardBackground)
+                    .disabled(isReadOnly)
                     .cornerRadius(NomisTheme.cardCornerRadius)
                     .overlay(
                         RoundedRectangle(cornerRadius: NomisTheme.cardCornerRadius)
@@ -46,13 +49,16 @@ struct NoteEditorView: View {
                         RoundedRectangle(cornerRadius: NomisTheme.cardCornerRadius)
                             .stroke(NomisTheme.border, lineWidth: 1)
                     )
+                    .disabled(isReadOnly)
                     .onChange(of: text) { _, newValue in
-                        onContentChanged()
+                        if !isReadOnly {
+                            onContentChanged()
+                        }
                     }
                 
                 Spacer()
                 
-                if authManager.canEdit {
+                if authManager.canEdit && !isReadOnly {
                     Button("Kaydet") {
                         saveNote()
                     }

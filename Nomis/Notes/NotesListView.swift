@@ -9,6 +9,7 @@ struct NotesListView: View {
     @Query(sort: \Note.createdAt, order: .reverse) private var notes: [Note]
     @State private var showingAddNote = false
     @State private var selectedNote: Note?
+    @State private var selectedNoteForView: Note?
     @State private var showingDeleteAlert = false
     @State private var noteToDelete: Note?
     @State private var showingAdminAuth = false
@@ -26,7 +27,7 @@ struct NotesListView: View {
                         ForEach(notes) { note in
                             NoteRowView(
                                 note: note,
-                                onTap: { selectedNote = note },
+                                onTap: { selectedNoteForView = note },
                                 onEdit: authManager.canEdit ? { selectedNote = note } : nil
                             )
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -65,6 +66,9 @@ struct NotesListView: View {
             }
             .sheet(item: $selectedNote) { note in
                 NoteEditorView(note: note)
+            }
+            .sheet(item: $selectedNoteForView) { note in
+                NoteEditorView(note: note, isReadOnly: true)
             }
             .alert("Notu Sil", isPresented: $showingDeleteAlert) {
                 Button("İptal", role: .cancel) {
