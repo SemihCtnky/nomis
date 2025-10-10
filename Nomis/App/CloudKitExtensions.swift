@@ -21,9 +21,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         
         record["baslamaTarihi"] = baslamaTarihi as CKRecordValue
         record["createdAt"] = createdAt as CKRecordValue
-        record["createdByUsername"] = createdByUsername as CKRecordValue
-        record["lastEditedAt"] = lastEditedAt as CKRecordValue
-        record["lastEditedByUsername"] = lastEditedByUsername as CKRecordValue
+        if let lastEditedAt = lastEditedAt {
+            record["lastEditedAt"] = lastEditedAt as CKRecordValue
+        }
         record["isCompleted"] = (isCompleted ? 1 : 0) as CKRecordValue
         
         // Encode gunlukVeriler as JSON
@@ -87,7 +87,9 @@ extension YeniGunlukForm: CloudKitConvertible {
     private func encodeTezgahKarti(_ kart: TezgahKarti) -> [String: Any] {
         var dict: [String: Any] = [:]
         dict["id"] = kart.id.uuidString
-        dict["ayar"] = kart.ayar ?? 0
+        if let ayar = kart.ayar {
+            dict["ayar"] = ayar
+        }
         
         // Satirlar
         var satirlarArray: [[String: Any]] = []
@@ -96,8 +98,11 @@ extension YeniGunlukForm: CloudKitConvertible {
             satirDict["id"] = satir.id.uuidString
             satirDict["aciklamaGiris"] = satir.aciklamaGiris
             satirDict["aciklamaCikis"] = satir.aciklamaCikis
-            satirDict["girisValues"] = satir.girisValues.map { $0.value ?? 0.0 }
-            satirDict["cikisValues"] = satir.cikisValues.map { $0.value ?? 0.0 }
+            satirDict["girisValue"] = satir.girisValue ?? 0.0
+            satirDict["cikisValue"] = satir.cikisValue ?? 0.0
+            if let ayar = satir.ayar {
+                satirDict["ayar"] = ayar
+            }
             satirlarArray.append(satirDict)
         }
         dict["satirlar"] = satirlarArray
@@ -108,7 +113,7 @@ extension YeniGunlukForm: CloudKitConvertible {
             var fireDict: [String: Any] = [:]
             fireDict["id"] = fire.id.uuidString
             fireDict["value"] = fire.value ?? 0.0
-            fireDict["note"] = fire.note
+            fireDict["aciklama"] = fire.aciklama
             fireArray.append(fireDict)
         }
         dict["fireEklemeleri"] = fireArray
@@ -126,7 +131,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if label == "id", let uuid = child.value as? UUID {
                     dict["id"] = uuid.uuidString
                 } else if label == "ayar", let ayar = child.value as? Int? {
-                    dict["ayar"] = ayar ?? 0
+                    if let ayarValue = ayar {
+                        dict["ayar"] = ayarValue
+                    }
                 } else if label == "satirlar", let satirlar = child.value as? [IslemSatiri] {
                     var satirlarArray: [[String: Any]] = []
                     for satir in satirlar {
@@ -145,7 +152,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                         var fireDict: [String: Any] = [:]
                         fireDict["id"] = fire.id.uuidString
                         fireDict["value"] = fire.value ?? 0.0
-                        fireDict["note"] = fire.note
+                        fireDict["aciklama"] = fire.aciklama
                         fireArray.append(fireDict)
                     }
                     dict["fireEklemeleri"] = fireArray
@@ -159,9 +166,6 @@ extension YeniGunlukForm: CloudKitConvertible {
     func updateFromRecord(_ record: CKRecord) {
         if let lastEditedAt = record["lastEditedAt"] as? Date {
             self.lastEditedAt = lastEditedAt
-        }
-        if let lastEditedByUsername = record["lastEditedByUsername"] as? String {
-            self.lastEditedByUsername = lastEditedByUsername
         }
         if let isCompletedInt = record["isCompleted"] as? Int {
             self.isCompleted = isCompletedInt == 1
@@ -182,8 +186,7 @@ extension SarnelForm: CloudKitConvertible {
         
         record["karatAyar"] = karatAyar as CKRecordValue
         record["createdAt"] = createdAt as CKRecordValue
-        record["createdByUsername"] = createdByUsername as CKRecordValue
-        record["lastEditedByUsername"] = lastEditedByUsername as CKRecordValue
+        record["lastEditedAt"] = lastEditedAt as CKRecordValue
         
         if let girisAltin = girisAltin {
             record["girisAltin"] = girisAltin as CKRecordValue
@@ -219,7 +222,7 @@ extension SarnelForm: CloudKitConvertible {
             var asitDict: [String: Any] = [:]
             asitDict["id"] = asit.id.uuidString
             asitDict["valueGr"] = asit.valueGr
-            asitDict["note"] = asit.note
+            asitDict["note"] = asit.note ?? ""
             asitArray.append(asitDict)
         }
         
@@ -229,7 +232,7 @@ extension SarnelForm: CloudKitConvertible {
             var fireDict: [String: Any] = [:]
             fireDict["id"] = fire.id.uuidString
             fireDict["value"] = fire.value
-            fireDict["note"] = fire.note
+            fireDict["note"] = fire.note ?? ""
             fireArray.append(fireDict)
         }
         
@@ -271,8 +274,8 @@ extension SarnelForm: CloudKitConvertible {
         if let demirliToz = record["demirliToz"] as? Double {
             self.demirliToz = demirliToz
         }
-        if let lastEditedByUsername = record["lastEditedByUsername"] as? String {
-            self.lastEditedByUsername = lastEditedByUsername
+        if let lastEditedAt = record["lastEditedAt"] as? Date {
+            self.lastEditedAt = lastEditedAt
         }
     }
 }
@@ -288,11 +291,10 @@ extension KilitToplamaForm: CloudKitConvertible {
         
         record["model"] = (model ?? "") as CKRecordValue
         record["firma"] = (firma ?? "") as CKRecordValue
-        record["ayar"] = (ayar ?? "") as CKRecordValue
-        record["startDate"] = startDate as CKRecordValue
-        record["endDate"] = endDate as CKRecordValue
-        record["createdByUsername"] = createdByUsername as CKRecordValue
-        record["lastEditedByUsername"] = lastEditedByUsername as CKRecordValue
+        if let ayar = ayar {
+            record["ayar"] = ayar as CKRecordValue
+        }
+        record["createdAt"] = createdAt as CKRecordValue
         
         if let startedAt = startedAt {
             record["startedAt"] = startedAt as CKRecordValue
@@ -371,11 +373,8 @@ extension KilitToplamaForm: CloudKitConvertible {
         if let firma = record["firma"] as? String {
             self.firma = firma
         }
-        if let ayar = record["ayar"] as? String {
+        if let ayar = record["ayar"] as? Int {
             self.ayar = ayar
-        }
-        if let lastEditedByUsername = record["lastEditedByUsername"] as? String {
-            self.lastEditedByUsername = lastEditedByUsername
         }
     }
 }
@@ -392,6 +391,7 @@ extension Note: CloudKitConvertible {
         record["title"] = title as CKRecordValue
         record["text"] = text as CKRecordValue
         record["createdAt"] = createdAt as CKRecordValue
+        record["lastEditedAt"] = lastEditedAt as CKRecordValue
         record["createdByUsername"] = createdByUsername as CKRecordValue
         record["lastEditedByUsername"] = lastEditedByUsername as CKRecordValue
         
@@ -404,6 +404,9 @@ extension Note: CloudKitConvertible {
         }
         if let text = record["text"] as? String {
             self.text = text
+        }
+        if let lastEditedAt = record["lastEditedAt"] as? Date {
+            self.lastEditedAt = lastEditedAt
         }
         if let lastEditedByUsername = record["lastEditedByUsername"] as? String {
             self.lastEditedByUsername = lastEditedByUsername
