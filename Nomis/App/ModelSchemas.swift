@@ -1058,8 +1058,8 @@ class YeniGunlukForm {
         self.createdAt = Date()
         self.lastEditedAt = Date()
         
-        // Haftalık günleri hemen oluştur
-        createWeeklyDays()
+        // Haftalık günleri init'te oluşturma - SwiftData crash yapabilir
+        // createWeeklyDays() form insert edildikten sonra çağrılmalı
     }
     
     func createWeeklyDays() {

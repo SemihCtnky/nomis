@@ -1663,6 +1663,12 @@ struct DailyOperationsEditorView: View {
             
             if isNewForm {
                 modelContext.insert(form)
+                
+                // Haftalık günleri oluştur (insert'ten SONRA - SwiftData relationship için güvenli)
+                if form.gunlukVeriler.isEmpty {
+                    form.createWeeklyDays()
+                }
+                
                 isNewForm = false
             }
             
@@ -1702,6 +1708,12 @@ struct DailyOperationsEditorView: View {
             
             if isNewForm {
                 modelContext.insert(form)
+                
+                // Haftalık günleri oluştur (insert'ten SONRA - SwiftData relationship için güvenli)
+                if form.gunlukVeriler.isEmpty {
+                    form.createWeeklyDays()
+                }
+                
                 isNewForm = false
             }
             
@@ -1721,6 +1733,12 @@ struct DailyOperationsEditorView: View {
             
             if isNewForm {
                 modelContext.insert(form)
+                
+                // Haftalık günleri oluştur (insert'ten SONRA - SwiftData relationship için güvenli)
+                if form.gunlukVeriler.isEmpty {
+                    form.createWeeklyDays()
+                }
+                
                 isNewForm = false
             }
             
