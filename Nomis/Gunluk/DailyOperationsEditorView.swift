@@ -27,6 +27,10 @@ struct DailyOperationsEditorView: View {
     @State private var showingWeeklyFinishAlert = false
     @State private var showingCancelAuth = false
     
+    // Zoom functionality
+    @State private var currentZoomScale: CGFloat = 1.0
+    @GestureState private var gestureZoomScale: CGFloat = 1.0
+    
     // Focus management for Tezgah cards
     @FocusState private var focusedTezgahField: TezgahFocusedField?
     
@@ -72,6 +76,24 @@ struct DailyOperationsEditorView: View {
         return true
     }
     
+    // Computed zoom scale (gesture + base)
+    private var finalZoomScale: CGFloat {
+        currentZoomScale * gestureZoomScale
+    }
+    
+    // Magnification gesture for pinch-to-zoom
+    private var magnificationGesture: some Gesture {
+        MagnificationGesture()
+            .updating($gestureZoomScale) { value, state, _ in
+                state = value
+            }
+            .onEnded { value in
+                currentZoomScale *= value
+                // Limit zoom: 0.5x to 3.0x
+                currentZoomScale = min(max(currentZoomScale, 0.5), 3.0)
+            }
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: true) {
@@ -110,7 +132,9 @@ struct DailyOperationsEditorView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 20)
                                 .padding(.top, 20)
+                                .animation(.none, value: UUID()) // Disable animations
                             }
+                            .drawingGroup() // Metal rendering for horizontal scroll performance
                         }
                         
                         // Haftalık Fire Özeti - sadece son gün (Cuma) için
@@ -128,6 +152,8 @@ struct DailyOperationsEditorView: View {
                         }
                     }
                 }
+                .scaleEffect(finalZoomScale) // Apply zoom
+                .gesture(magnificationGesture) // Pinch-to-zoom gesture
             }
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
