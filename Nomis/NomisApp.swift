@@ -4,15 +4,10 @@ import SwiftData
 @main
 struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
+    @StateObject private var containerManager = ModelContainerManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // ModelContainer - ALWAYS created (in-memory if persistent fails)
-    let sharedModelContainer: ModelContainer
-    
     init() {
-        // Create ModelContainer - will ALWAYS succeed (falls back to in-memory)
-        self.sharedModelContainer = Self.createModelContainer()
-        
         // App initialization
         setupNavigationBarAppearance()
     }
@@ -29,17 +24,86 @@ struct NomisApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(authManager)
-                .modelContainer(sharedModelContainer)
-                .onChange(of: scenePhase) { _, newPhase in
-                    handleScenePhaseChange(newPhase)
+            if let container = containerManager.container {
+                ContentView()
+                    .environmentObject(authManager)
+                    .modelContainer(container)
+                    .onChange(of: scenePhase) { _, newPhase in
+                        handleScenePhaseChange(newPhase)
+                    }
+            } else {
+                // Loading or error state
+                VStack(spacing: 20) {
+                    ProgressView()
+                    Text("Yükleniyor...")
+                        .font(.headline)
+                    
+                    if let error = containerManager.error {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                    }
                 }
+            }
         }
     }
     
-    // Static function to create ModelContainer - ALWAYS returns a valid container
-    private static func createModelContainer() -> ModelContainer {
+    private func handleScenePhaseChange(_ phase: ScenePhase) {
+        switch phase {
+        case .background, .inactive:
+            // Auto-save any drafts when app goes to background or becomes inactive
+            saveAllDrafts()
+        case .active:
+            // App became active
+            break
+        @unknown default:
+            break
+        }
+    }
+    
+    private func saveAllDrafts() {
+        guard let container = containerManager.container else { return }
+        
+        // Auto-save all changes
+        do {
+            let context = container.mainContext
+            if context.hasChanges {
+                try context.save()
+            }
+        } catch {
+            // Retry once after a delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                guard let container = self.containerManager.container else { return }
+                do {
+                    let context = container.mainContext
+                    if context.hasChanges {
+                        try context.save()
+                    }
+                } catch {
+                    // Silent fail - don't crash on auto-save
+                    print("⚠️ Auto-save failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+}
+
+// Separate class to manage ModelContainer creation asynchronously
+@MainActor
+class ModelContainerManager: ObservableObject {
+    @Published var container: ModelContainer?
+    @Published var error: String?
+    
+    init() {
+        // Create container asynchronously to avoid blocking app launch
+        Task {
+            await createContainer()
+        }
+    }
+    
+    private func createContainer() async {
         let schema = Schema([
             // Core Models
             User.self,
@@ -96,7 +160,8 @@ struct NomisApp: App {
         
         if let container = try? ModelContainer(for: schema, configurations: [memoryConfig]) {
             print("✅ ModelContainer: In-memory mode (data temporary)")
-            return container
+            self.container = container
+            return
         }
         
         // STRATEGY 3: Try persistent container
@@ -108,7 +173,8 @@ struct NomisApp: App {
         
         if let container = try? ModelContainer(for: schema, configurations: [persistentConfig]) {
             print("✅ ModelContainer: Persistent mode (data saved)")
-            return container
+            self.container = container
+            return
         }
         
         // STRATEGY 4: Try minimal User-only schema in-memory
@@ -121,75 +187,20 @@ struct NomisApp: App {
         
         if let container = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
             print("⚠️ ModelContainer: Minimal User-only mode")
-            return container
+            self.container = container
+            return
         }
         
         // STRATEGY 5: Try simplest possible container
         if let container = try? ModelContainer(for: Schema([User.self])) {
             print("⚠️ ModelContainer: Emergency User mode")
-            return container
+            self.container = container
+            return
         }
         
-        // STRATEGY 6: Force create empty User container (THIS MUST WORK)
-        // If even this fails, iOS/SwiftData itself is completely broken
-        do {
-            let emergencySchema = Schema([User.self])
-            let emergencyContainer = try ModelContainer(for: emergencySchema)
-            print("⚠️ ModelContainer: Force-created emergency container")
-            return emergencyContainer
-        } catch {
-            // ABSOLUTE LAST RESORT: Create most basic in-memory container
-            // This is the ONLY place where failure is truly impossible
-            let ultraMinimalSchema = Schema([User.self])
-            let ultraMinimalConfig = ModelConfiguration(
-                schema: ultraMinimalSchema,
-                isStoredInMemoryOnly: true,
-                allowsSave: false
-            )
-            
-            // This WILL work - in-memory User-only container with no save
-            let lastResortContainer = try! ModelContainer(
-                for: ultraMinimalSchema,
-                configurations: [ultraMinimalConfig]
-            )
-            print("🆘 ModelContainer: Last resort in-memory container (read-only)")
-            return lastResortContainer
-        }
-    }
-    
-    private func handleScenePhaseChange(_ phase: ScenePhase) {
-        switch phase {
-        case .background, .inactive:
-            // Auto-save any drafts when app goes to background or becomes inactive
-            saveAllDrafts()
-        case .active:
-            // App became active
-            break
-        @unknown default:
-            break
-        }
-    }
-    
-    private func saveAllDrafts() {
-        // Auto-save all changes
-        do {
-            let context = sharedModelContainer.mainContext
-            if context.hasChanges {
-                try context.save()
-            }
-        } catch {
-            // Retry once after a delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                do {
-                    let context = self.sharedModelContainer.mainContext
-                    if context.hasChanges {
-                        try context.save()
-                    }
-                } catch {
-                    // Silent fail - don't crash on auto-save
-                    print("⚠️ Auto-save failed: \(error.localizedDescription)")
-                }
-            }
-        }
+        // If ALL strategies fail, set error but DON'T crash
+        print("❌ ModelContainer: Failed to create - App will show error screen")
+        self.error = "Veri yöneticisi başlatılamadı. Lütfen uygulamayı yeniden başlatın."
+        self.container = nil
     }
 }
