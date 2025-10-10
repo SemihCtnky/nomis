@@ -383,7 +383,16 @@ class CloudKitSyncService: ObservableObject {
     private func createSarnelForm(from record: CKRecord) -> SarnelForm? {
         guard let id = UUID(uuidString: record.recordID.recordName) else { return nil }
         
-        let form = SarnelForm()
+        // Get karatAyar from JSON or use default
+        var karatAyar = 0
+        if let sarnelJSON = record["sarnelDataJSON"] as? String,
+           let jsonData = sarnelJSON.data(using: .utf8),
+           let dict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+           let ayar = dict["karatAyar"] as? Int {
+            karatAyar = ayar
+        }
+        
+        let form = SarnelForm(karatAyar: karatAyar)
         form.id = id
         form.updateFromRecord(record)
         return form
