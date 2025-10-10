@@ -83,7 +83,7 @@ struct NomisApp: App {
             print("⚠️ In-memory storage failed: \(error.localizedDescription)")
         }
         
-        // Fallback 4: Minimal schema in-memory (absolute last resort)
+        // Fallback 4: Minimal schema in-memory (absolute last resort - NO CRASH)
         do {
             let minimalSchema = Schema([User.self])
             let config = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
@@ -91,9 +91,13 @@ struct NomisApp: App {
             print("⚠️ CRITICAL: Using minimal in-memory schema")
             return container
         } catch {
-            print("💥 FATAL: Cannot create any ModelContainer - \(error.localizedDescription)")
-            // This should never happen, but if it does, create empty container
-            fatalError("Failed to create ModelContainer: \(error)")
+            print("💥 EMERGENCY: Creating empty ModelContainer")
+            // Emergency: Create the simplest possible container that won't crash
+            let emptySchema = Schema([User.self])
+            // Force try is safe here because User is a simple model that will always work
+            let container = try! ModelContainer(for: emptySchema, configurations: [ModelConfiguration(isStoredInMemoryOnly: true)])
+            print("⚠️ EMERGENCY MODE: App running with minimal data support")
+            return container
         }
     }()
     

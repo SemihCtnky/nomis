@@ -1068,6 +1068,12 @@ class YeniGunlukForm {
     }
     
     func createWeeklyDays() {
+        // Prevent duplicate creation
+        guard gunlukVeriler.isEmpty else {
+            print("⚠️ createWeeklyDays: Already has data, skipping")
+            return
+        }
+        
         let calendar = Calendar.current
         
         // Başlama tarihinin hangi haftaya ait olduğunu bul
@@ -1078,9 +1084,11 @@ class YeniGunlukForm {
         if startWeekday == 1 || startWeekday == 7 { // Pazar veya Cumartesi
             // Bir sonraki Pazartesi'yi bul
             let daysToMonday = startWeekday == 1 ? 1 : 2 // Pazar→1gün, Cumartesi→2gün
-            if let nextMonday = calendar.date(byAdding: .day, value: daysToMonday, to: baslamaTarihi) {
-                referenceDate = nextMonday
+            guard let nextMonday = calendar.date(byAdding: .day, value: daysToMonday, to: baslamaTarihi) else {
+                print("⚠️ createWeeklyDays: Failed to calculate next Monday")
+                return
             }
+            referenceDate = nextMonday
         }
         
         // Referans tarihin o haftasının Pazartesi'sini bul
@@ -1088,24 +1096,39 @@ class YeniGunlukForm {
         let daysFromMonday = weekday - 2 // Pazartesi = 2, yani 0 olması lazım
         
         guard let weekMonday = calendar.date(byAdding: .day, value: -daysFromMonday, to: referenceDate) else {
+            print("⚠️ createWeeklyDays: Failed to calculate week Monday")
             return
         }
         
         // O haftanın Cuma'sını bul
         guard let weekFriday = calendar.date(byAdding: .day, value: 4, to: weekMonday) else {
+            print("⚠️ createWeeklyDays: Failed to calculate week Friday")
             return
         }
         
-        // Pazartesi'den Cuma'ya kadar tüm iş günlerini oluştur
+        // Pazartesi'den Cuma'ya kadar tüm iş günlerini oluştur (infinite loop protection)
         var dayCounter = weekMonday
-        while dayCounter <= weekFriday {
-                let gunlukVeri = GunlukGunVerisi(tarih: dayCounter)
-                gunlukVeriler.append(gunlukVeri)
+        var safetyCounter = 0
+        let maxIterations = 10 // Safety limit
+        
+        while dayCounter <= weekFriday && safetyCounter < maxIterations {
+            let gunlukVeri = GunlukGunVerisi(tarih: dayCounter)
+            gunlukVeriler.append(gunlukVeri)
             
             // Bir sonraki güne geç
-            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: dayCounter) else { break }
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: dayCounter) else {
+                print("⚠️ createWeeklyDays: Failed to get next day, breaking loop")
+                break
+            }
             dayCounter = nextDay
+            safetyCounter += 1
         }
+        
+        if safetyCounter >= maxIterations {
+            print("⚠️ createWeeklyDays: Safety limit reached, stopping loop")
+        }
+        
+        print("✅ createWeeklyDays: Created \(gunlukVeriler.count) days")
     }
 }
 
