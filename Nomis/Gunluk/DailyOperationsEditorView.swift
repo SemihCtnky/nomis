@@ -96,17 +96,18 @@ struct DailyOperationsEditorView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: true) {
-                LazyVStack(spacing: 0, pinnedViews: []) {
-                    // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
-                    ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { gunIndex, gunVerisi in
-                        VStack(spacing: 0) {
-                            // Gün başlığı
-                            gunBasligi(for: gunVerisi)
-                            
-                            // Kartlar - Yatay scroll
-                            ScrollView(.horizontal, showsIndicators: true) {
-                                LazyHStack(alignment: .top, spacing: 16) {
+            GeometryReader { geometry in
+                ScrollView(.vertical, showsIndicators: true) {
+                    LazyVStack(spacing: 0, pinnedViews: []) {
+                        // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
+                        ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { gunIndex, gunVerisi in
+                            VStack(spacing: 0) {
+                                // Gün başlığı
+                                gunBasligi(for: gunVerisi)
+                                
+                                // Kartlar - Yatay scroll
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    LazyHStack(alignment: .top, spacing: 16) {
                                     // Tezgah kartları (ikişer tane)
                                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
                                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
@@ -128,33 +129,38 @@ struct DailyOperationsEditorView: View {
                                     
                                     // Testere Kesme kartı (sonda, birer tane)
                                     testereKesmeCard(for: gunVerisi, cardIndex: 1)
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 20)
-                                .padding(.top, 20)
-                            }
-                            .animation(.none, value: UUID()) // Disable animations for smooth scroll
-                        }
-                        
-                        // Haftalık Fire Özeti - sadece son gün (Cuma) için
-                        if gunIndex == form.gunlukVeriler.count - 1 || isFriday(gunVerisi.tarih) {
-                            VStack(spacing: 16) {
-                                Spacer()
-                                    .frame(height: 40)
-                                
-                                WeeklyFireSummaryTable(fireData: calculateWeeklyFireSummary())
+                                    }
                                     .padding(.horizontal, 16)
-                                
-                                Spacer()
-                                    .frame(height: 20)
+                                    .padding(.bottom, 20)
+                                    .padding(.top, 20)
+                                    .animation(.none) // Disable animations for smooth horizontal scroll
+                                }
+                            }
+                            
+                            // Haftalık Fire Özeti - sadece son gün (Cuma) için
+                            if gunIndex == form.gunlukVeriler.count - 1 || isFriday(gunVerisi.tarih) {
+                                VStack(spacing: 16) {
+                                    Spacer()
+                                        .frame(height: 40)
+                                    
+                                    WeeklyFireSummaryTable(fireData: calculateWeeklyFireSummary())
+                                        .padding(.horizontal, 16)
+                                    
+                                    Spacer()
+                                        .frame(height: 20)
+                                }
                             }
                         }
                     }
+                    .animation(.none) // Disable all animations for smooth scroll
+                    .scaleEffect(finalZoomScale, anchor: .top)
+                    .frame(minWidth: geometry.size.width, alignment: .center)
                 }
-                .scaleEffect(finalZoomScale) // Apply zoom
-                .gesture(magnificationGesture) // Pinch-to-zoom gesture
+                .scrollDismissesKeyboard(.interactively)
+                .scrollContentBackground(.hidden)
+                .gesture(magnificationGesture)
             }
-            .scrollDismissesKeyboard(.interactively)
+            .ignoresSafeArea(.keyboard)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
