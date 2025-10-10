@@ -108,33 +108,42 @@ struct DailyOperationsEditorView: View {
                                 // Kartlar - Yatay scroll
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(alignment: .top, spacing: 16) {
-                                    // Tezgah kartları (ikişer tane)
-                                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
-                                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
-                                    
-                                    // Cila kartı (birer tane)
-                                    cilaCard(for: gunVerisi)
-                                    
-                                    // Ocak kartı (birer tane)
-                                    ocakCard(for: gunVerisi)
-                                    
-                                    // Patlatma kartı (birer tane)
-                                    patlatmaCard(for: gunVerisi)
-                                    
-                                    // Tambur kartı (birer tane)
-                                    tamburCard(for: gunVerisi)
-                                    
-                                    // Makine Kesme kartı (sonda, birer tane) 
-                                    makineKesmeCard(for: gunVerisi, cardIndex: 1)
-                                    
-                                    // Testere Kesme kartı (sonda, birer tane)
-                                    testereKesmeCard(for: gunVerisi, cardIndex: 1)
+                                        // Tezgah kartları (ikişer tane)
+                                        tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
+                                            .id("\(gunVerisi.id)-tezgah-1")
+                                        tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
+                                            .id("\(gunVerisi.id)-tezgah-2")
+                                        
+                                        // Cila kartı (birer tane)
+                                        cilaCard(for: gunVerisi)
+                                            .id("\(gunVerisi.id)-cila")
+                                        
+                                        // Ocak kartı (birer tane)
+                                        ocakCard(for: gunVerisi)
+                                            .id("\(gunVerisi.id)-ocak")
+                                        
+                                        // Patlatma kartı (birer tane)
+                                        patlatmaCard(for: gunVerisi)
+                                            .id("\(gunVerisi.id)-patlatma")
+                                        
+                                        // Tambur kartı (birer tane)
+                                        tamburCard(for: gunVerisi)
+                                            .id("\(gunVerisi.id)-tambur")
+                                        
+                                        // Makine Kesme kartı (sonda, birer tane) 
+                                        makineKesmeCard(for: gunVerisi, cardIndex: 1)
+                                            .id("\(gunVerisi.id)-makine")
+                                        
+                                        // Testere Kesme kartı (sonda, birer tane)
+                                        testereKesmeCard(for: gunVerisi, cardIndex: 1)
+                                            .id("\(gunVerisi.id)-testere")
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.bottom, 20)
                                     .padding(.top, 20)
-                                    .animation(.none) // Disable animations for smooth horizontal scroll
                                 }
+                                .scrollBounceBehavior(.basedOnSize)
+                                .scrollIndicatorsFlash(onAppear: false)
                             }
                             
                             // Haftalık Fire Özeti - sadece son gün (Cuma) için
@@ -152,9 +161,11 @@ struct DailyOperationsEditorView: View {
                             }
                         }
                     }
-                    .animation(.none) // Disable all animations for smooth scroll
                     .scaleEffect(finalZoomScale, anchor: .top)
                     .frame(minWidth: geometry.size.width, alignment: .center)
+                    .transaction { transaction in
+                        transaction.animation = nil
+                    }
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .scrollContentBackground(.hidden)
