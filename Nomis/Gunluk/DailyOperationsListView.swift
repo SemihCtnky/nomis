@@ -26,19 +26,6 @@ struct DailyOperationsListView: View {
                     List {
                         ForEach(forms) { form in
                             formRowView(for: form)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    if authManager.canDelete {
-                                        Button(role: .destructive) {
-                                            formToDelete = form
-                                            pendingAction = {
-                                                deleteForm(form)
-                                            }
-                                            showingAdminAuth = true
-                                        } label: {
-                                            Label("Sil", systemImage: "trash")
-                                        }
-                                    }
-                                }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -148,6 +135,30 @@ struct DailyOperationsListView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 16)
                     .background(NomisTheme.primaryGreen)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Silme butonu - sadece killeR hesabı için
+            if authManager.canDelete && !authManager.canEdit {
+                Button(action: {
+                    formToDelete = form
+                    pendingAction = {
+                        deleteForm(form)
+                    }
+                    showingAdminAuth = true
+                }) {
+                    HStack {
+                        Image(systemName: "trash")
+                            .font(.title2)
+                        Text("Sil")
+                            .font(.title2.weight(.bold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 18)
+                    .background(Color.red)
                     .cornerRadius(12)
                 }
                 .buttonStyle(PlainButtonStyle())

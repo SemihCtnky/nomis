@@ -29,21 +29,15 @@ struct NotesListView: View {
                             NoteRowView(
                                 note: note,
                                 onTap: { selectedNoteForView = note },
-                                onEdit: authManager.canEdit ? { selectedNote = note } : nil
-                            )
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                if authManager.canDelete {
-                                    Button(role: .destructive) {
-                                        noteToDelete = note
-                                        pendingAction = {
-                                            deleteNote(note)
-                                        }
-                                        showingAdminAuth = true
-                                    } label: {
-                                        Label("Sil", systemImage: "trash")
+                                onEdit: authManager.canEdit ? { selectedNote = note } : nil,
+                                onDelete: (authManager.canDelete && !authManager.canEdit) ? {
+                                    noteToDelete = note
+                                    pendingAction = {
+                                        deleteNote(note)
                                     }
-                                }
-                            }
+                                    showingAdminAuth = true
+                                } : nil
+                            )
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -111,6 +105,7 @@ struct NoteRowView: View {
     let note: Note
     let onTap: () -> Void
     let onEdit: (() -> Void)?
+    let onDelete: (() -> Void)?
     
     var body: some View {
         VStack(alignment: .leading, spacing: NomisTheme.smallSpacing) {
@@ -165,6 +160,18 @@ struct NoteRowView: View {
                             .foregroundColor(.white)
                             .padding(24)
                             .background(NomisTheme.primaryGreen)
+                            .cornerRadius(12)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                
+                if let onDelete = onDelete {
+                    Button(action: onDelete) {
+                        Image(systemName: "trash")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(24)
+                            .background(Color.red)
                             .cornerRadius(12)
                     }
                     .buttonStyle(PlainButtonStyle())

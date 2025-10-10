@@ -27,19 +27,6 @@ struct KilitListView: View {
                     List {
                         ForEach(forms) { form in
                             formRowView(for: form)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    if authManager.canDelete {
-                                        Button(role: .destructive) {
-                                            pendingAction = {
-                                                formToDelete = form
-                                                showingDeleteAlert = true
-                                            }
-                                            showingAdminAuth = true
-                                        } label: {
-                                            Label("Sil", systemImage: "trash")
-                                        }
-                                    }
-                                }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -117,6 +104,13 @@ struct KilitListView: View {
                     selectedForm = form
                 }
                 showingAdminAuth = true
+            } : nil,
+            onDelete: (authManager.canDelete && !authManager.canEdit) ? {
+                formToDelete = form
+                pendingAction = {
+                    deleteForm(form)
+                }
+                showingAdminAuth = true
             } : nil
         )
     }
@@ -128,6 +122,7 @@ struct KilitFormRowView: View {
     let form: KilitToplamaForm
     let onTap: () -> Void
     let onEdit: (() -> Void)?
+    let onDelete: (() -> Void)?
     
     private var isCompleted: Bool {
         form.endedAt != nil
@@ -194,6 +189,18 @@ struct KilitFormRowView: View {
                                     .foregroundColor(.white)
                                     .padding(24)
                                     .background(NomisTheme.primaryGreen)
+                                    .cornerRadius(12)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        
+                        if let onDelete = onDelete {
+                            Button(action: onDelete) {
+                                Image(systemName: "trash")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding(24)
+                                    .background(Color.red)
                                     .cornerRadius(12)
                             }
                             .buttonStyle(PlainButtonStyle())

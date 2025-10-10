@@ -71,29 +71,28 @@ Kilitçim, kuyumcu atölyeleri için tasarlanmış profesyonel bir iOS uygulamas
 ## 🔐 Kullanıcı Rolleri ve Hesaplar
 
 ### Admin
-```
-Kullanıcı Adı: mert
-Şifre: 9023
-```
-**Yetkiler:**
-- Tüm formları oluşturma, düzenleme, silme
-- Model ve firma yönetimi
-- Kullanıcı yönetimi
-- Tüm ayarlara erişim
+- **Kullanıcı Adı**: mert
+- **Yetkiler:**
+  - Tüm formları oluşturma ve düzenleme
+  - Model ve firma yönetimi
+  - Kullanıcı yönetimi
+  - Tüm ayarlara erişim
+
+### Silme Yetkisi
+- **Kullanıcı Adı**: killeR
+- **Yetkiler:**
+  - Sadece silme işlemleri
+  - Düzenleme yetkisi yok
 
 ### Görüntüleyici Hesapları
-```
-Kullanıcı Adı: kadir
-Şifre: 2390
+- **Kullanıcı Adları**: kadir, yalçın
+- **Yetkiler:**
+  - Tüm verileri görüntüleme (salt-okunur)
+  - Form ve kayıtları inceleme
+  - Düzenleme ve silme yetkisi yok
+  - Model/firma ekleme/düzenleme yok
 
-Kullanıcı Adı: yalçın
-Şifre: 4806
-```
-**Yetkiler:**
-- Tüm verileri görüntüleme (salt-okunur)
-- Form ve kayıtları inceleme
-- Düzenleme ve silme yetkisi yok
-- Model/firma ekleme/düzenleme yok
+> **Not**: Şifreler güvenlik nedeniyle README'de gösterilmemektedir. Giriş bilgileri için uygulama sahibiyle iletişime geçin.
 
 ## 🏗️ Teknik Detaylar
 
@@ -193,7 +192,7 @@ Kullanıcı Adı: yalçın
 
 ### İlk Çalıştırma
 1. Uygulama açıldığında login ekranı görünür
-2. Yukarıdaki hesaplardan biriyle giriş yapın
+2. Geçerli kullanıcı adı ve şifre ile giriş yapın
 3. Ana ekranda 7 modül kartını görürsünüz
 4. Tüm modüller tam fonksiyoneldir
 

@@ -27,19 +27,6 @@ struct SarnelListView: View {
                     List {
                         ForEach(forms) { form in
                             formRowView(for: form)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    if authManager.canDelete {
-                                        Button(role: .destructive) {
-                                            pendingAction = {
-                                                formToDelete = form
-                                                showingDeleteAlert = true
-                                            }
-                                            showingAdminAuth = true
-                                        } label: {
-                                            Label("Sil", systemImage: "trash")
-                                        }
-                                    }
-                                }
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -117,6 +104,13 @@ struct SarnelListView: View {
                     selectedForm = form
                 }
                 showingAdminAuth = true
+            } : nil,
+            onDelete: (authManager.canDelete && !authManager.canEdit) ? {
+                formToDelete = form
+                pendingAction = {
+                    deleteForm(form)
+                }
+                showingAdminAuth = true
             } : nil
         )
     }
@@ -133,6 +127,7 @@ struct SarnelFormRowView: View {
     let form: SarnelForm
     let onTap: () -> Void
     let onEdit: (() -> Void)?
+    let onDelete: (() -> Void)?
     
     private var isCompleted: Bool {
         form.endedAt != nil
@@ -154,10 +149,11 @@ struct SarnelFormRowView: View {
         }
     }
     
-    init(form: SarnelForm, onTap: @escaping () -> Void, onEdit: (() -> Void)? = nil) {
+    init(form: SarnelForm, onTap: @escaping () -> Void, onEdit: (() -> Void)? = nil, onDelete: (() -> Void)? = nil) {
         self.form = form
         self.onTap = onTap
         self.onEdit = onEdit
+        self.onDelete = onDelete
     }
     
     var body: some View {
@@ -211,6 +207,17 @@ struct SarnelFormRowView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                     
+                    if let onDelete = onDelete {
+                        Button(action: onDelete) {
+                            Image(systemName: "trash")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(24)
+                                .background(Color.red)
+                                .cornerRadius(12)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
                     
                     if let duration = formDuration {
                         Text(duration)
