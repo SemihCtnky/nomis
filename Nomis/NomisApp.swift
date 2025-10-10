@@ -7,7 +7,7 @@ struct NomisApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     // Persistent ModelContainer with proper error handling
-    lazy var sharedModelContainer: ModelContainer = {
+    let sharedModelContainer: ModelContainer = {
         let schema = Schema([
             // Core Models
             User.self,
@@ -106,21 +106,17 @@ struct NomisApp: App {
     }
     
     private func saveAllDrafts() {
+        let context = sharedModelContainer.mainContext
+        
+        guard context.hasChanges else { return }
+        
         do {
-            let context = sharedModelContainer.mainContext
-            if context.hasChanges {
-                try context.save()
-            }
+            try context.save()
         } catch {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                do {
-                    let context = self.sharedModelContainer.mainContext
-                    if context.hasChanges {
-                        try context.save()
-                    }
-                } catch {
-                    // Silent fail
-                }
+            // Retry after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak context] in
+                guard let context = context, context.hasChanges else { return }
+                try? context.save() // Silent fail on retry
             }
         }
     }
