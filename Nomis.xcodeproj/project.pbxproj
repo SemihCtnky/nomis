@@ -33,6 +33,9 @@
 		2A1A2A681C1A2A2A2A2A2A68 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1A2A671C1A2A2A2A2A2A67 /* BackupView.swift */; };
 		2A1A2A6A1C1A2A2A2A2A2A6A /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1A2A691C1A2A2A2A2A2A69 /* SettingsView.swift */; };
 		7F54512B2E8F0699002F54C9 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7F54512A2E8F0699002F54C9 /* PrivacyInfo.xcprivacy */; };
+		7F6D7B512E99449A002E314D /* CloudKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6D7B502E99449A002E314D /* CloudKitSyncService.swift */; };
+		7F6D7B522E99449A002E314D /* CloudKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6D7B4E2E99449A002E314D /* CloudKitExtensions.swift */; };
+		7F6D7B532E99449A002E314D /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6D7B4F2E99449A002E314D /* CloudKitManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +71,9 @@
 		7F54512A2E8F0699002F54C9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7F54512C2E8FFF98002F54C9 /* increment_build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = increment_build.sh; sourceTree = "<group>"; };
 		7F6D7B4D2E99126B002E314D /* Nomis.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nomis.entitlements; sourceTree = "<group>"; };
+		7F6D7B4E2E99449A002E314D /* CloudKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitExtensions.swift; sourceTree = "<group>"; };
+		7F6D7B4F2E99449A002E314D /* CloudKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
+		7F6D7B502E99449A002E314D /* CloudKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitSyncService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +143,9 @@
 		2A1A2A3E1C1A2A2A2A2A2A3E /* App */ = {
 			isa = PBXGroup;
 			children = (
+				7F6D7B4E2E99449A002E314D /* CloudKitExtensions.swift */,
+				7F6D7B4F2E99449A002E314D /* CloudKitManager.swift */,
+				7F6D7B502E99449A002E314D /* CloudKitSyncService.swift */,
 				2A1A2A3F1C1A2A2A2A2A2A3F /* ModelSchemas.swift */,
 				2A1A2A411C1A2A2A2A2A2A41 /* Theme.swift */,
 				2A1A2A431C1A2A2A2A2A2A43 /* Formatters.swift */,
@@ -385,6 +394,9 @@
 				2A1A2A501C1A2A2A2A2A2A50 /* NoteEditorView.swift in Sources */,
 				2A1A2A521C1A2A2A2A2A2A52 /* AdminAuthSheet.swift in Sources */,
 				2A1A2A541C1A2A2A2A2A2A54 /* LabeledField.swift in Sources */,
+				7F6D7B512E99449A002E314D /* CloudKitSyncService.swift in Sources */,
+				7F6D7B522E99449A002E314D /* CloudKitExtensions.swift in Sources */,
+				7F6D7B532E99449A002E314D /* CloudKitManager.swift in Sources */,
 				2A1A2A561C1A2A2A2A2A2A56 /* TableComponents.swift in Sources */,
 				2A1A2A581C1A2A2A2A2A2A58 /* SarnelListView.swift in Sources */,
 				2A1A2A5A1C1A2A2A2A2A2A5A /* SarnelEditorView.swift in Sources */,

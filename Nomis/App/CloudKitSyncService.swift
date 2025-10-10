@@ -177,8 +177,7 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // Update existing
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 // Insert new from CloudKit
                 if let form = createGunlukForm(from: record) {
@@ -201,8 +200,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 if let form = createSarnelForm(from: record) {
                     modelContext.insert(form)
@@ -224,8 +222,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 if let form = createKilitForm(from: record) {
                     modelContext.insert(form)
@@ -247,8 +244,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableNote = existingNote
-                mutableNote.updateFrom(record: record)
+                existingNote.updateFromRecord(record)
             } else {
                 if let note = createNote(from: record) {
                     modelContext.insert(note)
@@ -270,8 +266,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableItem = existingItem
-                mutableItem.updateFrom(record: record)
+                existingItem.updateFromRecord(record)
             } else {
                 if let item = createModelItem(from: record) {
                     modelContext.insert(item)
@@ -293,8 +288,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableItem = existingItem
-                mutableItem.updateFrom(record: record)
+                existingItem.updateFromRecord(record)
             } else {
                 if let item = createCompanyItem(from: record) {
                     modelContext.insert(item)
@@ -313,8 +307,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 if let form = createGunlukForm(from: record) {
                     modelContext.insert(form)
@@ -331,8 +324,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 if let form = createSarnelForm(from: record) {
                     modelContext.insert(form)
@@ -349,8 +341,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableForm = existingForm
-                mutableForm.updateFrom(record: record)
+                existingForm.updateFromRecord(record)
             } else {
                 if let form = createKilitForm(from: record) {
                     modelContext.insert(form)
@@ -367,8 +358,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                var mutableNote = existingNote
-                mutableNote.updateFrom(record: record)
+                existingNote.updateFromRecord(record)
             } else {
                 if let note = createNote(from: record) {
                     modelContext.insert(note)
@@ -382,13 +372,11 @@ class CloudKitSyncService: ObservableObject {
     // MARK: - Create from CKRecord
     
     private func createGunlukForm(from record: CKRecord) -> YeniGunlukForm? {
-        guard let idString = record.recordID.recordName.components(separatedBy: "-").first,
-              let id = UUID(uuidString: record.recordID.recordName) else { return nil }
+        guard let id = UUID(uuidString: record.recordID.recordName) else { return nil }
         
         let form = YeniGunlukForm()
         form.id = id
-        var mutableForm = form
-        mutableForm.updateFrom(record: record)
+        form.updateFromRecord(record)
         return form
     }
     
@@ -397,8 +385,7 @@ class CloudKitSyncService: ObservableObject {
         
         let form = SarnelForm()
         form.id = id
-        var mutableForm = form
-        mutableForm.updateFrom(record: record)
+        form.updateFromRecord(record)
         return form
     }
     
@@ -407,8 +394,7 @@ class CloudKitSyncService: ObservableObject {
         
         let form = KilitToplamaForm()
         form.id = id
-        var mutableForm = form
-        mutableForm.updateFrom(record: record)
+        form.updateFromRecord(record)
         return form
     }
     
@@ -419,8 +405,7 @@ class CloudKitSyncService: ObservableObject {
         
         let note = Note(title: title, text: text)
         note.id = id
-        var mutableNote = note
-        mutableNote.updateFrom(record: record)
+        note.updateFromRecord(record)
         return note
     }
     
