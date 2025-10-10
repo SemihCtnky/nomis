@@ -6,7 +6,7 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // Lazy container - oluşturulur ama crash olmaz
+    // Persistent ModelContainer with proper error handling
     lazy var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             // Core Models
@@ -45,29 +45,28 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // Clean old stores
-        if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-            let storeURL = appSupport.appendingPathComponent("default.store")
-            try? FileManager.default.removeItem(at: storeURL)
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
-            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
-        }
+        // Create persistent configuration
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         
-        // Try in-memory first (safest)
-        if let container = try? ModelContainer(
-            for: schema,
-            configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)]
-        ) {
+        do {
+            // Try to create persistent container
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             return container
+        } catch {
+            // Log error for debugging but don't crash the app
+            print("⚠️ Failed to create ModelContainer: \(error.localizedDescription)")
+            
+            // Try with default configuration as fallback
+            do {
+                let container = try ModelContainer(for: schema)
+                return container
+            } catch {
+                // Last resort: force try with minimal schema
+                // This should only happen in extreme cases
+                print("⚠️ Critical: Using minimal schema - \(error.localizedDescription)")
+                return try! ModelContainer(for: Schema([User.self]))
+            }
         }
-        
-        // Try persistent
-        if let container = try? ModelContainer(for: schema) {
-            return container
-        }
-        
-        // Emergency: minimal schema
-        return try! ModelContainer(for: Schema([User.self]))
     }()
     
     init() {

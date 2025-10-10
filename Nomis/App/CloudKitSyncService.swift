@@ -176,8 +176,11 @@ class CloudKitSyncService: ObservableObject {
         // 3. Merge: Update local or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                // Update existing
+                // Update existing - ensure weekly days exist
                 existingForm.updateFromRecord(record)
+                if existingForm.gunlukVeriler.isEmpty {
+                    existingForm.createWeeklyDays()
+                }
             } else {
                 // Insert new from CloudKit
                 if let form = createGunlukForm(from: record) {
@@ -308,6 +311,10 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 existingForm.updateFromRecord(record)
+                // Ensure weekly days exist after update
+                if existingForm.gunlukVeriler.isEmpty {
+                    existingForm.createWeeklyDays()
+                }
             } else {
                 if let form = createGunlukForm(from: record) {
                     modelContext.insert(form)
@@ -377,6 +384,13 @@ class CloudKitSyncService: ObservableObject {
         let form = YeniGunlukForm()
         form.id = id
         form.updateFromRecord(record)
+        
+        // Create weekly days if they don't exist
+        // This is crucial to prevent crashes when displaying forms synced from CloudKit
+        if form.gunlukVeriler.isEmpty {
+            form.createWeeklyDays()
+        }
+        
         return form
     }
     

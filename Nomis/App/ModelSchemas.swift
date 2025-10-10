@@ -1010,6 +1010,11 @@ public class BackupService: ObservableObject {
     }
 }
 
+// MARK: - Protocol for IslemKarti types
+protocol IslemKartiProtocol {
+    var satirlar: [IslemSatiri] { get }
+}
+
 // MARK: - New Daily Operations Models
 @Model
 class YeniGunlukForm {
