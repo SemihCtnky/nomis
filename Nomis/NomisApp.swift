@@ -8,6 +8,7 @@ struct NomisApp: App {
     
     // Optional ModelContainer - App works even without it (CRASH-PROOF)
     let sharedModelContainer: ModelContainer? = {
+        print("🔄 Initializing ModelContainer...")
         let schema = Schema([
             // Core Models
             User.self,
@@ -45,23 +46,14 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // Detect if running on simulator
-        #if targetEnvironment(simulator)
-        let isSimulator = true
-        #else
-        let isSimulator = false
-        #endif
-        
-        // Fallback 1: Try persistent storage (best for real device)
-        if !isSimulator {
-            do {
-                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-                let container = try ModelContainer(for: schema, configurations: [config])
-                print("✅ ModelContainer: Persistent storage initialized")
-                return container
-            } catch {
-                print("⚠️ Persistent storage failed: \(error.localizedDescription)")
-            }
+        // Fallback 1: Try in-memory storage first (most compatible)
+        do {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            let container = try ModelContainer(for: schema, configurations: [config])
+            print("✅ ModelContainer: In-memory storage initialized")
+            return container
+        } catch {
+            print("⚠️ In-memory storage failed: \(error.localizedDescription)")
         }
         
         // Fallback 2: Try default configuration
@@ -73,17 +65,7 @@ struct NomisApp: App {
             print("⚠️ Default configuration failed: \(error.localizedDescription)")
         }
         
-        // Fallback 3: In-memory storage (safest, works on simulator)
-        do {
-            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            let container = try ModelContainer(for: schema, configurations: [config])
-            print("✅ ModelContainer: In-memory storage initialized (simulator-safe)")
-            return container
-        } catch {
-            print("⚠️ In-memory storage failed: \(error.localizedDescription)")
-        }
-        
-        // Fallback 4: Minimal schema in-memory
+        // Fallback 3: Minimal schema in-memory
         do {
             let minimalSchema = Schema([User.self])
             let config = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
