@@ -75,8 +75,8 @@ struct DailyOperationsListView: View {
         }
         .sheet(isPresented: $showingAdminAuth) {
             AdminAuthSheet(
-                title: "Admin Yetkilendirme",
-                message: "Bu işlem için admin şifresi gereklidir",
+                title: "Yönetici Yetkisi Gerekli",
+                message: "Bu işlemi gerçekleştirmek için şifrenizi girin.",
                 onSuccess: {
                     pendingAction?()
                     pendingAction = nil

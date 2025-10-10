@@ -87,7 +87,7 @@ struct KilitListView: View {
             .sheet(isPresented: $showingAdminAuth) {
                 AdminAuthSheet(
                     title: "Yönetici Yetkisi Gerekli",
-                    message: "Bu işlemi gerçekleştirmek için admin şifrenizi girin."
+                    message: "Bu işlemi gerçekleştirmek için şifrenizi girin."
                 ) {
                     pendingAction?()
                     pendingAction = nil

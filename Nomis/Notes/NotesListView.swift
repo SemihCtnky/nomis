@@ -13,6 +13,7 @@ struct NotesListView: View {
     @State private var showingDeleteAlert = false
     @State private var noteToDelete: Note?
     @State private var showingAdminAuth = false
+    @State private var pendingAction: (() -> Void)?
     
     var body: some View {
         NavigationStack {
@@ -34,6 +35,9 @@ struct NotesListView: View {
                                 if authManager.canDelete {
                                     Button(role: .destructive) {
                                         noteToDelete = note
+                                        pendingAction = {
+                                            deleteNote(note)
+                                        }
                                         showingAdminAuth = true
                                     } label: {
                                         Label("Sil", systemImage: "trash")
@@ -85,11 +89,10 @@ struct NotesListView: View {
             .sheet(isPresented: $showingAdminAuth) {
                 AdminAuthSheet(
                     title: "Yönetici Yetkisi Gerekli",
-                    message: "Bu notu silmek için admin şifrenizi girin."
+                    message: "Bu notu silmek için şifrenizi girin."
                 ) {
-                    if let note = noteToDelete {
-                        deleteNote(note)
-                    }
+                    pendingAction?()
+                    pendingAction = nil
                     noteToDelete = nil
                 }
             }
