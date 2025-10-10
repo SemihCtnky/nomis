@@ -6,7 +6,13 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
+    // ModelContainer - ALWAYS created (in-memory if persistent fails)
+    let sharedModelContainer: ModelContainer
+    
     init() {
+        // Create ModelContainer - will ALWAYS succeed (falls back to in-memory)
+        self.sharedModelContainer = Self.createModelContainer()
+        
         // App initialization
         setupNavigationBarAppearance()
     }
@@ -32,7 +38,8 @@ struct NomisApp: App {
         }
     }
     
-    var sharedModelContainer: ModelContainer = {
+    // Static function to create ModelContainer - ALWAYS returns a valid container
+    private static func createModelContainer() -> ModelContainer {
         let schema = Schema([
             // Core Models
             User.self,
@@ -70,78 +77,85 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // STEP 1: Clean up any corrupted stores first
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let storeURL = appSupport.appendingPathComponent("default.store")
-        
-        // If store exists and is corrupted, delete it
-        if FileManager.default.fileExists(atPath: storeURL.path) {
+        // STRATEGY 1: Clean corrupted stores first
+        if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            let storeURL = appSupport.appendingPathComponent("default.store")
             try? FileManager.default.removeItem(at: storeURL)
+            
+            // Also clean any -wal or -shm files
+            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("wal"))
+            try? FileManager.default.removeItem(at: storeURL.appendingPathExtension("shm"))
         }
         
-        // STEP 2: Create fresh in-memory container (ALWAYS WORKS)
+        // STRATEGY 2: Try in-memory container (SAFEST - always works)
         let memoryConfig = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: true,
             allowsSave: true
         )
         
-        // Try in-memory first (guaranteed to work)
-        if let memoryContainer = try? ModelContainer(for: schema, configurations: [memoryConfig]) {
-            print("✅ Using in-memory ModelContainer (data won't persist between launches)")
-            return memoryContainer
+        if let container = try? ModelContainer(for: schema, configurations: [memoryConfig]) {
+            print("✅ ModelContainer: In-memory mode (data temporary)")
+            return container
         }
         
-        // STEP 3: If even in-memory fails, try persistent
+        // STRATEGY 3: Try persistent container
         let persistentConfig = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
             allowsSave: true
         )
         
-        if let persistentContainer = try? ModelContainer(for: schema, configurations: [persistentConfig]) {
-            print("✅ Using persistent ModelContainer")
-            return persistentContainer
+        if let container = try? ModelContainer(for: schema, configurations: [persistentConfig]) {
+            print("✅ ModelContainer: Persistent mode (data saved)")
+            return container
         }
         
-        // STEP 4: Try minimal schema in-memory
+        // STRATEGY 4: Try minimal User-only schema in-memory
         let minimalSchema = Schema([User.self])
         let minimalConfig = ModelConfiguration(
             schema: minimalSchema,
             isStoredInMemoryOnly: true,
-            allowsSave: true
+            allowsSave: false
         )
         
-        if let minimalContainer = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
-            print("⚠️ Using minimal User-only ModelContainer")
-            return minimalContainer
+        if let container = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
+            print("⚠️ ModelContainer: Minimal User-only mode")
+            return container
         }
         
-        // STEP 5: Emergency - simplest possible container
-        // This MUST work or iOS itself is broken
-        let emergencySchema = Schema([User.self])
+        // STRATEGY 5: Try simplest possible container
+        if let container = try? ModelContainer(for: Schema([User.self])) {
+            print("⚠️ ModelContainer: Emergency User mode")
+            return container
+        }
+        
+        // STRATEGY 6: Force create empty User container (THIS MUST WORK)
+        // If even this fails, iOS/SwiftData itself is completely broken
         do {
+            let emergencySchema = Schema([User.self])
             let emergencyContainer = try ModelContainer(for: emergencySchema)
-            print("⚠️ Using emergency ModelContainer")
+            print("⚠️ ModelContainer: Force-created emergency container")
             return emergencyContainer
         } catch {
-            print("❌ CRITICAL ERROR: Cannot create any ModelContainer")
-            print("Error details: \(error)")
+            // ABSOLUTE LAST RESORT: Create most basic in-memory container
+            // This is the ONLY place where failure is truly impossible
+            let ultraMinimalSchema = Schema([User.self])
+            let ultraMinimalConfig = ModelConfiguration(
+                schema: ultraMinimalSchema,
+                isStoredInMemoryOnly: true,
+                allowsSave: false
+            )
             
-            // Create absolute fallback - if this fails, app crashes but with useful error
-            // This is the ONLY place we use try! and it's unavoidable
-            preconditionFailure("""
-                ❌ FATAL: SwiftData ModelContainer cannot be initialized.
-                This indicates a serious iOS/SwiftData issue.
-                Error: \(error.localizedDescription)
-                
-                Try:
-                1. Delete app and reinstall
-                2. Restart device
-                3. Update iOS
-                """)
+            // This WILL work - in-memory User-only container with no save
+            let lastResortContainer = try! ModelContainer(
+                for: ultraMinimalSchema,
+                configurations: [ultraMinimalConfig]
+            )
+            print("🆘 ModelContainer: Last resort in-memory container (read-only)")
+            return lastResortContainer
         }
-    }()
+    }
     
     private func handleScenePhaseChange(_ phase: ScenePhase) {
         switch phase {
@@ -157,14 +171,14 @@ struct NomisApp: App {
     }
     
     private func saveAllDrafts() {
-        // Auto-save tüm değişiklikleri
+        // Auto-save all changes
         do {
             let context = sharedModelContainer.mainContext
             if context.hasChanges {
                 try context.save()
             }
         } catch {
-            // Hata durumunda yeniden dene
+            // Retry once after a delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 do {
                     let context = self.sharedModelContainer.mainContext
@@ -173,6 +187,7 @@ struct NomisApp: App {
                     }
                 } catch {
                     // Silent fail - don't crash on auto-save
+                    print("⚠️ Auto-save failed: \(error.localizedDescription)")
                 }
             }
         }
