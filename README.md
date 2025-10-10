@@ -68,31 +68,28 @@ Kilitçim, kuyumcu atölyeleri için tasarlanmış profesyonel bir iOS uygulamas
 - **Uygulama Bilgileri**: Versiyon ve geliştirici bilgileri
 - **Çıkış Yapma**: Güvenli oturum kapatma
 
-## 🔐 Kullanıcı Rolleri ve Hesaplar
+## 🔐 Kullanıcı Rolleri
 
-### Admin
-- **Kullanıcı Adı**: mert
-- **Yetkiler:**
-  - Tüm formları oluşturma ve düzenleme
-  - Model ve firma yönetimi
-  - Kullanıcı yönetimi
-  - Tüm ayarlara erişim
+### Admin Rolü
+**Yetkiler:**
+- Tüm formları oluşturma ve düzenleme
+- Model ve firma yönetimi
+- Kullanıcı yönetimi
+- Tüm ayarlara erişim
 
-### Silme Yetkisi
-- **Kullanıcı Adı**: killeR
-- **Yetkiler:**
-  - Sadece silme işlemleri
-  - Düzenleme yetkisi yok
+### Silme Rolü
+**Yetkiler:**
+- Sadece silme işlemleri
+- Düzenleme yetkisi yok
 
-### Görüntüleyici Hesapları
-- **Kullanıcı Adları**: kadir, yalçın
-- **Yetkiler:**
-  - Tüm verileri görüntüleme (salt-okunur)
-  - Form ve kayıtları inceleme
-  - Düzenleme ve silme yetkisi yok
-  - Model/firma ekleme/düzenleme yok
+### Görüntüleyici Rolü
+**Yetkiler:**
+- Tüm verileri görüntüleme (salt-okunur)
+- Form ve kayıtları inceleme
+- Düzenleme ve silme yetkisi yok
+- Model/firma ekleme/düzenleme yok
 
-> **Not**: Şifreler güvenlik nedeniyle README'de gösterilmemektedir. Giriş bilgileri için uygulama sahibiyle iletişime geçin.
+> **Not**: Kullanıcı adları ve şifreler güvenlik nedeniyle README'de gösterilmemektedir. Giriş bilgileri için uygulama sahibiyle iletişime geçin.
 
 ## 🏗️ Teknik Detaylar
 
