@@ -684,22 +684,26 @@ struct StableEditableCell: View {
     }
     
     var body: some View {
-        HStack(spacing: NomisTheme.tinySpacing) {
-            TextField(placeholder, text: $text)
+        HStack(spacing: 4) {
+            TextField(placeholder, text: $text, axis: .vertical)
                 .disabled(!isEnabled)
-                .multilineTextAlignment(.center)
-                .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
+                .multilineTextAlignment(.leading)
+                .font(.system(size: 13))
                 .foregroundColor(
                     textColor ?? (isEnabled ? NomisTheme.darkText : NomisTheme.secondaryText)
                 )
+                .lineLimit(2...4)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
             
             if !text.isEmpty && textColor != NomisTheme.destructive {
                 Button(action: { showTooltip.toggle() }) {
-                    Image(systemName: "questionmark.circle.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(NomisTheme.primaryGreen.opacity(0.7))
+                    Text("?")
+                        .font(.caption.weight(.bold))
+                        .foregroundColor(.blue)
                 }
                 .buttonStyle(PlainButtonStyle())
+                .padding(.trailing, 4)
                 .popover(isPresented: $showTooltip) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Oluşturma Bilgisi")
@@ -712,10 +716,13 @@ struct StableEditableCell: View {
                     .padding()
                     .frame(minWidth: 180)
                 }
+            } else {
+                Spacer()
+                    .frame(width: 20) // Soru işareti için yer ayır
             }
         }
-        .padding(.horizontal, NomisTheme.smallSpacing)
-        .padding(.vertical, NomisTheme.smallSpacing)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
         .background(
             Rectangle()
                 .fill(isEnabled ? NomisTheme.lightCream : NomisTheme.cardBackground.opacity(0.5))

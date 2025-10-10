@@ -420,7 +420,8 @@ struct DailyOperationsEditorView: View {
                     triggerAutoSave()
                 }
             ), format: .number)
-            .keyboardType(.decimalPad)
+            .keyboardType(.numbersAndPunctuation)
+            .submitLabel(.next)
             .focused($focusedTezgahField, equals: .giris(cardIndex: cardIndex, satirIndex: index))
             .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
@@ -428,9 +429,7 @@ struct DailyOperationsEditorView: View {
             .foregroundColor(NomisTheme.darkText)
             .onSubmit {
                 // Giriş değeri girildikten sonra hemen SOLUNDAKİ açıklamaya geç
-                if hasGirisValue(satir) {
-                    focusedTezgahField = .solAciklama(cardIndex: cardIndex, satirIndex: index)
-                }
+                focusedTezgahField = .solAciklama(cardIndex: cardIndex, satirIndex: index)
             }
             .luxuryTableCell()
             
@@ -445,7 +444,8 @@ struct DailyOperationsEditorView: View {
                     triggerAutoSave()
                 }
             ), format: .number)
-            .keyboardType(.decimalPad)
+            .keyboardType(.numbersAndPunctuation)
+            .submitLabel(.next)
             .focused($focusedTezgahField, equals: .cikis(cardIndex: cardIndex, satirIndex: index))
             .disabled(isReadOnly || authManager.currentUsername != "mert")
             .multilineTextAlignment(.center)
@@ -453,9 +453,7 @@ struct DailyOperationsEditorView: View {
             .foregroundColor(NomisTheme.darkText)
             .onSubmit {
                 // Çıkış değeri girildikten sonra sağ açıklamaya geç
-                if hasCikisValue(satir) {
-                    focusedTezgahField = .sagAciklama(cardIndex: cardIndex, satirIndex: index)
-                }
+                focusedTezgahField = .sagAciklama(cardIndex: cardIndex, satirIndex: index)
             }
             .luxuryTableCell()
             

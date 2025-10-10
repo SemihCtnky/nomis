@@ -171,6 +171,7 @@ struct NoteRowView: View {
             }
             .padding(.vertical, NomisTheme.smallSpacing)
         }
+        .contentShape(Rectangle())
         .buttonStyle(PlainButtonStyle())
     }
 }

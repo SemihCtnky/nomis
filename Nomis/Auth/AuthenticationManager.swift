@@ -20,15 +20,15 @@ class AuthenticationManager: ObservableObject {
         // Simple authentication logic
         // In a real app, this would validate against a secure backend
         if username == "mert" && password == "9023" {
-            // Admin: Full permissions
+            // Admin: Full edit permissions, but NO delete
             isAuthenticated = true
             canEdit = true
-            canDelete = true
+            canDelete = false
             currentUsername = username
             updateLastAuthenticationTime()
             return true
         } else if username == "killeR" && password == "k4yy21wac70?!/gdkye" {
-            // Deleter: Only delete permission, no edit
+            // Deleter: ONLY delete permission, no edit
             isAuthenticated = true
             canEdit = false
             canDelete = true
