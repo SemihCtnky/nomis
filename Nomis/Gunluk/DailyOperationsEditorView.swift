@@ -75,7 +75,7 @@ struct DailyOperationsEditorView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 0) {
+                LazyVStack(spacing: 0, pinnedViews: []) {
                     // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
                     ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { index, gunVerisi in
                         VStack(spacing: 0) {
@@ -84,7 +84,7 @@ struct DailyOperationsEditorView: View {
                             
                             // Kartlar - Yatay scroll
                             ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(alignment: .top, spacing: 16) {
+                                LazyHStack(alignment: .top, spacing: 16) {
                                     // Tezgah kartları (ikişer tane)
                                     tezgahCard(for: gunVerisi, cardIndex: 1)
                                     tezgahCard(for: gunVerisi, cardIndex: 2)
@@ -129,6 +129,7 @@ struct DailyOperationsEditorView: View {
                     }
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
