@@ -6,8 +6,8 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // ModelContainer with multi-level fallback - NEVER CRASHES
-    let sharedModelContainer: ModelContainer = {
+    // Optional ModelContainer - App works even without it (CRASH-PROOF)
+    let sharedModelContainer: ModelContainer? = {
         let schema = Schema([
             // Core Models
             User.self,
@@ -83,7 +83,7 @@ struct NomisApp: App {
             print("⚠️ In-memory storage failed: \(error.localizedDescription)")
         }
         
-        // Fallback 4: Minimal schema in-memory (absolute last resort - NO CRASH)
+        // Fallback 4: Minimal schema in-memory
         do {
             let minimalSchema = Schema([User.self])
             let config = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
@@ -91,13 +91,9 @@ struct NomisApp: App {
             print("⚠️ CRITICAL: Using minimal in-memory schema")
             return container
         } catch {
-            print("💥 EMERGENCY: Creating empty ModelContainer")
-            // Emergency: Create the simplest possible container that won't crash
-            let emptySchema = Schema([User.self])
-            // Force try is safe here because User is a simple model that will always work
-            let container = try! ModelContainer(for: emptySchema, configurations: [ModelConfiguration(isStoredInMemoryOnly: true)])
-            print("⚠️ EMERGENCY MODE: App running with minimal data support")
-            return container
+            print("💥 FATAL: Cannot create ModelContainer - \(error.localizedDescription)")
+            print("⚠️ App will run without data persistence")
+            return nil
         }
     }()
     
@@ -117,12 +113,30 @@ struct NomisApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(authManager)
-                .modelContainer(sharedModelContainer)
-                .onChange(of: scenePhase) { _, newPhase in
-                    handleScenePhaseChange(newPhase)
+            Group {
+                if let container = sharedModelContainer {
+                    ContentView()
+                        .environmentObject(authManager)
+                        .modelContainer(container)
+                        .onChange(of: scenePhase) { _, newPhase in
+                            handleScenePhaseChange(newPhase)
+                        }
+                } else {
+                    // Fallback view when ModelContainer is not available
+                    VStack(spacing: 20) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 60))
+                            .foregroundColor(.orange)
+                        Text("Veri sistemi başlatılamadı")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        Text("Lütfen uygulamayı yeniden başlatın")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
                 }
+            }
         }
     }
     
@@ -138,8 +152,9 @@ struct NomisApp: App {
     }
     
     private func saveAllDrafts() {
-        let context = sharedModelContainer.mainContext
+        guard let container = sharedModelContainer else { return }
         
+        let context = container.mainContext
         guard context.hasChanges else { return }
         
         do {
