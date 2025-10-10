@@ -32,6 +32,12 @@ class CloudKitManager: ObservableObject {
         // Use your Bundle ID as container identifier
         self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim")
         self.publicDatabase = container.publicCloudDatabase
+        
+        // Detect simulator - CloudKit might not work properly
+        #if targetEnvironment(simulator)
+        print("⚠️ CloudKit: Running on simulator - iCloud sync may not work")
+        #endif
+        
         // isAvailable will be checked when first operation is called
     }
     
@@ -39,14 +45,23 @@ class CloudKitManager: ObservableObject {
     private func checkAndUpdateAvailability() async {
         guard !isAvailable else { return } // Already checked
         
+        // Simulator check - be more lenient
+        #if targetEnvironment(simulator)
+        print("⚠️ CloudKit: Simulator detected - sync may be unavailable")
+        #endif
+        
         do {
             let status = try await container.accountStatus()
             await MainActor.run {
                 self.isAvailable = (status == .available)
+                if !self.isAvailable {
+                    print("⚠️ CloudKit: Account not available - status: \(status.rawValue)")
+                }
             }
         } catch {
             await MainActor.run {
                 self.isAvailable = false
+                print("⚠️ CloudKit: Check failed - \(error.localizedDescription)")
             }
         }
     }
@@ -54,9 +69,15 @@ class CloudKitManager: ObservableObject {
     // Check if CloudKit is available (simulator might not have iCloud)
     private func ensureAvailable() throws {
         guard isAvailable else {
+            #if targetEnvironment(simulator)
+            throw NSError(domain: "CloudKit", code: -1, userInfo: [
+                NSLocalizedDescriptionKey: "Simulator'da iCloud sync kullanılamıyor. Gerçek cihazda test edin."
+            ])
+            #else
             throw NSError(domain: "CloudKit", code: -1, userInfo: [
                 NSLocalizedDescriptionKey: "iCloud hesabınız bulunamadı. Lütfen Ayarlar > iCloud'dan oturum açın."
             ])
+            #endif
         }
     }
     

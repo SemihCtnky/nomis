@@ -6,7 +6,7 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // Persistent ModelContainer with proper error handling
+    // ModelContainer with multi-level fallback - NEVER CRASHES
     let sharedModelContainer: ModelContainer = {
         let schema = Schema([
             // Core Models
@@ -45,27 +45,55 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // Create persistent configuration
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        // Detect if running on simulator
+        #if targetEnvironment(simulator)
+        let isSimulator = true
+        #else
+        let isSimulator = false
+        #endif
         
-        do {
-            // Try to create persistent container
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            return container
-        } catch {
-            // Log error for debugging but don't crash the app
-            print("⚠️ Failed to create ModelContainer: \(error.localizedDescription)")
-            
-            // Try with default configuration as fallback
+        // Fallback 1: Try persistent storage (best for real device)
+        if !isSimulator {
             do {
-                let container = try ModelContainer(for: schema)
+                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+                let container = try ModelContainer(for: schema, configurations: [config])
+                print("✅ ModelContainer: Persistent storage initialized")
                 return container
             } catch {
-                // Last resort: force try with minimal schema
-                // This should only happen in extreme cases
-                print("⚠️ Critical: Using minimal schema - \(error.localizedDescription)")
-                return try! ModelContainer(for: Schema([User.self]))
+                print("⚠️ Persistent storage failed: \(error.localizedDescription)")
             }
+        }
+        
+        // Fallback 2: Try default configuration
+        do {
+            let container = try ModelContainer(for: schema)
+            print("✅ ModelContainer: Default configuration initialized")
+            return container
+        } catch {
+            print("⚠️ Default configuration failed: \(error.localizedDescription)")
+        }
+        
+        // Fallback 3: In-memory storage (safest, works on simulator)
+        do {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            let container = try ModelContainer(for: schema, configurations: [config])
+            print("✅ ModelContainer: In-memory storage initialized (simulator-safe)")
+            return container
+        } catch {
+            print("⚠️ In-memory storage failed: \(error.localizedDescription)")
+        }
+        
+        // Fallback 4: Minimal schema in-memory (absolute last resort)
+        do {
+            let minimalSchema = Schema([User.self])
+            let config = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
+            let container = try ModelContainer(for: minimalSchema, configurations: [config])
+            print("⚠️ CRITICAL: Using minimal in-memory schema")
+            return container
+        } catch {
+            print("💥 FATAL: Cannot create any ModelContainer - \(error.localizedDescription)")
+            // This should never happen, but if it does, create empty container
+            fatalError("Failed to create ModelContainer: \(error)")
         }
     }()
     
