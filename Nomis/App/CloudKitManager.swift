@@ -1,0 +1,216 @@
+import Foundation
+import CloudKit
+import SwiftData
+
+/// CloudKit Public Database Manager
+/// Manages sync between local SwiftData and CloudKit Public Database
+@MainActor
+class CloudKitManager: ObservableObject {
+    static let shared = CloudKitManager()
+    
+    // CloudKit Container and Database
+    private let container: CKContainer
+    private let publicDatabase: CKDatabase
+    
+    // Sync state
+    @Published var isSyncing = false
+    @Published var lastSyncDate: Date?
+    @Published var syncError: String?
+    
+    // Record types
+    enum RecordType: String {
+        case gunlukForm = "YeniGunlukForm"
+        case sarnelForm = "SarnelForm"
+        case kilitForm = "KilitToplamaForm"
+        case note = "Note"
+        case modelItem = "ModelItem"
+        case companyItem = "CompanyItem"
+    }
+    
+    private init() {
+        // Use your Bundle ID as container identifier
+        self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim")
+        self.publicDatabase = container.publicCloudDatabase
+    }
+    
+    // MARK: - Account Status
+    
+    /// Check if user is signed in to iCloud
+    func checkAccountStatus() async throws -> CKAccountStatus {
+        return try await container.accountStatus()
+    }
+    
+    // MARK: - Upload (Local → CloudKit)
+    
+    /// Upload a record to CloudKit
+    func uploadRecord(_ record: CKRecord) async throws {
+        isSyncing = true
+        defer { isSyncing = false }
+        
+        do {
+            let _ = try await publicDatabase.save(record)
+            lastSyncDate = Date()
+            syncError = nil
+        } catch {
+            syncError = "Upload failed: \(error.localizedDescription)"
+            throw error
+        }
+    }
+    
+    /// Upload multiple records in batch
+    func uploadRecords(_ records: [CKRecord]) async throws {
+        guard !records.isEmpty else { return }
+        
+        isSyncing = true
+        defer { isSyncing = false }
+        
+        // CloudKit batch limit is 400 records
+        let batches = records.chunked(into: 400)
+        
+        for batch in batches {
+            let operation = CKModifyRecordsOperation(recordsToSave: batch, recordIDsToDelete: nil)
+            operation.savePolicy = .changedKeys
+            operation.qualityOfService = .userInitiated
+            
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                operation.modifyRecordsCompletionBlock = { savedRecords, deletedRecordIDs, error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+                publicDatabase.add(operation)
+            }
+        }
+        
+        lastSyncDate = Date()
+        syncError = nil
+    }
+    
+    // MARK: - Download (CloudKit → Local)
+    
+    /// Fetch all records of a specific type
+    func fetchRecords(ofType recordType: RecordType) async throws -> [CKRecord] {
+        let query = CKQuery(recordType: recordType.rawValue, predicate: NSPredicate(value: true))
+        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        
+        var allRecords: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        
+        repeat {
+            let (records, nextCursor) = try await fetchRecordsWithCursor(query: query, cursor: cursor)
+            allRecords.append(contentsOf: records)
+            cursor = nextCursor
+        } while cursor != nil
+        
+        return allRecords
+    }
+    
+    private func fetchRecordsWithCursor(query: CKQuery, cursor: CKQueryOperation.Cursor?) async throws -> ([CKRecord], CKQueryOperation.Cursor?) {
+        try await withCheckedThrowingContinuation { continuation in
+            let operation: CKQueryOperation
+            
+            if let cursor = cursor {
+                operation = CKQueryOperation(cursor: cursor)
+            } else {
+                operation = CKQueryOperation(query: query)
+            }
+            
+            operation.resultsLimit = 100
+            var fetchedRecords: [CKRecord] = []
+            
+            operation.recordFetchedBlock = { record in
+                fetchedRecords.append(record)
+            }
+            
+            operation.queryCompletionBlock = { cursor, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(returning: (fetchedRecords, cursor))
+                }
+            }
+            
+            publicDatabase.add(operation)
+        }
+    }
+    
+    // MARK: - Delete
+    
+    /// Delete a record from CloudKit
+    func deleteRecord(withID recordID: CKRecord.ID) async throws {
+        isSyncing = true
+        defer { isSyncing = false }
+        
+        do {
+            let _ = try await publicDatabase.deleteRecord(withID: recordID)
+            lastSyncDate = Date()
+            syncError = nil
+        } catch {
+            syncError = "Delete failed: \(error.localizedDescription)"
+            throw error
+        }
+    }
+    
+    /// Delete multiple records
+    func deleteRecords(withIDs recordIDs: [CKRecord.ID]) async throws {
+        guard !recordIDs.isEmpty else { return }
+        
+        isSyncing = true
+        defer { isSyncing = false }
+        
+        let batches = recordIDs.chunked(into: 400)
+        
+        for batch in batches {
+            let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: batch)
+            operation.qualityOfService = .userInitiated
+            
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                operation.modifyRecordsCompletionBlock = { _, _, error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+                publicDatabase.add(operation)
+            }
+        }
+        
+        lastSyncDate = Date()
+        syncError = nil
+    }
+    
+    // MARK: - Sync Changes (Incremental)
+    
+    /// Fetch only records modified after a certain date
+    func fetchRecordsModifiedAfter(_ date: Date, ofType recordType: RecordType) async throws -> [CKRecord] {
+        let predicate = NSPredicate(format: "modificationDate > %@", date as NSDate)
+        let query = CKQuery(recordType: recordType.rawValue, predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
+        
+        var allRecords: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        
+        repeat {
+            let (records, nextCursor) = try await fetchRecordsWithCursor(query: query, cursor: cursor)
+            allRecords.append(contentsOf: records)
+            cursor = nextCursor
+        } while cursor != nil
+        
+        return allRecords
+    }
+}
+
+// MARK: - Helper Extensions
+
+extension Array {
+    /// Split array into chunks of specified size
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
+    }
+}
+
