@@ -92,7 +92,7 @@ struct DailyOperationsEditorView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
-                ScrollView(.vertical, showsIndicators: true) {
+                ScrollView([.vertical, .horizontal], showsIndicators: true) {
                     LazyVStack(spacing: 0, pinnedViews: []) {
                         // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
                         ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { gunIndex, gunVerisi in

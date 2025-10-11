@@ -1187,7 +1187,7 @@ struct StableTableHeader: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(columns, id: \.self) { column in
+            ForEach(Array(columns.enumerated()), id: \.offset) { index, column in
                 Text(column)
                     .font(.system(size: NomisTheme.headlineSize, weight: NomisTheme.headlineWeight))
                     .foregroundColor(NomisTheme.blackNight)
