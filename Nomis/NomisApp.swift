@@ -8,6 +8,93 @@ struct NomisApp: App {
     
     // SAFE ModelContainer - ASLA CRASH OLMAZ
     let sharedModelContainer: ModelContainer? = {
+        // TEST 1: Sadece User modeli
+        print("🔍 TEST 1: Sadece User...")
+        do {
+            let schema1 = Schema([User.self])
+            let container1 = try ModelContainer(for: schema1, configurations: [ModelConfiguration(schema: schema1, isStoredInMemoryOnly: true)])
+            print("✅ User.self çalışıyor!")
+        } catch {
+            print("❌ User.self FAIL: \(error)")
+            return nil
+        }
+        
+        // TEST 2: Core models
+        print("🔍 TEST 2: Core models...")
+        do {
+            let schema2 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self])
+            let container2 = try ModelContainer(for: schema2, configurations: [ModelConfiguration(schema: schema2, isStoredInMemoryOnly: true)])
+            print("✅ Core models çalışıyor!")
+        } catch {
+            print("❌ Core models FAIL: \(error)")
+            return nil
+        }
+        
+        // TEST 3: Sarnel forms
+        print("🔍 TEST 3: Sarnel forms...")
+        do {
+            let schema3 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self, SarnelForm.self, AsitItem.self, FireItem.self])
+            let container3 = try ModelContainer(for: schema3, configurations: [ModelConfiguration(schema: schema3, isStoredInMemoryOnly: true)])
+            print("✅ Sarnel forms çalışıyor!")
+        } catch {
+            print("❌ Sarnel forms FAIL: \(error)")
+            return nil
+        }
+        
+        // TEST 4: Kilit forms
+        print("🔍 TEST 4: Kilit forms...")
+        do {
+            let schema4 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self, SarnelForm.self, AsitItem.self, FireItem.self, KilitToplamaForm.self, KilitItem.self])
+            let container4 = try ModelContainer(for: schema4, configurations: [ModelConfiguration(schema: schema4, isStoredInMemoryOnly: true)])
+            print("✅ Kilit forms çalışıyor!")
+        } catch {
+            print("❌ Kilit forms FAIL: \(error)")
+            return nil
+        }
+        
+        // TEST 5: Legacy Gunluk (FULL)
+        print("🔍 TEST 5: Legacy Gunluk (FULL)...")
+        do {
+            let schema5 = Schema([
+                User.self, Note.self, ModelItem.self, CompanyItem.self,
+                SarnelForm.self, AsitItem.self, FireItem.self,
+                KilitToplamaForm.self, KilitItem.self,
+                GunlukForm.self,
+                TezgahCard.self, TezgahRow.self, ParcaDeger.self,
+                OcakCard.self, OcakRow.self,
+                PatlatmaCard.self, CilaCard.self, TamburCard.self,
+                MakineKesmeCard.self, TestereKesmeCard.self
+            ])
+            let container5 = try ModelContainer(for: schema5, configurations: [ModelConfiguration(schema: schema5, isStoredInMemoryOnly: true)])
+            print("✅ Legacy Gunluk (FULL) çalışıyor!")
+        } catch {
+            print("❌ Legacy Gunluk (FULL) FAIL: \(error)")
+            return nil
+        }
+        
+        // TEST 6: Yeni Gunluk (ŞÜPHELİ!)
+        print("🔍 TEST 6: Yeni Gunluk models...")
+        do {
+            let schema6 = Schema([
+                User.self, Note.self, ModelItem.self, CompanyItem.self,
+                SarnelForm.self, AsitItem.self, FireItem.self,
+                KilitToplamaForm.self, KilitItem.self,
+                GunlukForm.self,
+                YeniGunlukForm.self, GunlukGunVerisi.self,
+                TezgahKarti.self, TezgahSatiri.self,
+                CilaKarti.self, OcakKarti.self,
+                PatlatmaKarti.self, TamburKarti.self,
+                MakineKesmeKarti.self, TestereKesmeKarti.self,
+                FireEklemesi.self, GenisletilebilirDeger.self, IslemSatiri.self
+            ])
+            let container6 = try ModelContainer(for: schema6, configurations: [ModelConfiguration(schema: schema6, isStoredInMemoryOnly: true)])
+            print("✅ Yeni Gunluk çalışıyor!")
+            return container6
+        } catch {
+            print("❌ Yeni Gunluk FAIL: \(error)")
+            return nil
+        }
+        
         let schema = Schema([
             // Core Models
             User.self,
