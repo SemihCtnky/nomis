@@ -5,11 +5,14 @@ Kilitçim, kuyumcu atölyeleri için tasarlanmış profesyonel bir iOS uygulamas
 ## ✨ Özellikler
 
 ### Ana Özellikler
-- **Rol Tabanlı Erişim**: Admin ve görüntüleyici rolleri
+- **CloudKit Senkronizasyon**: Manuel senkronizasyon ile çoklu cihaz desteği
+- **Rol Tabanlı Erişim**: Admin, görüntüleyici ve silme rolleri
 - **Otomatik Kaydetme**: 3 saniyede bir taslak kaydetme
 - **Güvenli Kimlik Doğrulama**: Keychain tabanlı güvenli şifre saklama
 - **Kapsamlı Yedekleme**: JSON/CSV export/import + ZIP desteği
 - **Gelişmiş Analiz**: Tarih, ayar ve kart bazlı fire analizi
+- **Dark Mode**: Sistem teması desteği
+- **Zoom ve Kaydırma**: Tüm formlarda pinch-to-zoom desteği
 
 ### 📱 Modüller
 
@@ -226,6 +229,20 @@ Bu uygulama üretim için hazırdır ve App Store'a yüklenebilir.
 
 ---
 
-**Versiyon**: 1.0.0  
+**Versiyon**: 1.2.0  
 **Son Güncelleme**: Ekim 2025  
 **Platform**: iOS 17.0+
+
+## 🆕 Sürüm Notları
+
+### Versiyon 1.2.0 (Güncel)
+- ✅ CloudKit manuel senkronizasyon eklendi (çoklu cihaz desteği)
+- ✅ Güvenli silme mekanizması (sadece yetkili kullanıcılar)
+- ✅ Formlar varsayılan olarak salt-okunur açılır
+- ✅ Tüm formlarda pinch-to-zoom desteği
+- ✅ Performans iyileştirmeleri (LazyVStack/LazyHStack)
+- ✅ TextField Enter tuşu navigasyonu
+- ✅ Dark Mode desteği
+- ✅ Metin sarma ve çok satırlı görüntüleme
+- ✅ Tezgah kartında haftalık fire özeti güncellendi
+- ✅ Swipe-to-delete kaldırıldı, güvenli silme butonu eklendi

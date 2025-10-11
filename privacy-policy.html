@@ -109,7 +109,7 @@
 <body>
     <div class="container">
         <h1>Gizlilik Politikası</h1>
-        <p class="updated">Son Güncelleme: 1 Ekim 2025</p>
+        <p class="updated">Son Güncelleme: 11 Ekim 2025</p>
 
         <div class="highlight">
             <p><strong>Kilitçim</strong>, gizliliğinize saygı duyar ve kişisel verilerinizi korumayı taahhüt eder. Bu gizlilik politikası, Kilitçim iOS uygulamasını kullandığınızda hangi bilgilerin toplandığını, nasıl kullanıldığını ve korunduğunu açıklar.</p>
@@ -181,9 +181,24 @@
         
         <h3>4.1 Veri Saklama</h3>
         <ul>
-            <li>Veriler, kullanıcı silene kadar cihazda saklanır</li>
-            <li>Uygulama silindiğinde tüm veriler kalıcı olarak silinir</li>
-            <li>iCloud yedekleme aktifse, iOS tarafından yedeklenir (kullanıcı kontrolünde)</li>
+            <li>Veriler öncelikle cihazınızda yerel olarak saklanır</li>
+            <li>Manuel senkronizasyon özelliği ile CloudKit Public Database'de saklanabilir (opsiyonel)</li>
+            <li>CloudKit senkronizasyonu kullanıcı tarafından manuel olarak başlatılır</li>
+            <li>Senkronize edilen veriler Apple'ın CloudKit altyapısında güvenle saklanır</li>
+            <li>Uygulama silindiğinde cihaz üzerindeki tüm veriler kalıcı olarak silinir</li>
+            <li>CloudKit'teki veriler manuel silme gerektir (yetkili kullanıcılar tarafından)</li>
+            <li>iCloud yedekleme aktifse, iOS tarafından yerel veriler yedeklenir (kullanıcı kontrolünde)</li>
+        </ul>
+        
+        <h3>4.1.1 CloudKit Senkronizasyon</h3>
+        <p><strong>Önemli:</strong> CloudKit senkronizasyon özelliği tamamen opsiyoneldir ve kullanıcı kontrolündedir.</p>
+        <ul>
+            <li>Senkronizasyon <strong>yalnızca manuel olarak</strong> başlatılır (otomatik değil)</li>
+            <li>Ana ekranda senkronizasyon butonu (⟳) ile aktif edilir</li>
+            <li>Public Database kullanılır - aynı uygulamayı kullanan tüm yetkili kullanıcılar verilere erişebilir</li>
+            <li>Veriler şifrelenmiş bağlantı üzerinden Apple sunucularına gönderilir</li>
+            <li>Çoklu cihaz ve çoklu kullanıcı işbirliği sağlar</li>
+            <li>Bir cihazda yapılan değişiklikler, senkronizasyon sonrası diğer cihazlarda görünür</li>
         </ul>
 
         <h3>4.2 Veri Silme Hakkı</h3>
