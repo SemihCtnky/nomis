@@ -228,7 +228,13 @@ struct DailyOperationsEditorView: View {
             )
         }
         .onAppear {
-            if !isNewForm {
+            if isNewForm {
+                // YENİ FORM: Haftalık günleri oluştur
+                if form.gunlukVeriler.isEmpty {
+                    form.createWeeklyDays()
+                    print("✅ Yeni form için hafta günleri oluşturuldu: \(form.gunlukVeriler.count) gün")
+                }
+            } else {
                 // Mevcut form için orderIndex kontrolü yap
                 ensureOrderIndexForExistingRows()
                 
