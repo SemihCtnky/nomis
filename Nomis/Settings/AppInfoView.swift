@@ -26,9 +26,9 @@ struct AppInfoView: View {
                 // App Information
                 VStack(spacing: 20) {
                     InfoRowView(title: "Uygulama Adı", value: "NOMIS")
-                    InfoRowView(title: "Versiyon", value: "1.0.0")
+                    InfoRowView(title: "Versiyon", value: "1.2.0")
                     InfoRowView(title: "Geliştirici", value: "NOMIS Team")
-                    InfoRowView(title: "Son Güncelleme", value: "2024")
+                    InfoRowView(title: "Son Güncelleme", value: "2025")
                 }
                 .padding()
                 .background(NomisTheme.lightCream)

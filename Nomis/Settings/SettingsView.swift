@@ -130,7 +130,7 @@ struct AppInfoView: View {
                     HStack {
                         Text("Versiyon")
                         Spacer()
-                        Text("1.0.0")
+                        Text("1.2.0")
                             .foregroundColor(NomisTheme.secondary)
                     }
                 
@@ -947,9 +947,9 @@ struct AdminSystemInfoTab: View {
             VStack(spacing: 20) {
                 AdminInfoCard(title: "Uygulama Bilgileri", items: [
                     ("Uygulama Adı", "Kilitçim"),
-                    ("Versiyon", "1.0.0"),
+                    ("Versiyon", "1.2.0"),
                     ("Platform", "iOS"),
-                    ("Build", "2024.1")
+                    ("Build", "2025.1")
                 ])
                 
                 AdminInfoCard(title: "Sistem Bilgileri", items: [
