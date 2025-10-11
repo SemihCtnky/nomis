@@ -6,13 +6,15 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // SAFE ModelContainer - ASLA CRASH OLMAZ
+    // SAFE ModelContainer - CloudKit OTOMATIK SYNC KAPALI!
     let sharedModelContainer: ModelContainer? = {
-        // TEST 1: Sadece User modeli
-        print("🔍 TEST 1: Sadece User...")
+        // TEST 1: Sadece User modeli (CloudKit .none)
+        print("🔍 TEST 1: Sadece User (CloudKit KAPALI)...")
         do {
             let schema1 = Schema([User.self])
-            let container1 = try ModelContainer(for: schema1, configurations: [ModelConfiguration(schema: schema1, isStoredInMemoryOnly: true)])
+            var config1 = ModelConfiguration(schema: schema1)
+            config1.cloudKitDatabase = .none  // ← KRITIK: CloudKit otomatik sync KAPALI!
+            let container1 = try ModelContainer(for: schema1, configurations: [config1])
             print("✅ User.self çalışıyor!")
         } catch {
             print("❌ User.self FAIL: \(error)")
@@ -23,7 +25,9 @@ struct NomisApp: App {
         print("🔍 TEST 2: Core models...")
         do {
             let schema2 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self])
-            let container2 = try ModelContainer(for: schema2, configurations: [ModelConfiguration(schema: schema2, isStoredInMemoryOnly: true)])
+            var config2 = ModelConfiguration(schema: schema2)
+            config2.cloudKitDatabase = .none
+            let container2 = try ModelContainer(for: schema2, configurations: [config2])
             print("✅ Core models çalışıyor!")
         } catch {
             print("❌ Core models FAIL: \(error)")
@@ -34,7 +38,9 @@ struct NomisApp: App {
         print("🔍 TEST 3: Sarnel forms...")
         do {
             let schema3 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self, SarnelForm.self, AsitItem.self, FireItem.self])
-            let container3 = try ModelContainer(for: schema3, configurations: [ModelConfiguration(schema: schema3, isStoredInMemoryOnly: true)])
+            var config3 = ModelConfiguration(schema: schema3)
+            config3.cloudKitDatabase = .none
+            let container3 = try ModelContainer(for: schema3, configurations: [config3])
             print("✅ Sarnel forms çalışıyor!")
         } catch {
             print("❌ Sarnel forms FAIL: \(error)")
@@ -45,7 +51,9 @@ struct NomisApp: App {
         print("🔍 TEST 4: Kilit forms...")
         do {
             let schema4 = Schema([User.self, Note.self, ModelItem.self, CompanyItem.self, SarnelForm.self, AsitItem.self, FireItem.self, KilitToplamaForm.self, KilitItem.self])
-            let container4 = try ModelContainer(for: schema4, configurations: [ModelConfiguration(schema: schema4, isStoredInMemoryOnly: true)])
+            var config4 = ModelConfiguration(schema: schema4)
+            config4.cloudKitDatabase = .none
+            let container4 = try ModelContainer(for: schema4, configurations: [config4])
             print("✅ Kilit forms çalışıyor!")
         } catch {
             print("❌ Kilit forms FAIL: \(error)")
@@ -65,7 +73,9 @@ struct NomisApp: App {
                 PatlatmaCard.self, CilaCard.self, TamburCard.self,
                 MakineKesmeCard.self, TestereKesmeCard.self
             ])
-            let container5 = try ModelContainer(for: schema5, configurations: [ModelConfiguration(schema: schema5, isStoredInMemoryOnly: true)])
+            var config5 = ModelConfiguration(schema: schema5)
+            config5.cloudKitDatabase = .none
+            let container5 = try ModelContainer(for: schema5, configurations: [config5])
             print("✅ Legacy Gunluk (FULL) çalışıyor!")
         } catch {
             print("❌ Legacy Gunluk (FULL) FAIL: \(error)")
@@ -87,7 +97,9 @@ struct NomisApp: App {
                 MakineKesmeKarti.self, TestereKesmeKarti.self,
                 FireEklemesi.self, GenisletilebilirDeger.self, IslemSatiri.self
             ])
-            let container6 = try ModelContainer(for: schema6, configurations: [ModelConfiguration(schema: schema6, isStoredInMemoryOnly: true)])
+            var config6 = ModelConfiguration(schema: schema6)
+            config6.cloudKitDatabase = .none
+            let container6 = try ModelContainer(for: schema6, configurations: [config6])
             print("✅ Yeni Gunluk çalışıyor!")
             return container6
         } catch {
@@ -132,27 +144,14 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // Try 1: Default
+        // Fallback: Try default with CloudKit disabled
+        print("🔍 FALLBACK: Default schema with CloudKit disabled...")
         do {
-            return try ModelContainer(for: schema)
-        } catch {
-            print("❌ Default failed: \(error)")
-        }
-        
-        // Try 2: In-memory
-        do {
-            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            var config = ModelConfiguration(schema: schema)
+            config.cloudKitDatabase = .none  // CloudKit otomatik sync KAPALI!
             return try ModelContainer(for: schema, configurations: [config])
         } catch {
-            print("❌ In-memory failed: \(error)")
-        }
-        
-        // Try 3: Minimal schema
-        do {
-            let minimalSchema = Schema([User.self])
-            return try ModelContainer(for: minimalSchema)
-        } catch {
-            print("❌ Even User.self failed: \(error)")
+            print("❌ Default failed: \(error)")
         }
         
         // Give up - return nil
