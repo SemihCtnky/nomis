@@ -6,8 +6,8 @@ struct NomisApp: App {
     @StateObject private var authManager = AuthenticationManager()
     @Environment(\.scenePhase) private var scenePhase
     
-    // BASİT VE ÇALIŞAN ModelContainer - Karmaşık yapma!
-    let sharedModelContainer: ModelContainer = {
+    // SAFE ModelContainer - ASLA CRASH OLMAZ
+    let sharedModelContainer: ModelContainer? = {
         let schema = Schema([
             // Core Models
             User.self,
@@ -45,20 +45,32 @@ struct NomisApp: App {
             IslemSatiri.self
         ])
         
-        // Basit: Direkt ModelContainer oluştur
+        // Try 1: Default
         do {
             return try ModelContainer(for: schema)
         } catch {
-            // Eğer hata varsa in-memory dene
-            do {
-                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                return try ModelContainer(for: schema, configurations: [config])
-            } catch {
-                // Son çare: Minimal schema
-                let minimalSchema = Schema([User.self])
-                return try! ModelContainer(for: minimalSchema)
-            }
+            print("❌ Default failed: \(error)")
         }
+        
+        // Try 2: In-memory
+        do {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try ModelContainer(for: schema, configurations: [config])
+        } catch {
+            print("❌ In-memory failed: \(error)")
+        }
+        
+        // Try 3: Minimal schema
+        do {
+            let minimalSchema = Schema([User.self])
+            return try ModelContainer(for: minimalSchema)
+        } catch {
+            print("❌ Even User.self failed: \(error)")
+        }
+        
+        // Give up - return nil
+        print("💥 CANNOT CREATE ANY ModelContainer")
+        return nil
     }()
     
     init() {
@@ -77,12 +89,30 @@ struct NomisApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(authManager)
-                .modelContainer(sharedModelContainer)
-                .onChange(of: scenePhase) { _, newPhase in
-                    handleScenePhaseChange(newPhase)
+            if let container = sharedModelContainer {
+                ContentView()
+                    .environmentObject(authManager)
+                    .modelContainer(container)
+                    .onChange(of: scenePhase) { _, newPhase in
+                        handleScenePhaseChange(newPhase)
+                    }
+            } else {
+                VStack(spacing: 20) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.red)
+                    
+                    Text("Veri Sistemi Başlatılamadı")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    
+                    Text("Uygulamayı yeniden başlatın veya destek alın.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
                 }
+                .padding()
+            }
         }
     }
     
@@ -98,7 +128,8 @@ struct NomisApp: App {
     }
     
     private func saveAllDrafts() {
-        let context = sharedModelContainer.mainContext
+        guard let container = sharedModelContainer else { return }
+        let context = container.mainContext
         guard context.hasChanges else { return }
         
         do {
