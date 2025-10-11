@@ -652,11 +652,21 @@ struct DailyOperationsEditorView: View {
                 )
                 .animation(.none, value: UUID()) // Disable table animations completely
                 
-                // Fire Summary Table
-                let fireData = calculateFireByAyar(for: cilaKarti.satirlar)
-                FireSummaryTable(fireData: fireData)
-                    .padding(.top, 8)
-                    .padding(.horizontal, 16)
+                // Boşluk ekle - fire tablosu için
+                Spacer()
+                    .frame(height: 16)
+                
+                // Fire Summary Table - VStack içinde wrap et
+                VStack(spacing: 0) {
+                    let fireData = calculateFireByAyar(for: cilaKarti.satirlar)
+                    FireSummaryTable(fireData: fireData)
+                        .padding(.horizontal, 16)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Alt boşluk
+                Spacer()
+                    .frame(height: 16)
             }
         }
         .luxuryTableContainer()
@@ -717,11 +727,21 @@ struct DailyOperationsEditorView: View {
                 )
                 .animation(.none, value: UUID()) // Disable table animations completely
                 
-                // Fire Summary Table
-                let fireData = calculateFireByAyar(for: ocakKarti.satirlar)
-                FireSummaryTable(fireData: fireData)
-                    .padding(.top, 8)
-                    .padding(.horizontal, 16)
+                // Boşluk ekle - fire tablosu için
+                Spacer()
+                    .frame(height: 16)
+                
+                // Fire Summary Table - VStack içinde wrap et
+                VStack(spacing: 0) {
+                    let fireData = calculateFireByAyar(for: ocakKarti.satirlar)
+                    FireSummaryTable(fireData: fireData)
+                        .padding(.horizontal, 16)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Alt boşluk
+                Spacer()
+                    .frame(height: 16)
             }
         }
         .luxuryTableContainer()
@@ -762,11 +782,21 @@ struct DailyOperationsEditorView: View {
                     }
                 )
                 
-                // Fire Summary Table
-                let fireData = calculateFireByAyar(for: patlatmaKarti.satirlar)
-                FireSummaryTable(fireData: fireData)
-                    .padding(.top, 8)
-                    .padding(.horizontal, 16)
+                // Boşluk ekle - fire tablosu için
+                Spacer()
+                    .frame(height: 16)
+                
+                // Fire Summary Table - VStack içinde wrap et
+                VStack(spacing: 0) {
+                    let fireData = calculateFireByAyar(for: patlatmaKarti.satirlar)
+                    FireSummaryTable(fireData: fireData)
+                        .padding(.horizontal, 16)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Alt boşluk
+                Spacer()
+                    .frame(height: 16)
             }
         }
         .luxuryTableContainer()
@@ -807,11 +837,21 @@ struct DailyOperationsEditorView: View {
                     }
                 )
                 
-                // Fire Summary Table
-                let fireData = calculateFireByAyar(for: tamburKarti.satirlar)
-                FireSummaryTable(fireData: fireData)
-                    .padding(.top, 8)
-                    .padding(.horizontal, 16)
+                // Boşluk ekle - fire tablosu için
+                Spacer()
+                    .frame(height: 16)
+                
+                // Fire Summary Table - VStack içinde wrap et
+                VStack(spacing: 0) {
+                    let fireData = calculateFireByAyar(for: tamburKarti.satirlar)
+                    FireSummaryTable(fireData: fireData)
+                        .padding(.horizontal, 16)
+                }
+                .frame(maxWidth: .infinity)
+                
+                // Alt boşluk
+                Spacer()
+                    .frame(height: 16)
             }
         }
         .luxuryTableContainer()
