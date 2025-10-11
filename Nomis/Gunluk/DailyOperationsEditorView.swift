@@ -1021,14 +1021,18 @@ struct DailyOperationsEditorView: View {
     private func ensureMakineKesmeKarti(for gunVerisi: GunlukGunVerisi, cardIndex: Int) {
         // Sadece cardIndex 1 destekleniyor (tek kart)
         if cardIndex == 1 && gunVerisi.makineKesmeKarti1 == nil {
-            gunVerisi.makineKesmeKarti1 = MakineKesmeKarti()
+            let kart = MakineKesmeKarti()
+            kart.ensureRows() // ← SATIRLARI OLUŞTUR!
+            gunVerisi.makineKesmeKarti1 = kart
         }
     }
     
     private func ensureTestereKesmeKarti(for gunVerisi: GunlukGunVerisi, cardIndex: Int) {
         // Sadece cardIndex 1 destekleniyor (tek kart)
         if cardIndex == 1 && gunVerisi.testereKesmeKarti1 == nil {
-            gunVerisi.testereKesmeKarti1 = TestereKesmeKarti()
+            let kart = TestereKesmeKarti()
+            kart.ensureRows() // ← SATIRLARI OLUŞTUR!
+            gunVerisi.testereKesmeKarti1 = kart
         }
     }
     

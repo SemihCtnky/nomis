@@ -163,7 +163,7 @@ struct TableHeader: View {
     
     var body: some View {
         HStack {
-            ForEach(columns, id: \.self) { column in
+            ForEach(Array(columns.enumerated()), id: \.offset) { index, column in
                 Text(column)
                     .font(.subheadline.weight(NomisTheme.headlineWeight))
                     .foregroundColor(NomisTheme.text)
@@ -192,7 +192,7 @@ struct TotalsRow: View {
                 .foregroundColor(NomisTheme.text)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            ForEach(values, id: \.self) { value in
+            ForEach(Array(values.enumerated()), id: \.offset) { index, value in
                 Text(value)
                     .font(.subheadline.weight(NomisTheme.headlineWeight))
                     .foregroundColor(NomisTheme.primary)
