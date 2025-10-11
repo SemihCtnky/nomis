@@ -407,7 +407,13 @@ struct StableTezgahTableRow: View {
     let satir: TezgahSatiri
     let index: Int
     let isReadOnly: Bool
+    
     @State private var localChanges = false
+    
+    enum Field: Hashable {
+        case giris, solAciklama, cikis, sagAciklama
+    }
+    @FocusState private var localFocus: Field?
     
     var body: some View {
         HStack(spacing: 0) {
@@ -419,8 +425,12 @@ struct StableTezgahTableRow: View {
                 ),
                 placeholder: "Açıklama",
                 isEnabled: !isReadOnly,
-                createdAt: satir.aciklamaGirisTarihi
+                createdAt: satir.aciklamaGirisTarihi,
+                onSubmit: {
+                    localFocus = .giris
+                }
             )
+            .focused($localFocus, equals: .solAciklama)
             
             // Giriş Value
             StableNumberCell(
@@ -429,9 +439,13 @@ struct StableTezgahTableRow: View {
                     set: { satir.girisValue = $0; markChanged() }
                 ),
                 placeholder: "0",
-                    unit: "",
-                isEnabled: !isReadOnly
+                unit: "",
+                isEnabled: !isReadOnly,
+                onSubmit: {
+                    localFocus = .solAciklama
+                }
             )
+            .focused($localFocus, equals: .giris)
             
             // Çıkış Value
             StableNumberCell(
@@ -440,9 +454,13 @@ struct StableTezgahTableRow: View {
                     set: { satir.cikisValue = $0; markChanged() }
                 ),
                 placeholder: "0",
-                    unit: "",
-                isEnabled: !isReadOnly
+                unit: "",
+                isEnabled: !isReadOnly,
+                onSubmit: {
+                    localFocus = .sagAciklama
+                }
             )
+            .focused($localFocus, equals: .cikis)
             
             // Açıklama Çıkış
             StableEditableCell(
@@ -452,8 +470,12 @@ struct StableTezgahTableRow: View {
                 ),
                 placeholder: "Açıklama",
                 isEnabled: !isReadOnly,
-                createdAt: satir.aciklamaCikisTarihi
+                createdAt: satir.aciklamaCikisTarihi,
+                onSubmit: {
+                    localFocus = .cikis
+                }
             )
+            .focused($localFocus, equals: .sagAciklama)
             
         }
         .frame(height: 55) // Fixed height prevents jumping
@@ -488,6 +510,11 @@ struct StableIslemTableRow: View {
     let onAddRowAfter: ((Int) -> Void)? // Yeni satır ekleme callback'i
     @State private var localChanges = false
     
+    enum Field: Hashable {
+        case solAciklama, giris, cikis, fireAciklama, ayar
+    }
+    @FocusState private var localFocus: Field?
+    
     var body: some View {
         HStack(spacing: 0) {
             // Açıklama Giriş
@@ -498,8 +525,12 @@ struct StableIslemTableRow: View {
                 ),
                 placeholder: "Açıklama",
                 isEnabled: !isReadOnly,
-                createdAt: satir.aciklamaGirisTarihi
+                createdAt: satir.aciklamaGirisTarihi,
+                onSubmit: {
+                    localFocus = .giris
+                }
             )
+            .focused($localFocus, equals: .solAciklama)
             
             // Giriş Value (editable via computed property)
             StableNumberCell(
@@ -509,8 +540,12 @@ struct StableIslemTableRow: View {
                 ),
                 placeholder: "0",
                 unit: "",
-                isEnabled: !isReadOnly
+                isEnabled: !isReadOnly,
+                onSubmit: {
+                    localFocus = .solAciklama
+                }
             )
+            .focused($localFocus, equals: .giris)
             
             // Çıkış Values - Expandable veya Normal
             Group {
@@ -558,8 +593,12 @@ struct StableIslemTableRow: View {
                         ),
                         placeholder: "0",
                         unit: "",
-                        isEnabled: !isReadOnly
+                        isEnabled: !isReadOnly,
+                        onSubmit: {
+                            localFocus = .fireAciklama
+                        }
                     )
+                    .focused($localFocus, equals: .cikis)
                 }
             }
             .frame(maxWidth: .infinity) // Consistent with other cells
@@ -595,8 +634,16 @@ struct StableIslemTableRow: View {
                 ),
                 placeholder: "Açıklama",
                 isEnabled: !isReadOnly,
-                createdAt: satir.aciklamaFireTarihi
+                createdAt: satir.aciklamaFireTarihi,
+                onSubmit: {
+                    if showAyarColumn {
+                        localFocus = .ayar
+                    } else {
+                        localFocus = .cikis
+                    }
+                }
             )
+            .focused($localFocus, equals: .fireAciklama)
             
             // Ayar (sadece Makine & Testere Kesme kartlarında göster)
             if showAyarColumn {
@@ -612,6 +659,7 @@ struct StableIslemTableRow: View {
                 }
                 .disabled(isReadOnly)
                 .pickerStyle(MenuPickerStyle())
+                .focused($localFocus, equals: .ayar)
                 .font(.system(size: NomisTheme.bodySize, weight: .semibold))
                 .foregroundColor(NomisTheme.prominentText)
                 .frame(maxWidth: .infinity, minHeight: 55) // Consistent with other cells
@@ -672,15 +720,17 @@ struct StableEditableCell: View {
     let isEnabled: Bool
     let createdAt: Date?
     let textColor: Color?
+    let onSubmit: (() -> Void)?
     
     @State private var showTooltip = false
     
-    init(text: Binding<String>, placeholder: String, isEnabled: Bool, createdAt: Date? = nil, textColor: Color? = nil) {
+    init(text: Binding<String>, placeholder: String, isEnabled: Bool, createdAt: Date? = nil, textColor: Color? = nil, onSubmit: (() -> Void)? = nil) {
         self._text = text
         self.placeholder = placeholder
         self.isEnabled = isEnabled
         self.createdAt = createdAt
         self.textColor = textColor
+        self.onSubmit = onSubmit
     }
     
     var body: some View {
@@ -695,6 +745,10 @@ struct StableEditableCell: View {
                 .lineLimit(2...4)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
+                .submitLabel(.next)
+                .onSubmit {
+                    onSubmit?()
+                }
             
             if !text.isEmpty && textColor != NomisTheme.destructive {
                 Button(action: { showTooltip.toggle() }) {
@@ -756,8 +810,17 @@ struct StableNumberCell: View {
     let placeholder: String
     let unit: String
     let isEnabled: Bool
+    let onSubmit: (() -> Void)?
     
     @State private var textValue: String = ""
+    
+    init(value: Binding<Double?>, placeholder: String = "0", unit: String = "", isEnabled: Bool, onSubmit: (() -> Void)? = nil) {
+        self._value = value
+        self.placeholder = placeholder
+        self.unit = unit
+        self.isEnabled = isEnabled
+        self.onSubmit = onSubmit
+    }
     
     var body: some View {
         HStack(spacing: NomisTheme.tinySpacing) {
@@ -767,6 +830,7 @@ struct StableNumberCell: View {
                 .multilineTextAlignment(.center)
                 .font(.system(size: NomisTheme.bodySize, weight: NomisTheme.bodyWeight))
                 .foregroundColor(isEnabled ? NomisTheme.darkText : NomisTheme.secondaryText)
+                .submitLabel(.next)
                 .onChange(of: textValue) { _, newValue in
                     value = NomisFormatters.parseDouble(from: newValue)
                 }
@@ -775,6 +839,9 @@ struct StableNumberCell: View {
                 }
                 .onChange(of: value) { _, _ in
                     updateTextValue()
+                }
+                .onSubmit {
+                    onSubmit?()
                 }
             
             if !unit.isEmpty {
