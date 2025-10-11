@@ -60,13 +60,25 @@ struct NomisApp: App {
         
         do {
             return try ModelContainer(for: schema, configurations: [config])
-        } catch {
+        } catch let persistentError {
             // Fallback: in-memory database
+            print("⚠️ Persistent storage failed: \(persistentError)")
             do {
                 let inMemoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+                print("✅ Using in-memory database as fallback")
                 return try ModelContainer(for: schema, configurations: [inMemoryConfig])
-            } catch {
-                fatalError("ModelContainer başlatılamadı: \(error)")
+            } catch let inMemoryError {
+                // Son çare: Minimal schema ile in-memory
+                print("❌ In-memory also failed: \(inMemoryError)")
+                let minimalSchema = Schema([User.self])
+                do {
+                    let minimalConfig = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+                    print("⚠️ Using minimal schema (User only)")
+                    return try ModelContainer(for: minimalSchema, configurations: [minimalConfig])
+                } catch {
+                    // Bu hiçbir zaman olmamalı ama güvenlik için
+                    fatalError("CRITICAL: Cannot initialize any ModelContainer: \(error)")
+                }
             }
         }
     }()
