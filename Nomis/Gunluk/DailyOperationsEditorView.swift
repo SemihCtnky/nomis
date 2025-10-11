@@ -379,6 +379,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750)
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureTezgahKarti(for: gunVerisi, cardIndex: cardIndex)
         }
@@ -660,6 +661,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750) // Ayar sütunu için daha geniş
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureCilaKarti(for: gunVerisi)
         }
@@ -724,6 +726,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750)
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureOcakKarti(for: gunVerisi)
         }
@@ -768,6 +771,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750)
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensurePatlatmaKarti(for: gunVerisi)
         }
@@ -812,6 +816,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750)
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureTamburKarti(for: gunVerisi)
         }
@@ -875,6 +880,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750) // Cila kartı ile aynı genişlik
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureMakineKesmeKarti(for: gunVerisi, cardIndex: cardIndex)
         }
@@ -938,6 +944,7 @@ struct DailyOperationsEditorView: View {
         }
         .luxuryTableContainer()
         .frame(width: 750) // Cila kartı ile aynı genişlik
+        .fixedSize(horizontal: false, vertical: true) // İçerik eklendikçe dikey genişle
         .onAppear {
             ensureTestereKesmeKarti(for: gunVerisi, cardIndex: cardIndex)
         }
