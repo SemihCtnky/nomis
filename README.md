@@ -229,13 +229,21 @@ Bu uygulama üretim için hazırdır ve App Store'a yüklenebilir.
 
 ---
 
-**Versiyon**: 1.2.0  
+**Versiyon**: 1.3.0  
 **Son Güncelleme**: Ekim 2025  
 **Platform**: iOS 17.0+
 
 ## 🆕 Sürüm Notları
 
-### Versiyon 1.2.0 (Güncel)
+### Versiyon 1.3.0 (Güncel)
+- ✅ CloudKit senkronizasyon iyileştirmeleri
+- ✅ Public Database ile farklı iCloud hesapları arası veri paylaşımı
+- ✅ Çoklu cihaz desteği (5+ cihaz)
+- ✅ Index optimizasyonu (daha hızlı sorgulama)
+- ✅ Production log temizliği
+- ✅ Stabil ve güvenilir senkronizasyon
+
+### Versiyon 1.2.0
 - ✅ CloudKit manuel senkronizasyon eklendi (çoklu cihaz desteği)
 - ✅ Güvenli silme mekanizması (sadece yetkili kullanıcılar)
 - ✅ Formlar varsayılan olarak salt-okunur açılır
