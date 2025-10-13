@@ -212,31 +212,27 @@ class CloudKitManager: ObservableObject {
                 case .success(let cursor):
                     continuation.resume(returning: (fetchedRecords, cursor))
                 case .failure(let error):
-                    // Check if this is the "queryable" field error
+                    // Check if this is "record type doesn't exist" (first sync on new container)
+                    let ckError = error as NSError
+                    if ckError.domain == CKErrorDomain && (ckError.code == CKError.unknownItem.rawValue || 
+                       error.localizedDescription.contains("UnknownItem") ||
+                       error.localizedDescription.contains("does not exist")) {
+                        // Record type doesn't exist yet - this is normal for first sync
+                        // Return empty array, upload will create the schema
+                        print("ℹ️ CloudKit: Record type doesn't exist yet (first sync)")
+                        continuation.resume(returning: ([], nil))
+                        return
+                    }
+                    
+                    // Check if this is the "queryable" field error (old schema issue)
                     let errorMessage = error.localizedDescription
                     if errorMessage.contains("queryable") || errorMessage.contains("recordName") {
-                        let customError = NSError(
-                            domain: "CloudKit",
-                            code: -2,
-                            userInfo: [
-                                NSLocalizedDescriptionKey: """
-                                ⚠️ CloudKit yapılandırma hatası tespit edildi.
-                                
-                                Çözüm:
-                                1. https://icloud.developer.apple.com/dashboard adresine gidin
-                                2. Container: iCloud.com.semihctnky.kilitcim seçin
-                                3. Schema → Development → Record Types
-                                4. TÜM custom record type'ları silin (Note, SarnelForm, vb.)
-                                5. Sadece "Users" record type'ı kalacak
-                                6. Production'da da aynısını yapın
-                                7. Uygulamayı tekrar başlatın
-                                
-                                İlk sync'te schema otomatik oluşturulacak.
-                                """
-                            ]
-                        )
-                        continuation.resume(throwing: customError)
+                        print("❌ CloudKit: Schema error - queryable field issue")
+                        print("❌ This usually means old schema exists in container")
+                        // Return empty to allow upload (which will fix schema)
+                        continuation.resume(returning: ([], nil))
                     } else {
+                        print("❌ CloudKit: Query failed - \(error)")
                         continuation.resume(throwing: error)
                     }
                 }
