@@ -30,7 +30,7 @@ class CloudKitManager: ObservableObject {
     
     private init() {
         // Use your Bundle ID as container identifier
-        self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim")
+        self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim2")
         self.publicDatabase = container.publicCloudDatabase
         
         // Detect simulator - CloudKit might not work properly
