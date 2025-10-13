@@ -198,7 +198,33 @@ class CloudKitManager: ObservableObject {
                 case .success(let cursor):
                     continuation.resume(returning: (fetchedRecords, cursor))
                 case .failure(let error):
-                    continuation.resume(throwing: error)
+                    // Check if this is the "queryable" field error
+                    let errorMessage = error.localizedDescription
+                    if errorMessage.contains("queryable") || errorMessage.contains("recordName") {
+                        let customError = NSError(
+                            domain: "CloudKit",
+                            code: -2,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: """
+                                ⚠️ CloudKit yapılandırma hatası tespit edildi.
+                                
+                                Çözüm:
+                                1. https://icloud.developer.apple.com/dashboard adresine gidin
+                                2. Container: iCloud.com.semihctnky.kilitcim seçin
+                                3. Schema → Development → Record Types
+                                4. TÜM custom record type'ları silin (Note, SarnelForm, vb.)
+                                5. Sadece "Users" record type'ı kalacak
+                                6. Production'da da aynısını yapın
+                                7. Uygulamayı tekrar başlatın
+                                
+                                İlk sync'te schema otomatik oluşturulacak.
+                                """
+                            ]
+                        )
+                        continuation.resume(throwing: customError)
+                    } else {
+                        continuation.resume(throwing: error)
+                    }
                 }
             }
             
