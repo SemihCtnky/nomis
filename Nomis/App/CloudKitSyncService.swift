@@ -165,18 +165,22 @@ class CloudKitSyncService: ObservableObject {
     private func syncGunlukForms(modelContext: ModelContext) async throws {
         // 1. Upload local forms to CloudKit
         let localForms = try modelContext.fetch(FetchDescriptor<YeniGunlukForm>())
+        #if DEBUG
         print("📤 UPLOAD: \(localForms.count) YeniGunlukForm found locally")
+        #endif
         let records = localForms.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
+            #if DEBUG
             print("✅ UPLOAD SUCCESS: \(records.count) YeniGunlukForm uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No YeniGunlukForm to upload")
+            #endif
         }
         
         // 2. Download CloudKit forms
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .gunlukForm)
+        #if DEBUG
         print("📥 DOWNLOAD: \(cloudRecords.count) YeniGunlukForm fetched from CloudKit")
+        #endif
         
         // 3. Merge: Update local or insert new
         for record in cloudRecords {
@@ -199,17 +203,12 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncSarnelForms(modelContext: ModelContext) async throws {
         let localForms = try modelContext.fetch(FetchDescriptor<SarnelForm>())
-        print("📤 UPLOAD: \(localForms.count) SarnelForm found locally")
         let records = localForms.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
-            print("✅ UPLOAD SUCCESS: \(records.count) SarnelForm uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No SarnelForm to upload")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .sarnelForm)
-        print("📥 DOWNLOAD: \(cloudRecords.count) SarnelForm fetched from CloudKit")
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
@@ -226,17 +225,12 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncKilitForms(modelContext: ModelContext) async throws {
         let localForms = try modelContext.fetch(FetchDescriptor<KilitToplamaForm>())
-        print("📤 UPLOAD: \(localForms.count) KilitToplamaForm found locally")
         let records = localForms.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
-            print("✅ UPLOAD SUCCESS: \(records.count) KilitToplamaForm uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No KilitToplamaForm to upload")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .kilitForm)
-        print("📥 DOWNLOAD: \(cloudRecords.count) KilitToplamaForm fetched from CloudKit")
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
@@ -253,17 +247,12 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncNotes(modelContext: ModelContext) async throws {
         let localNotes = try modelContext.fetch(FetchDescriptor<Note>())
-        print("📤 UPLOAD: \(localNotes.count) Note found locally")
         let records = localNotes.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
-            print("✅ UPLOAD SUCCESS: \(records.count) Note uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No Note to upload")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .note)
-        print("📥 DOWNLOAD: \(cloudRecords.count) Note fetched from CloudKit")
         
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
@@ -280,17 +269,12 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncModelItems(modelContext: ModelContext) async throws {
         let localItems = try modelContext.fetch(FetchDescriptor<ModelItem>())
-        print("📤 UPLOAD: \(localItems.count) ModelItem found locally")
         let records = localItems.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
-            print("✅ UPLOAD SUCCESS: \(records.count) ModelItem uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No ModelItem to upload")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .modelItem)
-        print("📥 DOWNLOAD: \(cloudRecords.count) ModelItem fetched from CloudKit")
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
@@ -307,17 +291,12 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncCompanyItems(modelContext: ModelContext) async throws {
         let localItems = try modelContext.fetch(FetchDescriptor<CompanyItem>())
-        print("📤 UPLOAD: \(localItems.count) CompanyItem found locally")
         let records = localItems.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
-            print("✅ UPLOAD SUCCESS: \(records.count) CompanyItem uploaded to CloudKit")
-        } else {
-            print("⚠️ UPLOAD SKIPPED: No CompanyItem to upload")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .companyItem)
-        print("📥 DOWNLOAD: \(cloudRecords.count) CompanyItem fetched from CloudKit")
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
