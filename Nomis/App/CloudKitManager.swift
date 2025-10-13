@@ -226,13 +226,19 @@ class CloudKitManager: ObservableObject {
                     
                     // Check if this is the "queryable" field error (old schema issue)
                     let errorMessage = error.localizedDescription
+                    let ckError = error as NSError
+                    
+                    // ALWAYS print the actual error first
+                    print("❌ CloudKit: Actual error - \(error)")
+                    print("❌ CloudKit: Error code: \(ckError.code)")
+                    print("❌ CloudKit: Error domain: \(ckError.domain)")
+                    
                     if errorMessage.contains("queryable") || errorMessage.contains("recordName") {
-                        print("❌ CloudKit: Schema error - queryable field issue")
-                        print("❌ This usually means old schema exists in container")
+                        print("⚠️ CloudKit: Detected queryable/recordName issue - ignoring to allow upload")
                         // Return empty to allow upload (which will fix schema)
                         continuation.resume(returning: ([], nil))
                     } else {
-                        print("❌ CloudKit: Query failed - \(error)")
+                        print("❌ CloudKit: Query failed - throwing error")
                         continuation.resume(throwing: error)
                     }
                 }
