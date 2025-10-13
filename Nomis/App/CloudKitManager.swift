@@ -71,11 +71,11 @@ class CloudKitManager: ObservableObject {
         guard isAvailable else {
             #if targetEnvironment(simulator)
             throw NSError(domain: "CloudKit", code: -1, userInfo: [
-                NSLocalizedDescriptionKey: "Simulator'da iCloud sync kullanılamıyor. Gerçek cihazda test edin."
+                NSLocalizedDescriptionKey: "⚠️ Simulator'da iCloud sync kullanılamıyor.\n\nGerçek cihazda test edin."
             ])
             #else
             throw NSError(domain: "CloudKit", code: -1, userInfo: [
-                NSLocalizedDescriptionKey: "iCloud hesabınız bulunamadı. Lütfen Ayarlar > iCloud'dan oturum açın."
+                NSLocalizedDescriptionKey: "❌ iCloud bağlantısı kurulamadı.\n\nÇözüm:\n1. Ayarlar → [İsminiz] → iCloud\n2. iCloud Drive: AÇIK\n3. Wi-Fi/mobil veri kontrol edin"
             ])
             #endif
         }

@@ -68,6 +68,11 @@ struct HomeView: View {
             // Auto-sync on app launch (only if user manually triggers sync)
             // Disabled by default to avoid crashes on simulator without iCloud
         }
+        .onChange(of: syncService.syncStatus) { _, newStatus in
+            if case .error = newStatus {
+                showingSyncError = true
+            }
+        }
         .alert("Senkronizasyon Hatası", isPresented: $showingSyncError) {
             Button("Tamam", role: .cancel) { }
         } message: {
