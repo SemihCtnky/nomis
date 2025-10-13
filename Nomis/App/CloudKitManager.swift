@@ -29,8 +29,8 @@ class CloudKitManager: ObservableObject {
     }
     
     private init() {
-        // Use default container (automatically uses entitlements)
-        self.container = CKContainer.default()
+        // Use specific container v2 (clean container without schema issues)
+        self.container = CKContainer(identifier: "iCloud.com.semihctnky.kilitcim.v2")
         self.publicDatabase = container.publicCloudDatabase
         
         // Detect simulator - CloudKit might not work properly
