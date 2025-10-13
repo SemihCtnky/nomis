@@ -50,18 +50,32 @@ class CloudKitManager: ObservableObject {
         print("⚠️ CloudKit: Simulator detected - sync may be unavailable")
         #endif
         
+        print("🔍 CloudKit: Checking account status...")
+        print("🔍 CloudKit: Container ID: \(container.containerIdentifier ?? "nil")")
+        
         do {
             let status = try await container.accountStatus()
             await MainActor.run {
                 self.isAvailable = (status == .available)
+                print("🔍 CloudKit: Account status: \(status.rawValue)")
                 if !self.isAvailable {
-                    print("⚠️ CloudKit: Account not available - status: \(status.rawValue)")
+                    print("❌ CloudKit: Account not available - status: \(status.rawValue)")
+                    if status == .noAccount {
+                        print("❌ CloudKit: No iCloud account signed in")
+                    } else if status == .restricted {
+                        print("❌ CloudKit: iCloud access restricted")
+                    } else if status == .couldNotDetermine {
+                        print("❌ CloudKit: Could not determine account status")
+                    }
+                } else {
+                    print("✅ CloudKit: Account available and ready")
                 }
             }
         } catch {
             await MainActor.run {
                 self.isAvailable = false
-                print("⚠️ CloudKit: Check failed - \(error.localizedDescription)")
+                print("❌ CloudKit: Check failed - \(error)")
+                print("❌ CloudKit: Error description: \(error.localizedDescription)")
             }
         }
     }
