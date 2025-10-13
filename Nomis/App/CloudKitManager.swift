@@ -150,8 +150,9 @@ class CloudKitManager: ObservableObject {
         await checkAndUpdateAvailability()
         try ensureAvailable()
         
+        // Simple query without sort descriptors to avoid queryable field errors
         let query = CKQuery(recordType: recordType.rawValue, predicate: NSPredicate(value: true))
-        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        // Removed sort descriptor to prevent "recordName marked queryable" error
         
         var allRecords: [CKRecord] = []
         var cursor: CKQueryOperation.Cursor?
@@ -162,7 +163,12 @@ class CloudKitManager: ObservableObject {
             cursor = nextCursor
         } while cursor != nil
         
-        return allRecords
+        // Sort locally by modification date if available
+        return allRecords.sorted { (record1, record2) in
+            let date1 = record1.modificationDate ?? record1.creationDate ?? Date.distantPast
+            let date2 = record2.modificationDate ?? record2.creationDate ?? Date.distantPast
+            return date1 > date2
+        }
     }
     
     private func fetchRecordsWithCursor(query: CKQuery, cursor: CKQueryOperation.Cursor?) async throws -> ([CKRecord], CKQueryOperation.Cursor?) {
@@ -261,7 +267,7 @@ class CloudKitManager: ObservableObject {
         
         let predicate = NSPredicate(format: "modificationDate > %@", date as NSDate)
         let query = CKQuery(recordType: recordType.rawValue, predicate: predicate)
-        query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
+        // Removed sort descriptor to prevent "recordName marked queryable" error
         
         var allRecords: [CKRecord] = []
         var cursor: CKQueryOperation.Cursor?
@@ -272,7 +278,12 @@ class CloudKitManager: ObservableObject {
             cursor = nextCursor
         } while cursor != nil
         
-        return allRecords
+        // Sort locally by modification date
+        return allRecords.sorted { (record1, record2) in
+            let date1 = record1.modificationDate ?? Date.distantPast
+            let date2 = record2.modificationDate ?? Date.distantPast
+            return date1 > date2
+        }
     }
 }
 
