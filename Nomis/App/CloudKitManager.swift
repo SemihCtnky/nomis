@@ -229,16 +229,26 @@ class CloudKitManager: ObservableObject {
                     print("❌ CloudKit: Error code: \(ckError.code)")
                     print("❌ CloudKit: Error domain: \(ckError.domain)")
                     
-                    // Check if this is the "queryable" field error (old schema issue)
+                    // Check if this is a schema-related error that we should ignore
                     let errorMessage = error.localizedDescription
+                    
+                    // 1. "queryable" field error (old schema issue)
                     if errorMessage.contains("queryable") || errorMessage.contains("recordName") {
                         print("⚠️ CloudKit: Detected queryable/recordName issue - ignoring to allow upload")
-                        // Return empty to allow upload (which will fix schema)
                         continuation.resume(returning: ([], nil))
-                    } else {
-                        print("❌ CloudKit: Query failed - throwing error")
-                        continuation.resume(throwing: error)
+                        return
                     }
+                    
+                    // 2. "type busy" error (Apple creating schema, temporary issue)
+                    if errorMessage.contains("type busy") || ckError.code == CKError.serviceUnavailable.rawValue {
+                        print("⚠️ CloudKit: Detected 'type busy' (schema creation in progress) - ignoring to allow upload")
+                        continuation.resume(returning: ([], nil))
+                        return
+                    }
+                    
+                    // If none of the above, throw the error
+                    print("❌ CloudKit: Query failed - throwing error")
+                    continuation.resume(throwing: error)
                 }
             }
             
