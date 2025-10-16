@@ -75,10 +75,6 @@ struct KilitEditorView: View {
     @State private var hasChanges = false
     @State private var hasStarted = false
     
-    // Zoom functionality
-    @State private var currentZoomScale: CGFloat = 1.0
-    @GestureState private var gestureZoomScale: CGFloat = 1.0
-    
     let isReadOnly: Bool
     
     var isNewForm: Bool {
@@ -108,24 +104,6 @@ struct KilitEditorView: View {
             self._showingFinalSummary = State(initialValue: form.endedAt != nil)
             self._hasStarted = State(initialValue: form.startedAt != nil)
         }
-    }
-    
-    // Computed zoom scale (gesture + base)
-    private var finalZoomScale: CGFloat {
-        currentZoomScale * gestureZoomScale
-    }
-    
-    // Magnification gesture for pinch-to-zoom
-    private var magnificationGesture: some Gesture {
-        MagnificationGesture()
-            .updating($gestureZoomScale) { value, state, _ in
-                state = value
-            }
-            .onEnded { value in
-                currentZoomScale *= value
-                // Limit zoom: 0.5x to 3.0x
-                currentZoomScale = min(max(currentZoomScale, 0.5), 3.0)
-            }
     }
     
     var body: some View {
@@ -160,8 +138,6 @@ struct KilitEditorView: View {
                     }
                 }
                 .padding(NomisTheme.contentSpacing)
-                .scaleEffect(finalZoomScale) // Apply zoom
-                .gesture(magnificationGesture) // Pinch-to-zoom gesture
             }
             .navigationTitle(isNewForm ? "Yeni Kilit Toplama" : "Kilit Toplama Düzenle")
             .navigationBarTitleDisplayMode(.inline)

@@ -16,31 +16,9 @@ struct NoteEditorView: View {
     // Auto-save timer
     @State private var autoSaveTimer: Timer?
     
-    // Zoom functionality
-    @State private var currentZoomScale: CGFloat = 1.0
-    @GestureState private var gestureZoomScale: CGFloat = 1.0
-    
     init(note: Note? = nil, isReadOnly: Bool = false) {
         self.note = note
         self.isReadOnly = isReadOnly
-    }
-    
-    // Computed zoom scale (gesture + base)
-    private var finalZoomScale: CGFloat {
-        currentZoomScale * gestureZoomScale
-    }
-    
-    // Magnification gesture for pinch-to-zoom
-    private var magnificationGesture: some Gesture {
-        MagnificationGesture()
-            .updating($gestureZoomScale) { value, state, _ in
-                state = value
-            }
-            .onEnded { value in
-                currentZoomScale *= value
-                // Limit zoom: 0.5x to 3.0x
-                currentZoomScale = min(max(currentZoomScale, 0.5), 3.0)
-            }
     }
     
     var body: some View {
@@ -89,8 +67,6 @@ struct NoteEditorView: View {
                 }
             }
             .padding(NomisTheme.contentSpacing)
-            .scaleEffect(finalZoomScale) // Apply zoom
-            .gesture(magnificationGesture) // Pinch-to-zoom gesture
             .navigationTitle(note == nil ? "Yeni Not" : "Notu Düzenle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -22,10 +22,6 @@ struct DailyOperationsEditorView: View {
     @State private var showingWeeklyFinishAlert = false
     @State private var showingCancelAuth = false
     
-    // Zoom functionality
-    @State private var currentZoomScale: CGFloat = 1.0
-    @GestureState private var gestureZoomScale: CGFloat = 1.0
-    
     // Focus management for Tezgah cards
     @FocusState private var focusedTezgahField: TezgahFocusedField?
     
@@ -69,24 +65,6 @@ struct DailyOperationsEditorView: View {
     private var canSaveForm: Bool {
         // Her zaman kaydedilebilir (auto-save ile çelişmesin diye)
         return true
-    }
-    
-    // Computed zoom scale (gesture + base)
-    private var finalZoomScale: CGFloat {
-        currentZoomScale * gestureZoomScale
-    }
-    
-    // Magnification gesture for pinch-to-zoom
-    private var magnificationGesture: some Gesture {
-        MagnificationGesture()
-            .updating($gestureZoomScale) { value, state, _ in
-                state = value
-            }
-            .onEnded { value in
-                currentZoomScale *= value
-                // Limit zoom: 0.5x to 3.0x
-                currentZoomScale = min(max(currentZoomScale, 0.5), 3.0)
-            }
     }
     
     var body: some View {
@@ -159,7 +137,6 @@ struct DailyOperationsEditorView: View {
                             }
                         }
                     }
-                    .scaleEffect(finalZoomScale, anchor: .top)
                     .frame(minWidth: geometry.size.width, alignment: .center)
                     .transaction { transaction in
                         transaction.animation = nil
@@ -167,7 +144,6 @@ struct DailyOperationsEditorView: View {
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .scrollContentBackground(.hidden)
-                .gesture(magnificationGesture)
             }
             .ignoresSafeArea(.keyboard)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
