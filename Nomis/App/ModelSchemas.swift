@@ -792,10 +792,10 @@ public class BackupService: ObservableObject {
         kart.ayar = data["ayar"] as? Int
         kart.createdAt = createdAt
         
-        // Import satirlar
+        // Import satirlar (TezgahSatiri için özel)
         if let satirlarData = data["satirlar"] as? [[String: Any]] {
             for satirData in satirlarData {
-                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                if let satir = importTezgahSatiri(from: satirData, modelContext: modelContext) {
                     kart.satirlar.append(satir)
                 }
             }
@@ -811,6 +811,29 @@ public class BackupService: ObservableObject {
         }
         
         return kart
+    }
+    
+    private func importTezgahSatiri(from data: [String: Any], modelContext: ModelContext) -> TezgahSatiri? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString) else { return nil }
+        
+        let satir = TezgahSatiri()
+        satir.id = id
+        satir.aciklamaGiris = data["aciklamaGiris"] as? String ?? ""
+        satir.aciklamaCikis = data["aciklamaCikis"] as? String ?? ""
+        satir.girisValue = data["girisValue"] as? Double
+        satir.cikisValue = data["cikisValue"] as? Double
+        satir.ayar = data["ayar"] as? Int
+        satir.orderIndex = data["orderIndex"] as? Int ?? 0
+        
+        if let girisTarihString = data["aciklamaGirisTarihi"] as? String {
+            satir.aciklamaGirisTarihi = ISO8601DateFormatter().date(from: girisTarihString)
+        }
+        if let cikisTarihString = data["aciklamaCikisTarihi"] as? String {
+            satir.aciklamaCikisTarihi = ISO8601DateFormatter().date(from: cikisTarihString)
+        }
+        
+        return satir
     }
     
     private func importCilaKarti(from data: [String: Any], modelContext: ModelContext) -> CilaKarti? {
@@ -959,16 +982,9 @@ public class BackupService: ObservableObject {
         satir.id = id
         satir.aciklamaGiris = data["aciklamaGiris"] as? String ?? ""
         satir.aciklamaCikis = data["aciklamaCikis"] as? String ?? ""
-        satir.aciklamaFire = data["aciklamaFire"] as? String
+        satir.aciklamaFire = data["aciklamaFire"] as? String ?? ""
         satir.ayar = data["ayar"] as? Int
         satir.orderIndex = data["orderIndex"] as? Int ?? 0
-        
-        if let girisValueNum = data["girisValue"] as? Double {
-            satir.girisValue = girisValueNum
-        }
-        if let cikisValueNum = data["cikisValue"] as? Double {
-            satir.cikisValue = cikisValueNum
-        }
         
         if let girisTarihString = data["aciklamaGirisTarihi"] as? String {
             satir.aciklamaGirisTarihi = ISO8601DateFormatter().date(from: girisTarihString)
@@ -1036,10 +1052,23 @@ public class BackupService: ObservableObject {
         
         let item = KilitItem()
         item.id = id
-        item.girisAdet = data["girisAdet"] as? Int
+        
+        // Handle Int or Double for girisAdet
+        if let girisAdetInt = data["girisAdet"] as? Int {
+            item.girisAdet = Double(girisAdetInt)
+        } else if let girisAdetDouble = data["girisAdet"] as? Double {
+            item.girisAdet = girisAdetDouble
+        }
+        
         item.girisGram = data["girisGram"] as? Double
         item.cikisGram = data["cikisGram"] as? Double
-        item.cikisAdet = data["cikisAdet"] as? Int
+        
+        // Handle Int or Double for cikisAdet
+        if let cikisAdetInt = data["cikisAdet"] as? Int {
+            item.cikisAdet = Double(cikisAdetInt)
+        } else if let cikisAdetDouble = data["cikisAdet"] as? Double {
+            item.cikisAdet = cikisAdetDouble
+        }
         
         return item
     }
@@ -1048,12 +1077,12 @@ public class BackupService: ObservableObject {
         guard let idString = data["id"] as? String,
               let id = UUID(uuidString: idString),
               let createdAtString = data["createdAt"] as? String,
-              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString),
+              let valueGr = data["valueGr"] as? Double else { return nil }
         
-        let asit = AsitItem()
+        let note = data["note"] as? String
+        let asit = AsitItem(valueGr: valueGr, note: note)
         asit.id = id
-        asit.valueGr = data["valueGr"] as? Double ?? 0
-        asit.note = data["note"] as? String
         asit.createdAt = createdAt
         
         return asit
@@ -1063,12 +1092,12 @@ public class BackupService: ObservableObject {
         guard let idString = data["id"] as? String,
               let id = UUID(uuidString: idString),
               let createdAtString = data["createdAt"] as? String,
-              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString),
+              let value = data["value"] as? Double else { return nil }
         
-        let fire = FireItem()
+        let note = data["note"] as? String
+        let fire = FireItem(value: value, note: note)
         fire.id = id
-        fire.value = data["value"] as? Double ?? 0
-        fire.note = data["note"] as? String
         fire.createdAt = createdAt
         
         return fire
@@ -1127,10 +1156,9 @@ public class BackupService: ObservableObject {
                             guard let gunIdString = gunData["id"] as? String,
                                   let gunId = UUID(uuidString: gunIdString),
                                   let tarihString = gunData["tarih"] as? String,
-                                  let tarih = ISO8601DateFormatter().date(from: tarihString),
-                                  let gunAdi = gunData["gunAdi"] as? String else { continue }
+                                  let tarih = ISO8601DateFormatter().date(from: tarihString) else { continue }
                             
-                            let gunVerisi = GunlukGunVerisi(tarih: tarih, gunAdi: gunAdi)
+                            let gunVerisi = GunlukGunVerisi(tarih: tarih)
                             gunVerisi.id = gunId
                             
                             // Import Tezgah Kartı 1
