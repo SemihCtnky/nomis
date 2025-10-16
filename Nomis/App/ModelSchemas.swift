@@ -779,6 +779,301 @@ public class BackupService: ObservableObject {
         return zipURL
     }
     
+    // MARK: - Helper Import Functions
+    
+    private func importTezgahKarti(from data: [String: Any], modelContext: ModelContext) -> TezgahKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = TezgahKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        // Import fireEklemeleri
+        if let fireData = data["fireEklemeleri"] as? [[String: Any]] {
+            for fireItem in fireData {
+                if let fire = importFireEklemesi(from: fireItem, modelContext: modelContext) {
+                    kart.fireEklemeleri.append(fire)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importCilaKarti(from data: [String: Any], modelContext: ModelContext) -> CilaKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = CilaKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importOcakKarti(from data: [String: Any], modelContext: ModelContext) -> OcakKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = OcakKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importPatlatmaKarti(from data: [String: Any], modelContext: ModelContext) -> PatlatmaKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = PatlatmaKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importTamburKarti(from data: [String: Any], modelContext: ModelContext) -> TamburKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = TamburKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importMakineKesmeKarti(from data: [String: Any], modelContext: ModelContext) -> MakineKesmeKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = MakineKesmeKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importTestereKesmeKarti(from data: [String: Any], modelContext: ModelContext) -> TestereKesmeKarti? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let kart = TestereKesmeKarti()
+        kart.id = id
+        kart.ayar = data["ayar"] as? Int
+        kart.createdAt = createdAt
+        
+        // Import satirlar
+        if let satirlarData = data["satirlar"] as? [[String: Any]] {
+            for satirData in satirlarData {
+                if let satir = importIslemSatiri(from: satirData, modelContext: modelContext) {
+                    kart.satirlar.append(satir)
+                }
+            }
+        }
+        
+        return kart
+    }
+    
+    private func importIslemSatiri(from data: [String: Any], modelContext: ModelContext) -> IslemSatiri? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString) else { return nil }
+        
+        let satir = IslemSatiri()
+        satir.id = id
+        satir.aciklamaGiris = data["aciklamaGiris"] as? String ?? ""
+        satir.aciklamaCikis = data["aciklamaCikis"] as? String ?? ""
+        satir.aciklamaFire = data["aciklamaFire"] as? String
+        satir.ayar = data["ayar"] as? Int
+        satir.orderIndex = data["orderIndex"] as? Int ?? 0
+        
+        if let girisValueNum = data["girisValue"] as? Double {
+            satir.girisValue = girisValueNum
+        }
+        if let cikisValueNum = data["cikisValue"] as? Double {
+            satir.cikisValue = cikisValueNum
+        }
+        
+        if let girisTarihString = data["aciklamaGirisTarihi"] as? String {
+            satir.aciklamaGirisTarihi = ISO8601DateFormatter().date(from: girisTarihString)
+        }
+        if let cikisTarihString = data["aciklamaCikisTarihi"] as? String {
+            satir.aciklamaCikisTarihi = ISO8601DateFormatter().date(from: cikisTarihString)
+        }
+        if let fireTarihString = data["aciklamaFireTarihi"] as? String {
+            satir.aciklamaFireTarihi = ISO8601DateFormatter().date(from: fireTarihString)
+        }
+        
+        // Import girisValues
+        if let girisValuesData = data["girisValues"] as? [[String: Any]] {
+            for valueData in girisValuesData {
+                if let genisVal = importGenisletilebilirDeger(from: valueData, modelContext: modelContext) {
+                    satir.girisValues.append(genisVal)
+                }
+            }
+        }
+        
+        // Import cikisValues
+        if let cikisValuesData = data["cikisValues"] as? [[String: Any]] {
+            for valueData in cikisValuesData {
+                if let genisVal = importGenisletilebilirDeger(from: valueData, modelContext: modelContext) {
+                    satir.cikisValues.append(genisVal)
+                }
+            }
+        }
+        
+        return satir
+    }
+    
+    private func importGenisletilebilirDeger(from data: [String: Any], modelContext: ModelContext) -> GenisletilebilirDeger? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let eklemeTarihiString = data["eklemeTarihi"] as? String,
+              let eklemeTarihi = ISO8601DateFormatter().date(from: eklemeTarihiString) else { return nil }
+        
+        let deger = GenisletilebilirDeger()
+        deger.id = id
+        deger.value = data["value"] as? Double
+        deger.eklemeTarihi = eklemeTarihi
+        
+        return deger
+    }
+    
+    private func importFireEklemesi(from data: [String: Any], modelContext: ModelContext) -> FireEklemesi? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let fire = FireEklemesi()
+        fire.id = id
+        fire.value = data["value"] as? Double
+        fire.aciklama = data["aciklama"] as? String ?? ""
+        fire.createdAt = createdAt
+        
+        return fire
+    }
+    
+    private func importKilitItem(from data: [String: Any], modelContext: ModelContext) -> KilitItem? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString) else { return nil }
+        
+        let item = KilitItem()
+        item.id = id
+        item.girisAdet = data["girisAdet"] as? Int
+        item.girisGram = data["girisGram"] as? Double
+        item.cikisGram = data["cikisGram"] as? Double
+        item.cikisAdet = data["cikisAdet"] as? Int
+        
+        return item
+    }
+    
+    private func importAsitItem(from data: [String: Any], modelContext: ModelContext) -> AsitItem? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let asit = AsitItem()
+        asit.id = id
+        asit.valueGr = data["valueGr"] as? Double ?? 0
+        asit.note = data["note"] as? String
+        asit.createdAt = createdAt
+        
+        return asit
+    }
+    
+    private func importFireItem(from data: [String: Any], modelContext: ModelContext) -> FireItem? {
+        guard let idString = data["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let createdAtString = data["createdAt"] as? String,
+              let createdAt = ISO8601DateFormatter().date(from: createdAtString) else { return nil }
+        
+        let fire = FireItem()
+        fire.id = id
+        fire.value = data["value"] as? Double ?? 0
+        fire.note = data["note"] as? String
+        fire.createdAt = createdAt
+        
+        return fire
+    }
+    
     func importData(from url: URL, modelContext: ModelContext) throws {
         isImporting = true
         defer { isImporting = false }
@@ -795,7 +1090,7 @@ public class BackupService: ObservableObject {
             throw NSError(domain: "BackupImportError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid backup file format"])
         }
         
-        // Import Günlük Forms
+        // Import Günlük Forms (with full nested data)
         if let gunlukForms = backupData["gunlukForms"] as? [[String: Any]] {
             for formData in gunlukForms {
                 guard let idString = formData["id"] as? String,
@@ -825,11 +1120,75 @@ public class BackupService: ObservableObject {
                     }
                     
                     modelContext.insert(newForm)
+                    
+                    // Import gunlukVeriler (daily data with all cards)
+                    if let gunlukVerilerData = formData["gunlukVeriler"] as? [[String: Any]] {
+                        for gunData in gunlukVerilerData {
+                            guard let gunIdString = gunData["id"] as? String,
+                                  let gunId = UUID(uuidString: gunIdString),
+                                  let tarihString = gunData["tarih"] as? String,
+                                  let tarih = ISO8601DateFormatter().date(from: tarihString),
+                                  let gunAdi = gunData["gunAdi"] as? String else { continue }
+                            
+                            let gunVerisi = GunlukGunVerisi(tarih: tarih, gunAdi: gunAdi)
+                            gunVerisi.id = gunId
+                            
+                            // Import Tezgah Kartı 1
+                            if let tezgah1Data = gunData["tezgahKarti1"] as? [String: Any],
+                               let tezgah1 = importTezgahKarti(from: tezgah1Data, modelContext: modelContext) {
+                                gunVerisi.tezgahKarti1 = tezgah1
+                            }
+                            
+                            // Import Tezgah Kartı 2
+                            if let tezgah2Data = gunData["tezgahKarti2"] as? [String: Any],
+                               let tezgah2 = importTezgahKarti(from: tezgah2Data, modelContext: modelContext) {
+                                gunVerisi.tezgahKarti2 = tezgah2
+                            }
+                            
+                            // Import Cila Kartı
+                            if let cilaData = gunData["cilaKarti"] as? [String: Any],
+                               let cila = importCilaKarti(from: cilaData, modelContext: modelContext) {
+                                gunVerisi.cilaKarti = cila
+                            }
+                            
+                            // Import Ocak Kartı
+                            if let ocakData = gunData["ocakKarti"] as? [String: Any],
+                               let ocak = importOcakKarti(from: ocakData, modelContext: modelContext) {
+                                gunVerisi.ocakKarti = ocak
+                            }
+                            
+                            // Import Patlatma Kartı
+                            if let patlatmaData = gunData["patlatmaKarti"] as? [String: Any],
+                               let patlatma = importPatlatmaKarti(from: patlatmaData, modelContext: modelContext) {
+                                gunVerisi.patlatmaKarti = patlatma
+                            }
+                            
+                            // Import Tambur Kartı
+                            if let tamburData = gunData["tamburKarti"] as? [String: Any],
+                               let tambur = importTamburKarti(from: tamburData, modelContext: modelContext) {
+                                gunVerisi.tamburKarti = tambur
+                            }
+                            
+                            // Import Makine Kesme Kartı
+                            if let makineKesmeData = gunData["makineKesmeKarti"] as? [String: Any],
+                               let makineKesme = importMakineKesmeKarti(from: makineKesmeData, modelContext: modelContext) {
+                                gunVerisi.makineKesmeKarti1 = makineKesme
+                            }
+                            
+                            // Import Testere Kesme Kartı
+                            if let testereKesmeData = gunData["testereKesmeKarti"] as? [String: Any],
+                               let testereKesme = importTestereKesmeKarti(from: testereKesmeData, modelContext: modelContext) {
+                                gunVerisi.testereKesmeKarti1 = testereKesme
+                            }
+                            
+                            newForm.gunlukVeriler.append(gunVerisi)
+                        }
+                    }
                 }
             }
         }
         
-        // Import Kilit Forms
+        // Import Kilit Forms (with full nested data)
         if let kilitForms = backupData["kilitForms"] as? [[String: Any]] {
             for formData in kilitForms {
                 guard let idString = formData["id"] as? String,
@@ -858,11 +1217,47 @@ public class BackupService: ObservableObject {
                     }
                     
                     modelContext.insert(newForm)
+                    
+                    // Import kasaItems
+                    if let kasaItemsData = formData["kasaItems"] as? [[String: Any]] {
+                        for itemData in kasaItemsData {
+                            if let item = importKilitItem(from: itemData, modelContext: modelContext) {
+                                newForm.kasaItems.append(item)
+                            }
+                        }
+                    }
+                    
+                    // Import dilItems
+                    if let dilItemsData = formData["dilItems"] as? [[String: Any]] {
+                        for itemData in dilItemsData {
+                            if let item = importKilitItem(from: itemData, modelContext: modelContext) {
+                                newForm.dilItems.append(item)
+                            }
+                        }
+                    }
+                    
+                    // Import yayItems
+                    if let yayItemsData = formData["yayItems"] as? [[String: Any]] {
+                        for itemData in yayItemsData {
+                            if let item = importKilitItem(from: itemData, modelContext: modelContext) {
+                                newForm.yayItems.append(item)
+                            }
+                        }
+                    }
+                    
+                    // Import kilitItems
+                    if let kilitItemsData = formData["kilitItems"] as? [[String: Any]] {
+                        for itemData in kilitItemsData {
+                            if let item = importKilitItem(from: itemData, modelContext: modelContext) {
+                                newForm.kilitItems.append(item)
+                            }
+                        }
+                    }
                 }
             }
         }
         
-        // Import Sarnel Forms
+        // Import Sarnel Forms (with full nested data)
         if let sarnelForms = backupData["sarnelForms"] as? [[String: Any]] {
             for formData in sarnelForms {
                 guard let idString = formData["id"] as? String,
@@ -885,6 +1280,14 @@ public class BackupService: ObservableObject {
                         newForm.lastEditedAt = lastEditedAt
                     }
                     
+                    if let startedAtString = formData["startedAt"] as? String {
+                        newForm.startedAt = ISO8601DateFormatter().date(from: startedAtString)
+                    }
+                    
+                    if let endedAtString = formData["endedAt"] as? String {
+                        newForm.endedAt = ISO8601DateFormatter().date(from: endedAtString)
+                    }
+                    
                     if let stateRawValue = formData["state"] as? String,
                        let state = FormState(rawValue: stateRawValue) {
                         newForm.state = state
@@ -900,6 +1303,24 @@ public class BackupService: ObservableObject {
                     newForm.demirliToz = formData["demirliToz"] as? Double
                     
                     modelContext.insert(newForm)
+                    
+                    // Import asitCikislari
+                    if let asitCikislariData = formData["asitCikislari"] as? [[String: Any]] {
+                        for asitData in asitCikislariData {
+                            if let asit = importAsitItem(from: asitData, modelContext: modelContext) {
+                                newForm.asitCikislari.append(asit)
+                            }
+                        }
+                    }
+                    
+                    // Import extraFireItems
+                    if let fireItemsData = formData["extraFireItems"] as? [[String: Any]] {
+                        for fireData in fireItemsData {
+                            if let fire = importFireItem(from: fireData, modelContext: modelContext) {
+                                newForm.extraFireItems.append(fire)
+                            }
+                        }
+                    }
                 }
             }
         }
