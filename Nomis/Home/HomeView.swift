@@ -4,8 +4,10 @@ import SwiftData
 struct HomeView: View {
     @EnvironmentObject private var authManager: AuthenticationManager
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var syncService = CloudKitSyncService.shared
     
     @State private var selectedModule: HomeModule?
+    @State private var autoFetchTimer: Timer?
     
     var body: some View {
         NavigationView {
@@ -40,6 +42,37 @@ struct HomeView: View {
         .fullScreenCover(item: $selectedModule) { module in
             moduleView(for: module)
         }
+        .onAppear {
+            // CRITICAL: Fetch data on app launch for read-only users
+            startAutoFetch()
+        }
+        .onDisappear {
+            // Stop timer when view disappears
+            stopAutoFetch()
+        }
+    }
+    
+    // MARK: - Auto Fetch for Read-Only Users
+    
+    private func startAutoFetch() {
+        // Initial fetch on app launch
+        Task {
+            await syncService.performIncrementalSync(modelContext: modelContext)
+        }
+        
+        // Setup periodic fetch (every 30 seconds)
+        // This ensures read-only users see updates from admin users
+        autoFetchTimer?.invalidate()
+        autoFetchTimer = Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak syncService, modelContext] _ in
+            Task { @MainActor in
+                await syncService?.performIncrementalSync(modelContext: modelContext)
+            }
+        }
+    }
+    
+    private func stopAutoFetch() {
+        autoFetchTimer?.invalidate()
+        autoFetchTimer = nil
     }
     
     private var gridColumns: [GridItem] {
