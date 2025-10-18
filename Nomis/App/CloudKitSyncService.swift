@@ -417,7 +417,22 @@ class CloudKitSyncService: ObservableObject {
                 for gunVerisi in existingForm.gunlukVeriler {
                     modelContext.insert(gunVerisi)
                     // Insert all cards within each day
-                    if let tezgah = gunVerisi.tezgahKarti {
+                    if let tezgah = gunVerisi.tezgahKarti1 {
+                        modelContext.insert(tezgah)
+                        for satir in tezgah.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                        for fire in tezgah.fireEklemeleri {
+                            modelContext.insert(fire)
+                        }
+                    }
+                    if let tezgah = gunVerisi.tezgahKarti2 {
                         modelContext.insert(tezgah)
                         for satir in tezgah.satirlar {
                             modelContext.insert(satir)
@@ -480,7 +495,7 @@ class CloudKitSyncService: ObservableObject {
                             }
                         }
                     }
-                    if let makineKesme = gunVerisi.makineKesmeKarti {
+                    if let makineKesme = gunVerisi.makineKesmeKarti1 {
                         modelContext.insert(makineKesme)
                         for satir in makineKesme.satirlar {
                             modelContext.insert(satir)
@@ -492,7 +507,7 @@ class CloudKitSyncService: ObservableObject {
                             }
                         }
                     }
-                    if let testereKesme = gunVerisi.testereKesmeKarti {
+                    if let testereKesme = gunVerisi.testereKesmeKarti1 {
                         modelContext.insert(testereKesme)
                         for satir in testereKesme.satirlar {
                             modelContext.insert(satir)
@@ -549,7 +564,7 @@ class CloudKitSyncService: ObservableObject {
                 for item in existingForm.asitCikislari {
                     modelContext.insert(item)
                 }
-                for item in existingForm.fireData {
+                for item in existingForm.extraFireItems {
                     modelContext.insert(item)
                 }
                 
