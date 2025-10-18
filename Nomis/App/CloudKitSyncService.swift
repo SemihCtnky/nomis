@@ -15,6 +15,10 @@ class CloudKitSyncService: ObservableObject {
     @Published var syncError: String?
     @Published var syncStatus: SyncStatus = .idle
     
+    // Auto-sync timer (debounced)
+    private var autoSyncTimer: Timer?
+    private let autoSyncDelay: TimeInterval = 3.0 // 3 seconds after last change
+    
     enum SyncStatus: Equatable {
         case idle
         case syncing
@@ -36,6 +40,32 @@ class CloudKitSyncService: ObservableObject {
         if let lastSync = UserDefaults.standard.object(forKey: "lastCloudKitSync") as? Date {
             self.lastSyncDate = lastSync
         }
+    }
+    
+    deinit {
+        autoSyncTimer?.invalidate()
+    }
+    
+    // MARK: - Auto Sync (Debounced)
+    
+    /// Trigger auto-sync after a delay (debounced)
+    /// Call this every time data changes
+    func scheduleAutoSync(modelContext: ModelContext) {
+        // Cancel existing timer
+        autoSyncTimer?.invalidate()
+        
+        // Schedule new timer
+        autoSyncTimer = Timer.scheduledTimer(withTimeInterval: autoSyncDelay, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                await self?.performIncrementalSync(modelContext: modelContext)
+            }
+        }
+    }
+    
+    /// Cancel auto-sync timer
+    func cancelAutoSync() {
+        autoSyncTimer?.invalidate()
+        autoSyncTimer = nil
     }
     
     // MARK: - Full Sync (Initial or Manual)

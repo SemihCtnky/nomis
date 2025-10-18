@@ -6,6 +6,9 @@ struct DailyOperationsEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var authManager: AuthenticationManager
     
+    // CloudKit Sync for auto-sync
+    @StateObject private var syncService = CloudKitSyncService.shared
+    
     // SwiftData Query ile satırları direkt çek ve sırala
     @Query private var allTezgahSatirlar: [TezgahSatiri]
     @Query private var allIslemSatirlar: [IslemSatiri]
@@ -48,6 +51,10 @@ struct DailyOperationsEditorView: View {
     // SwiftData bug'unu bypass etmek için tamamen local yönetim
     @State private var useLocalOnly: Bool = true
     
+    // Performance optimization: Cache sorted days
+    @State private var sortedGunler: [GunlukGunVerisi] = []
+    @State private var weeklyFireSummaryCache: [[String: Any]]?
+    
     init(form: YeniGunlukForm? = nil, isReadOnly: Bool = false) {
         if let existingForm = form {
             self._form = State(initialValue: existingForm)
@@ -69,11 +76,10 @@ struct DailyOperationsEditorView: View {
     
     var body: some View {
         NavigationStack {
-            GeometryReader { geometry in
-                ScrollView(.vertical, showsIndicators: true) {
-                    LazyVStack(spacing: 0, pinnedViews: []) {
-                        // Günlük veriler (Pazartesi - Cuma) - Stable sıralama için sorted
-                        ForEach(Array(form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih }).enumerated()), id: \.element.id) { gunIndex, gunVerisi in
+            ScrollView(.vertical, showsIndicators: true) {
+                LazyVStack(spacing: 0, pinnedViews: []) {
+                    // Günlük veriler (Pazartesi - Cuma) - Cached sorted array for performance
+                    ForEach(Array(sortedGunler.enumerated()), id: \.element.id) { gunIndex, gunVerisi in
                             VStack(spacing: 0) {
                                 // Gün başlığı
                                 gunBasligi(for: gunVerisi)
@@ -122,29 +128,29 @@ struct DailyOperationsEditorView: View {
                             }
                             
                             // Haftalık Fire Özeti - sadece son gün (Cuma) için
-                            if gunIndex == form.gunlukVeriler.count - 1 || isFriday(gunVerisi.tarih) {
-                                VStack(spacing: 16) {
-                                    Spacer()
-                                        .frame(height: 40)
-                                    
-                                    WeeklyFireSummaryTable(fireData: calculateWeeklyFireSummary())
-                                        .frame(maxWidth: .infinity) // Ekran genişliğine sığdır
-                                        .padding(.horizontal, 16)
-                                    
-                                    Spacer()
-                                        .frame(height: 20)
+                            if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
+                                if let cachedSummary = weeklyFireSummaryCache {
+                                    VStack(spacing: 16) {
+                                        Spacer()
+                                            .frame(height: 40)
+                                        
+                                        WeeklyFireSummaryTable(fireData: cachedSummary)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.horizontal, 16)
+                                        
+                                        Spacer()
+                                            .frame(height: 20)
+                                    }
                                 }
                             }
                         }
                     }
-                    .frame(minWidth: geometry.size.width, alignment: .center)
                     .transaction { transaction in
                         transaction.animation = nil
                     }
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .scrollContentBackground(.hidden)
-            }
             .ignoresSafeArea(.keyboard)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
@@ -207,11 +213,16 @@ struct DailyOperationsEditorView: View {
             )
         }
         .onAppear {
+            // PERFORMANCE: Update caches on appear
+            updateSortedGunlerCache()
+            updateWeeklyFireSummaryCache()
+            
             if isNewForm {
                 // YENİ FORM: Haftalık günleri oluştur
                 if form.gunlukVeriler.isEmpty {
                     form.createWeeklyDays()
                     print("✅ Yeni form için hafta günleri oluşturuldu: \(form.gunlukVeriler.count) gün")
+                    updateSortedGunlerCache()
                 }
             } else {
                 // Mevcut form için orderIndex kontrolü yap
@@ -232,9 +243,37 @@ struct DailyOperationsEditorView: View {
                 }
             }
         }
+        .onChange(of: form.gunlukVeriler.count) { _, _ in
+            // PERFORMANCE: Update cache when days change
+            updateSortedGunlerCache()
+            updateWeeklyFireSummaryCache()
+        }
+        .onChange(of: hasChanges) { _, newValue in
+            // AUTO-SYNC: Trigger auto-sync when changes detected
+            if newValue {
+                triggerAutoSync()
+            }
+        }
     }
     
     // MARK: - Yardımcı Fonksiyonlar
+    
+    // MARK: - Performance Cache Updates
+    
+    private func updateSortedGunlerCache() {
+        sortedGunler = form.gunlukVeriler.sorted(by: { $0.tarih < $1.tarih })
+    }
+    
+    private func updateWeeklyFireSummaryCache() {
+        weeklyFireSummaryCache = calculateWeeklyFireSummary()
+    }
+    
+    // MARK: - Auto Sync Trigger
+    
+    private func triggerAutoSync() {
+        guard !isReadOnly && !isNewForm else { return }
+        syncService.scheduleAutoSync(modelContext: modelContext)
+    }
     
     private func ensureCilaKarti(for gunVerisi: GunlukGunVerisi) {
         if gunVerisi.cilaKarti == nil {
