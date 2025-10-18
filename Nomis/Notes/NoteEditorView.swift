@@ -122,7 +122,11 @@ struct NoteEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && note != nil else { return }
+        guard !isReadOnly && note != nil else {
+            print("📓 [NOTE] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NoteExists=\(note != nil)")
+            return
+        }
+        print("📓 [NOTE] AUTO-SYNC TRIGGER: Data changed")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

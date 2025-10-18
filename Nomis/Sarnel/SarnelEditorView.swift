@@ -1057,7 +1057,11 @@ struct SarnelEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && !isNewForm else { return }
+        guard !isReadOnly && !isNewForm else {
+            print("💎 [SARNEL] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
+            return
+        }
+        print("💎 [SARNEL] AUTO-SYNC TRIGGER: Data changed")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

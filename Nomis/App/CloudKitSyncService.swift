@@ -2,6 +2,15 @@ import Foundation
 import SwiftData
 import CloudKit
 
+// MARK: - 🔍 DEBUG LOGGING (TEMPORARY - REMOVE AFTER TESTING!)
+private let DEBUG_SYNC = true
+
+private func syncLog(_ message: String, emoji: String = "🔵") {
+    if DEBUG_SYNC {
+        print("\(emoji) [SYNC] \(message)")
+    }
+}
+
 /// CloudKit Sync Service
 /// Handles bidirectional sync between SwiftData and CloudKit
 @MainActor
@@ -51,6 +60,8 @@ class CloudKitSyncService: ObservableObject {
     /// Trigger auto-sync after a delay (debounced)
     /// Call this every time data changes
     func scheduleAutoSync(modelContext: ModelContext) {
+        syncLog("⏱️  AUTO-SYNC SCHEDULED: Will trigger in \(autoSyncDelay)s", emoji: "⏱️")
+        
         // Cancel existing task
         autoSyncTask?.cancel()
         
@@ -63,8 +74,11 @@ class CloudKitSyncService: ObservableObject {
                 try await Task.sleep(for: .seconds(self.autoSyncDelay))
             } catch {
                 // Task was cancelled, exit gracefully
+                syncLog("⏱️  AUTO-SYNC CANCELLED", emoji: "🚫")
                 return
             }
+            
+            syncLog("⏱️  AUTO-SYNC TRIGGERED: Starting incremental sync", emoji: "🚀")
             
             // Perform sync after delay (modelContext captured in MainActor context - safe!)
             await self.performIncrementalSync(modelContext: modelContext)
@@ -81,7 +95,12 @@ class CloudKitSyncService: ObservableObject {
     
     /// Perform full bidirectional sync
     func performFullSync(modelContext: ModelContext) async {
-        guard !isSyncing else { return }
+        guard !isSyncing else {
+            syncLog("🔄 FULL SYNC: Already syncing, skipping", emoji: "⏭️")
+            return
+        }
+        
+        syncLog("🔄 FULL SYNC START", emoji: "🚀")
         
         isSyncing = true
         syncStatus = .syncing
@@ -108,6 +127,8 @@ class CloudKitSyncService: ObservableObject {
             syncStatus = .success
             syncError = nil
             
+            syncLog("🔄 FULL SYNC COMPLETE: SUCCESS ✅", emoji: "🎉")
+            
             // Reset success message after 3 seconds
             Task {
                 try? await Task.sleep(nanoseconds: 3_000_000_000)
@@ -119,6 +140,7 @@ class CloudKitSyncService: ObservableObject {
         } catch {
             syncError = error.localizedDescription
             syncStatus = .error(error.localizedDescription)
+            syncLog("🔄 FULL SYNC FAILED: \(error.localizedDescription)", emoji: "❌")
         }
         
         isSyncing = false
@@ -130,9 +152,12 @@ class CloudKitSyncService: ObservableObject {
     func performIncrementalSync(modelContext: ModelContext) async {
         guard !isSyncing, let lastSync = lastSyncDate else {
             // No previous sync, do full sync
+            syncLog("🔁 INCREMENTAL SYNC: No lastSync, doing full sync", emoji: "⏩")
             await performFullSync(modelContext: modelContext)
             return
         }
+        
+        syncLog("🔁 INCREMENTAL SYNC START: Since \(lastSync)", emoji: "🚀")
         
         isSyncing = true
         syncStatus = .syncing
@@ -150,6 +175,8 @@ class CloudKitSyncService: ObservableObject {
             syncStatus = .success
             syncError = nil
             
+            syncLog("🔁 INCREMENTAL SYNC COMPLETE: SUCCESS ✅", emoji: "🎉")
+            
             Task {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 if syncStatus == .success {
@@ -160,6 +187,7 @@ class CloudKitSyncService: ObservableObject {
         } catch {
             syncError = error.localizedDescription
             syncStatus = .error(error.localizedDescription)
+            syncLog("🔁 INCREMENTAL SYNC FAILED: \(error.localizedDescription)", emoji: "❌")
         }
         
         isSyncing = false

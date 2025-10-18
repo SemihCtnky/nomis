@@ -2,6 +2,15 @@ import Foundation
 import CloudKit
 import SwiftData
 
+// MARK: - 🔍 DEBUG LOGGING (TEMPORARY - REMOVE AFTER TESTING!)
+private let DEBUG_CLOUDKIT = true
+
+private func debugLog(_ message: String, emoji: String = "🔵") {
+    if DEBUG_CLOUDKIT {
+        print("\(emoji) [CloudKit] \(message)")
+    }
+}
+
 /// CloudKit Public Database Manager
 /// Manages sync between local SwiftData and CloudKit Public Database
 @MainActor
@@ -125,7 +134,13 @@ class CloudKitManager: ObservableObject {
     
     /// Upload multiple records in batch
     func uploadRecords(_ records: [CKRecord]) async throws {
-        guard !records.isEmpty else { return }
+        guard !records.isEmpty else {
+            debugLog("📤 Upload: No records to upload", emoji: "ℹ️")
+            return
+        }
+        
+        debugLog("📤 Upload START: \(records.count) records", emoji: "🚀")
+        
         await checkAndUpdateAvailability()
         try ensureAvailable()
         
@@ -144,14 +159,18 @@ class CloudKitManager: ObservableObject {
                 operation.modifyRecordsResultBlock = { result in
                     switch result {
                     case .success:
+                        debugLog("📤 Upload batch SUCCESS: \(batch.count) records", emoji: "✅")
                         continuation.resume()
                     case .failure(let error):
+                        debugLog("📤 Upload batch FAILED: \(error.localizedDescription)", emoji: "❌")
                         continuation.resume(throwing: error)
                     }
                 }
                 publicDatabase.add(operation)
             }
         }
+        
+        debugLog("📤 Upload COMPLETE: All \(records.count) records uploaded", emoji: "🎉")
         
         lastSyncDate = Date()
         syncError = nil
@@ -161,6 +180,7 @@ class CloudKitManager: ObservableObject {
     
     /// Fetch all records of a specific type
     func fetchRecords(ofType recordType: RecordType) async throws -> [CKRecord] {
+        debugLog("📥 Fetch START: \(recordType.rawValue)", emoji: "🚀")
         await checkAndUpdateAvailability()
         try ensureAvailable()
         
@@ -178,11 +198,14 @@ class CloudKitManager: ObservableObject {
         } while cursor != nil
         
         // Sort locally by modification date if available
-        return allRecords.sorted { (record1, record2) in
+        let sortedRecords = allRecords.sorted { (record1, record2) in
             let date1 = record1.modificationDate ?? record1.creationDate ?? Date.distantPast
             let date2 = record2.modificationDate ?? record2.creationDate ?? Date.distantPast
             return date1 > date2
         }
+        
+        debugLog("📥 Fetch COMPLETE: \(sortedRecords.count) records fetched", emoji: "🎉")
+        return sortedRecords
     }
     
     private func fetchRecordsWithCursor(query: CKQuery, cursor: CKQueryOperation.Cursor?) async throws -> ([CKRecord], CKQueryOperation.Cursor?) {
@@ -312,6 +335,8 @@ class CloudKitManager: ObservableObject {
     
     /// Fetch only records modified after a certain date
     func fetchRecordsModifiedAfter(_ date: Date, ofType recordType: RecordType) async throws -> [CKRecord] {
+        debugLog("📥 Fetch Modified START: \(recordType.rawValue) since \(date)", emoji: "🚀")
+        
         await checkAndUpdateAvailability()
         try ensureAvailable()
         
@@ -335,12 +360,17 @@ class CloudKitManager: ObservableObject {
             return modDate > date
         }
         
+        debugLog("📥 Fetch Modified FILTER: \(allRecords.count) total → \(filteredRecords.count) new", emoji: "🔍")
+        
         // Sort locally by modification date
-        return filteredRecords.sorted { (record1, record2) in
+        let sortedRecords = filteredRecords.sorted { (record1, record2) in
             let date1 = record1.modificationDate ?? Date.distantPast
             let date2 = record2.modificationDate ?? Date.distantPast
             return date1 > date2
         }
+        
+        debugLog("📥 Fetch Modified COMPLETE: \(sortedRecords.count) records", emoji: "🎉")
+        return sortedRecords
     }
 }
 

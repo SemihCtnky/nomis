@@ -278,7 +278,11 @@ struct DailyOperationsEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && !isNewForm else { return }
+        guard !isReadOnly && !isNewForm else {
+            print("📝 [GUNLUK] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
+            return
+        }
+        print("📝 [GUNLUK] AUTO-SYNC TRIGGER: Data changed")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     
