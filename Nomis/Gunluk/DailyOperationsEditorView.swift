@@ -85,7 +85,6 @@ struct DailyOperationsEditorView: View {
                     .id(gunVerisi.id)
             }
         }
-        .scrollTargetLayout() // Optimize scroll performance
         .transaction { transaction in
             transaction.animation = nil
         }
@@ -160,7 +159,6 @@ struct DailyOperationsEditorView: View {
             .scrollDismissesKeyboard(.immediately)
             .scrollContentBackground(.hidden)
             .ignoresSafeArea(.keyboard)
-            .coordinateSpace(name: "scroll")
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -221,41 +219,28 @@ struct DailyOperationsEditorView: View {
                 }
             )
         }
-        .task {
-            // CRITICAL: Minimal work on appear - instant open!
+        .onAppear {
+            // INSTANT LOAD: Everything loads immediately - no delay!
             if isNewForm && form.gunlukVeriler.isEmpty {
-                // Create days synchronously (fast - just 5 empty objects)
                 form.createWeeklyDays()
             }
             
-            // Update sorted cache only (INSTANT - ~2ms)
+            // Update all caches immediately (FAST)
             updateSortedGunlerCache()
+            updateWeeklyFireSummaryCache()
             
-            // PERFORMANCE: All heavy operations async (non-blocking UI)
-            Task(priority: .userInitiated) {
-                // Let UI render first (instant open!)
-                try? await Task.sleep(for: .milliseconds(16)) // 1 frame @ 60fps
+            if !isNewForm {
+                // Existing form operations
+                ensureOrderIndexForExistingRows()
                 
-                await MainActor.run {
-                    // Update fire summary (heavy calculation)
-                    updateWeeklyFireSummaryCache()
-                    
-                    if !isNewForm {
-                        // Existing form: orderIndex check (can be delayed)
-                        ensureOrderIndexForExistingRows()
-                        
-                        // Save changes
-                        do {
-                            try modelContext.save()
-                        } catch {
-                            print("OrderIndex kaydetme hatası: \(error)")
-                        }
-                        
-                        // Sync local arrays
-                        if let firstGunVerisi = form.gunlukVeriler.first {
-                            syncLocalArrays(for: firstGunVerisi)
-                        }
-                    }
+                do {
+                    try modelContext.save()
+                } catch {
+                    print("OrderIndex kaydetme hatası: \(error)")
+                }
+                
+                if let firstGunVerisi = form.gunlukVeriler.first {
+                    syncLocalArrays(for: firstGunVerisi)
                 }
             }
         }
