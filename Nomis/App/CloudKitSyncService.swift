@@ -257,13 +257,13 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // Update existing - ensure weekly days exist
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
                 if existingForm.gunlukVeriler.isEmpty {
                     existingForm.createWeeklyDays()
                 }
             } else {
                 // Insert new from CloudKit
-                if let form = createGunlukForm(from: record) {
+                if let form = createGunlukForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                 }
             }
@@ -283,9 +283,9 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
             } else {
-                if let form = createSarnelForm(from: record) {
+                if let form = createSarnelForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                 }
             }
@@ -305,9 +305,9 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
             } else {
-                if let form = createKilitForm(from: record) {
+                if let form = createKilitForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                 }
             }
@@ -327,9 +327,9 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingNote.updateFromRecord(record)
+                existingNote.updateFromRecord(record, modelContext: modelContext)
             } else {
-                if let note = createNote(from: record) {
+                if let note = createNote(from: record, modelContext: modelContext) {
                     modelContext.insert(note)
                 }
             }
@@ -353,7 +353,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingItem.updateFromRecord(record)
+                existingItem.updateFromRecord(record, modelContext: modelContext)
             } else {
                 if let item = createModelItem(from: record) {
                     modelContext.insert(item)
@@ -379,7 +379,7 @@ class CloudKitSyncService: ObservableObject {
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingItem.updateFromRecord(record)
+                existingItem.updateFromRecord(record, modelContext: modelContext)
             } else {
                 if let item = createCompanyItem(from: record) {
                     modelContext.insert(item)
@@ -411,7 +411,7 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
                 
                 // ✅ CRITICAL: Insert all nested items into ModelContext
                 for gunVerisi in existingForm.gunlukVeriler {
@@ -548,7 +548,7 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
                 
                 // ✅ CRITICAL: Insert all nested items into ModelContext
                 for item in existingForm.asitCikislari {
@@ -561,7 +561,7 @@ class CloudKitSyncService: ObservableObject {
                 syncLog("🔄 Sarnel: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
                 // Insert new form
-                if let form = createSarnelForm(from: record) {
+                if let form = createSarnelForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                     syncLog("✅ Sarnel: Inserted new form from CloudKit", emoji: "✅")
                 }
@@ -590,7 +590,7 @@ class CloudKitSyncService: ObservableObject {
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
-                existingForm.updateFromRecord(record)
+                existingForm.updateFromRecord(record, modelContext: modelContext)
                 
                 // ✅ CRITICAL: Insert all nested items into ModelContext
                 for item in existingForm.kasaItems {
@@ -609,7 +609,7 @@ class CloudKitSyncService: ObservableObject {
                 syncLog("🔄 Kilit: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
                 // Insert new form
-                if let form = createKilitForm(from: record) {
+                if let form = createKilitForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                     syncLog("✅ Kilit: Inserted new form from CloudKit", emoji: "✅")
                 }
@@ -637,9 +637,9 @@ class CloudKitSyncService: ObservableObject {
         // 3. MERGE: Update local or insert new
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
-                existingNote.updateFromRecord(record)
+                existingNote.updateFromRecord(record, modelContext: modelContext)
             } else {
-                if let note = createNote(from: record) {
+                if let note = createNote(from: record, modelContext: modelContext) {
                     modelContext.insert(note)
                 }
             }
@@ -650,12 +650,12 @@ class CloudKitSyncService: ObservableObject {
     
     // MARK: - Create from CKRecord
     
-    private func createGunlukForm(from record: CKRecord) -> YeniGunlukForm? {
+    private func createGunlukForm(from record: CKRecord, modelContext: ModelContext) -> YeniGunlukForm? {
         guard let id = UUID(uuidString: record.recordID.recordName) else { return nil }
         
         let form = YeniGunlukForm()
         form.id = id
-        form.updateFromRecord(record)
+        form.updateFromRecord(record, modelContext: modelContext)
         
         // Create weekly days if they don't exist
         // This is crucial to prevent crashes when displaying forms synced from CloudKit
@@ -666,7 +666,7 @@ class CloudKitSyncService: ObservableObject {
         return form
     }
     
-    private func createSarnelForm(from record: CKRecord) -> SarnelForm? {
+    private func createSarnelForm(from record: CKRecord, modelContext: ModelContext) -> SarnelForm? {
         guard let id = UUID(uuidString: record.recordID.recordName) else { return nil }
         
         // Get karatAyar from JSON or use default
@@ -680,27 +680,27 @@ class CloudKitSyncService: ObservableObject {
         
         let form = SarnelForm(karatAyar: karatAyar)
         form.id = id
-        form.updateFromRecord(record)
+        form.updateFromRecord(record, modelContext: modelContext)
         return form
     }
     
-    private func createKilitForm(from record: CKRecord) -> KilitToplamaForm? {
+    private func createKilitForm(from record: CKRecord, modelContext: ModelContext) -> KilitToplamaForm? {
         guard let id = UUID(uuidString: record.recordID.recordName) else { return nil }
         
         let form = KilitToplamaForm()
         form.id = id
-        form.updateFromRecord(record)
+        form.updateFromRecord(record, modelContext: modelContext)
         return form
     }
     
-    private func createNote(from record: CKRecord) -> Note? {
+    private func createNote(from record: CKRecord, modelContext: ModelContext) -> Note? {
         guard let id = UUID(uuidString: record.recordID.recordName),
               let title = record["title"] as? String,
               let text = record["text"] as? String else { return nil }
         
         let note = Note(title: title, text: text)
         note.id = id
-        note.updateFromRecord(record)
+        note.updateFromRecord(record, modelContext: modelContext)
         return note
     }
     

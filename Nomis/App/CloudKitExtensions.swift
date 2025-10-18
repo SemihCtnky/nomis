@@ -6,7 +6,7 @@ import SwiftData
 
 protocol CloudKitConvertible {
     func toCKRecord() -> CKRecord
-    func updateFromRecord(_ record: CKRecord)
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext)
     static var recordType: String { get }
 }
 
@@ -165,7 +165,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return dict
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let lastEditedAt = record["lastEditedAt"] as? Date {
             self.lastEditedAt = lastEditedAt
         }
@@ -193,45 +193,46 @@ extension YeniGunlukForm: CloudKitConvertible {
             
             let tarih = Date(timeIntervalSince1970: tarihTimestamp)
             let gunVerisi = GunlukGunVerisi(tarih: tarih, id: id)
+            modelContext.insert(gunVerisi)  // ✅ INSERT IMMEDIATELY
             
             // Deserialize Tezgah Karti 1
             if let tezgah1Dict = gunDict["tezgahKarti1"] as? [String: Any] {
-                gunVerisi.tezgahKarti1 = decodeTezgahKarti(from: tezgah1Dict)
+                gunVerisi.tezgahKarti1 = decodeTezgahKarti(from: tezgah1Dict, modelContext: modelContext)
             }
             
             // Deserialize Tezgah Karti 2
             if let tezgah2Dict = gunDict["tezgahKarti2"] as? [String: Any] {
-                gunVerisi.tezgahKarti2 = decodeTezgahKarti(from: tezgah2Dict)
+                gunVerisi.tezgahKarti2 = decodeTezgahKarti(from: tezgah2Dict, modelContext: modelContext)
             }
             
             // Deserialize Cila Karti
             if let cilaDict = gunDict["cilaKarti"] as? [String: Any] {
-                gunVerisi.cilaKarti = decodeCilaKarti(from: cilaDict)
+                gunVerisi.cilaKarti = decodeCilaKarti(from: cilaDict, modelContext: modelContext)
             }
             
             // Deserialize Ocak Karti
             if let ocakDict = gunDict["ocakKarti"] as? [String: Any] {
-                gunVerisi.ocakKarti = decodeOcakKarti(from: ocakDict)
+                gunVerisi.ocakKarti = decodeOcakKarti(from: ocakDict, modelContext: modelContext)
             }
             
             // Deserialize Patlatma Karti
             if let patlatmaDict = gunDict["patlatmaKarti"] as? [String: Any] {
-                gunVerisi.patlatmaKarti = decodePatlatmaKarti(from: patlatmaDict)
+                gunVerisi.patlatmaKarti = decodePatlatmaKarti(from: patlatmaDict, modelContext: modelContext)
             }
             
             // Deserialize Tambur Karti
             if let tamburDict = gunDict["tamburKarti"] as? [String: Any] {
-                gunVerisi.tamburKarti = decodeTamburKarti(from: tamburDict)
+                gunVerisi.tamburKarti = decodeTamburKarti(from: tamburDict, modelContext: modelContext)
             }
             
             // Deserialize Makine Kesme Karti
             if let makineDict = gunDict["makineKesmeKarti"] as? [String: Any] {
-                gunVerisi.makineKesmeKarti1 = decodeMakineKesmeKarti(from: makineDict)
+                gunVerisi.makineKesmeKarti1 = decodeMakineKesmeKarti(from: makineDict, modelContext: modelContext)
             }
             
             // Deserialize Testere Kesme Karti
             if let testereDict = gunDict["testereKesmeKarti"] as? [String: Any] {
-                gunVerisi.testereKesmeKarti1 = decodeTestereKesmeKarti(from: testereDict)
+                gunVerisi.testereKesmeKarti1 = decodeTestereKesmeKarti(from: testereDict, modelContext: modelContext)
             }
             
             gunlukVeriler.append(gunVerisi)
@@ -240,7 +241,7 @@ extension YeniGunlukForm: CloudKitConvertible {
     
     // MARK: - Decode Helper Functions
     
-    private func decodeTezgahKarti(from dict: [String: Any]) -> TezgahKarti {
+    private func decodeTezgahKarti(from dict: [String: Any], modelContext: ModelContext) -> TezgahKarti {
         let kart = TezgahKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -248,6 +249,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -274,6 +276,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -293,6 +296,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let aciklama = fireDict["aciklama"] as? String {
                     fire.aciklama = aciklama
                 }
+                modelContext.insert(fire)  // ✅ INSERT IMMEDIATELY
                 kart.fireEklemeleri.append(fire)
             }
         }
@@ -300,7 +304,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodeCilaKarti(from dict: [String: Any]) -> CilaKarti {
+    private func decodeCilaKarti(from dict: [String: Any], modelContext: ModelContext) -> CilaKarti {
         let kart = CilaKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -308,6 +312,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -326,6 +331,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -333,6 +339,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -342,6 +349,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -349,7 +357,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodeOcakKarti(from dict: [String: Any]) -> OcakKarti {
+    private func decodeOcakKarti(from dict: [String: Any], modelContext: ModelContext) -> OcakKarti {
         let kart = OcakKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -357,6 +365,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -375,6 +384,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -382,6 +392,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -391,6 +402,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -398,7 +410,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodePatlatmaKarti(from dict: [String: Any]) -> PatlatmaKarti {
+    private func decodePatlatmaKarti(from dict: [String: Any], modelContext: ModelContext) -> PatlatmaKarti {
         let kart = PatlatmaKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -406,6 +418,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -424,6 +437,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -431,6 +445,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -440,6 +455,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -447,7 +463,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodeTamburKarti(from dict: [String: Any]) -> TamburKarti {
+    private func decodeTamburKarti(from dict: [String: Any], modelContext: ModelContext) -> TamburKarti {
         let kart = TamburKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -455,6 +471,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -473,6 +490,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -480,6 +498,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -489,6 +508,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -496,7 +516,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodeMakineKesmeKarti(from dict: [String: Any]) -> MakineKesmeKarti {
+    private func decodeMakineKesmeKarti(from dict: [String: Any], modelContext: ModelContext) -> MakineKesmeKarti {
         let kart = MakineKesmeKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -504,6 +524,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -522,6 +543,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -529,6 +551,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -538,6 +561,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -545,7 +569,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         return kart
     }
     
-    private func decodeTestereKesmeKarti(from dict: [String: Any]) -> TestereKesmeKarti {
+    private func decodeTestereKesmeKarti(from dict: [String: Any], modelContext: ModelContext) -> TestereKesmeKarti {
         let kart = TestereKesmeKarti()
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
@@ -553,6 +577,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
+        modelContext.insert(kart)  // ✅ INSERT IMMEDIATELY
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -571,6 +596,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let girisValuesArray = rowDict["girisValues"] as? [Double] {
                     for value in girisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.girisValues.append(deger)
                     }
                 }
@@ -578,6 +604,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
                     for value in cikisValuesArray {
                         let deger = GenisletilebilirDeger(value: value)
+                        modelContext.insert(deger)  // ✅ INSERT IMMEDIATELY
                         satir.cikisValues.append(deger)
                     }
                 }
@@ -587,6 +614,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let orderIndex = rowDict["orderIndex"] as? Int {
                     satir.orderIndex = orderIndex
                 }
+                modelContext.insert(satir)  // ✅ INSERT IMMEDIATELY
                 kart.satirlar.append(satir)
             }
         }
@@ -669,7 +697,7 @@ extension SarnelForm: CloudKitConvertible {
         return record
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let karatAyar = record["karatAyar"] as? Int {
             self.karatAyar = karatAyar
         }
@@ -725,6 +753,7 @@ extension SarnelForm: CloudKitConvertible {
                 }
                 let note = asitDict["note"] as? String
                 let asit = AsitItem(valueGr: valueGr, note: note ?? "", id: id)
+                modelContext.insert(asit)  // ✅ INSERT IMMEDIATELY
                 asitCikislari.append(asit)
             }
         }
@@ -739,6 +768,7 @@ extension SarnelForm: CloudKitConvertible {
                 }
                 let note = fireDict["note"] as? String
                 let fire = FireItem(value: value, note: note ?? "", id: id)
+                modelContext.insert(fire)  // ✅ INSERT IMMEDIATELY
                 extraFireItems.append(fire)
             }
         }
@@ -831,7 +861,7 @@ extension KilitToplamaForm: CloudKitConvertible {
         return record
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let model = record["model"] as? String {
             self.model = model
         }
@@ -873,6 +903,7 @@ extension KilitToplamaForm: CloudKitConvertible {
                 let cikisGram = itemDict["cikisGram"] as? Double
                 let cikisAdet = itemDict["cikisAdet"] as? Double
                 let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
+                modelContext.insert(item)  // ✅ INSERT IMMEDIATELY
                 kasaItems.append(item)
             }
         }
@@ -889,6 +920,7 @@ extension KilitToplamaForm: CloudKitConvertible {
                 let cikisGram = itemDict["cikisGram"] as? Double
                 let cikisAdet = itemDict["cikisAdet"] as? Double
                 let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
+                modelContext.insert(item)  // ✅ INSERT IMMEDIATELY
                 dilItems.append(item)
             }
         }
@@ -905,6 +937,7 @@ extension KilitToplamaForm: CloudKitConvertible {
                 let cikisGram = itemDict["cikisGram"] as? Double
                 let cikisAdet = itemDict["cikisAdet"] as? Double
                 let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
+                modelContext.insert(item)  // ✅ INSERT IMMEDIATELY
                 yayItems.append(item)
             }
         }
@@ -921,6 +954,7 @@ extension KilitToplamaForm: CloudKitConvertible {
                 let cikisGram = itemDict["cikisGram"] as? Double
                 let cikisAdet = itemDict["cikisAdet"] as? Double
                 let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
+                modelContext.insert(item)  // ✅ INSERT IMMEDIATELY
                 kilitItems.append(item)
             }
         }
@@ -946,7 +980,7 @@ extension Note: CloudKitConvertible {
         return record
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let title = record["title"] as? String {
             self.title = title
         }
@@ -977,7 +1011,7 @@ extension ModelItem: CloudKitConvertible {
         return record
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let name = record["name"] as? String {
             self.name = name
         }
@@ -999,7 +1033,7 @@ extension CompanyItem: CloudKitConvertible {
         return record
     }
     
-    func updateFromRecord(_ record: CKRecord) {
+    func updateFromRecord(_ record: CKRecord, modelContext: ModelContext) {
         if let name = record["name"] as? String {
             self.name = name
         }
