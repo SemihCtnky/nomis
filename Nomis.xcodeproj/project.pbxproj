@@ -542,7 +542,7 @@
 				CODE_SIGN_ENTITLEMENTS = Nomis/Nomis.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Nomis/Preview Content\"";
 				DEVELOPMENT_TEAM = 8YCF3HV5VQ;
 				ENABLE_PREVIEWS = YES;
@@ -578,7 +578,7 @@
 				CODE_SIGN_ENTITLEMENTS = Nomis/Nomis.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Nomis/Preview Content\"";
 				DEVELOPMENT_TEAM = 8YCF3HV5VQ;
 				ENABLE_PREVIEWS = YES;

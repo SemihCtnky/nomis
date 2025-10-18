@@ -53,7 +53,7 @@ struct DailyOperationsEditorView: View {
     
     // Performance optimization: Cache sorted days
     @State private var sortedGunler: [GunlukGunVerisi] = []
-    @State private var weeklyFireSummaryCache: [[String: Any]]?
+    @State private var weeklyFireSummaryCache: [AyarFireData] = []
     
     init(form: YeniGunlukForm? = nil, isReadOnly: Bool = false) {
         if let existingForm = form {
@@ -74,12 +74,12 @@ struct DailyOperationsEditorView: View {
         return true
     }
     
-    var body: some View {
-        NavigationStack {
-            ScrollView(.vertical, showsIndicators: true) {
-                LazyVStack(spacing: 0, pinnedViews: []) {
-                    // Günlük veriler (Pazartesi - Cuma) - Cached sorted array for performance
-                    ForEach(Array(sortedGunler.enumerated()), id: \.element.id) { gunIndex, gunVerisi in
+    // MARK: - Main Content View (Split for compiler)
+    
+    private var scrollContent: some View {
+        LazyVStack(spacing: 0, pinnedViews: []) {
+            // Günlük veriler (Pazartesi - Cuma) - Cached sorted array for performance
+            ForEach(Array(sortedGunler.enumerated()), id: \.element.id) { gunIndex, gunVerisi in
                             VStack(spacing: 0) {
                                 // Gün başlığı
                                 gunBasligi(for: gunVerisi)
@@ -129,12 +129,12 @@ struct DailyOperationsEditorView: View {
                             
                             // Haftalık Fire Özeti - sadece son gün (Cuma) için
                             if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
-                                if let cachedSummary = weeklyFireSummaryCache {
+                                if !weeklyFireSummaryCache.isEmpty {
                                     VStack(spacing: 16) {
                                         Spacer()
                                             .frame(height: 40)
                                         
-                                        WeeklyFireSummaryTable(fireData: cachedSummary)
+                                        WeeklyFireSummaryTable(fireData: weeklyFireSummaryCache)
                                             .frame(maxWidth: .infinity)
                                             .padding(.horizontal, 16)
                                         
@@ -145,12 +145,19 @@ struct DailyOperationsEditorView: View {
                             }
                         }
                     }
-                    .transaction { transaction in
-                        transaction.animation = nil
-                    }
                 }
-                .scrollDismissesKeyboard(.interactively)
-                .scrollContentBackground(.hidden)
+                .transaction { transaction in
+                    transaction.animation = nil
+                }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: true) {
+                scrollContent
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .scrollContentBackground(.hidden)
             .ignoresSafeArea(.keyboard)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
