@@ -339,25 +339,6 @@ extension YeniGunlukForm: CloudKitConvertible {
             }
         }
         
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
-            }
-        }
-        
         return kart
     }
     
@@ -401,25 +382,6 @@ extension YeniGunlukForm: CloudKitConvertible {
                     satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
-            }
-        }
-        
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -469,25 +431,6 @@ extension YeniGunlukForm: CloudKitConvertible {
             }
         }
         
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
-            }
-        }
-        
         return kart
     }
     
@@ -531,25 +474,6 @@ extension YeniGunlukForm: CloudKitConvertible {
                     satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
-            }
-        }
-        
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -599,25 +523,6 @@ extension YeniGunlukForm: CloudKitConvertible {
             }
         }
         
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
-            }
-        }
-        
         return kart
     }
     
@@ -661,25 +566,6 @@ extension YeniGunlukForm: CloudKitConvertible {
                     satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
-            }
-        }
-        
-        // Decode fire eklemeleri
-        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
-            for fireDict in fireArray {
-                guard let idString = fireDict["id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    continue
-                }
-                let fire = FireEklemesi()
-                fire.id = id
-                if let value = fireDict["value"] as? Double {
-                    fire.value = value
-                }
-                if let aciklama = fireDict["aciklama"] as? String {
-                    fire.aciklama = aciklama
-                }
-                kart.fireEklemeleri.append(fire)
             }
         }
         
