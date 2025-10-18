@@ -181,8 +181,8 @@ class AsitItem {
     var note: String?
     var createdAt: Date
     
-    init(valueGr: Double, note: String? = nil) {
-        self.id = UUID()
+    init(valueGr: Double, note: String? = nil, id: UUID? = nil) {
+        self.id = id ?? UUID()
         self.valueGr = valueGr
         self.note = note
         self.createdAt = Date()
@@ -267,8 +267,8 @@ class KilitItem {
     var cikisAdet: Double?
     var createdAt: Date
     
-    init(girisAdet: Double? = nil, girisGram: Double? = nil, cikisGram: Double? = nil, cikisAdet: Double? = nil) {
-        self.id = UUID()
+    init(girisAdet: Double? = nil, girisGram: Double? = nil, cikisGram: Double? = nil, cikisAdet: Double? = nil, id: UUID? = nil) {
+        self.id = id ?? UUID()
         self.girisAdet = girisAdet
         self.girisGram = girisGram
         self.cikisGram = cikisGram
@@ -284,8 +284,8 @@ class FireItem {
     var note: String?
     var createdAt: Date
     
-    init(value: Double, note: String? = nil) {
-        self.id = UUID()
+    init(value: Double, note: String? = nil, id: UUID? = nil) {
+        self.id = id ?? UUID()
         self.value = value
         self.note = note
         self.createdAt = Date()
@@ -1607,8 +1607,8 @@ class GunlukGunVerisi {
     @Relationship(deleteRule: .cascade) var makineKesmeKarti1: MakineKesmeKarti?
     @Relationship(deleteRule: .cascade) var testereKesmeKarti1: TestereKesmeKarti?
     
-    init(tarih: Date) {
-        self.id = UUID()
+    init(tarih: Date, id: UUID? = nil) {
+        self.id = id ?? UUID()
         self.tarih = tarih
         // Kartları lazy loading için nil bırak
         // Kullanıldığında oluşturulacaklar

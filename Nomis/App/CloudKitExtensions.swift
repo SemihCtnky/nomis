@@ -190,8 +190,7 @@ extension YeniGunlukForm: CloudKitConvertible {
             }
             
             let tarih = Date(timeIntervalSince1970: tarihTimestamp)
-            let gunVerisi = GunlukGunVerisi(tarih: tarih)
-            gunVerisi.id = id
+            let gunVerisi = GunlukGunVerisi(tarih: tarih, id: id)
             
             // Deserialize Tezgah Karti 1
             if let tezgah1Dict = gunDict["tezgahKarti1"] as? [String: Any] {
@@ -702,8 +701,7 @@ extension SarnelForm: CloudKitConvertible {
                     continue
                 }
                 let note = asitDict["note"] as? String
-                let asit = AsitItem(valueGr: valueGr, note: note ?? "")
-                asit.id = id
+                let asit = AsitItem(valueGr: valueGr, note: note ?? "", id: id)
                 asitCikislari.append(asit)
             }
         }
@@ -717,8 +715,7 @@ extension SarnelForm: CloudKitConvertible {
                     continue
                 }
                 let note = fireDict["note"] as? String
-                let fire = FireItem(value: value, note: note ?? "")
-                fire.id = id
+                let fire = FireItem(value: value, note: note ?? "", id: id)
                 extraFireItems.append(fire)
             }
         }
@@ -848,20 +845,11 @@ extension KilitToplamaForm: CloudKitConvertible {
                       let id = UUID(uuidString: idString) else {
                     continue
                 }
-                let item = KilitItem()
-                item.id = id
-                if let girisAdet = itemDict["girisAdet"] as? Double {
-                    item.girisAdet = girisAdet
-                }
-                if let girisGram = itemDict["girisGram"] as? Double {
-                    item.girisGram = girisGram
-                }
-                if let cikisGram = itemDict["cikisGram"] as? Double {
-                    item.cikisGram = cikisGram
-                }
-                if let cikisAdet = itemDict["cikisAdet"] as? Double {
-                    item.cikisAdet = cikisAdet
-                }
+                let girisAdet = itemDict["girisAdet"] as? Double
+                let girisGram = itemDict["girisGram"] as? Double
+                let cikisGram = itemDict["cikisGram"] as? Double
+                let cikisAdet = itemDict["cikisAdet"] as? Double
+                let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
                 kasaItems.append(item)
             }
         }
@@ -873,20 +861,11 @@ extension KilitToplamaForm: CloudKitConvertible {
                       let id = UUID(uuidString: idString) else {
                     continue
                 }
-                let item = KilitItem()
-                item.id = id
-                if let girisAdet = itemDict["girisAdet"] as? Double {
-                    item.girisAdet = girisAdet
-                }
-                if let girisGram = itemDict["girisGram"] as? Double {
-                    item.girisGram = girisGram
-                }
-                if let cikisGram = itemDict["cikisGram"] as? Double {
-                    item.cikisGram = cikisGram
-                }
-                if let cikisAdet = itemDict["cikisAdet"] as? Double {
-                    item.cikisAdet = cikisAdet
-                }
+                let girisAdet = itemDict["girisAdet"] as? Double
+                let girisGram = itemDict["girisGram"] as? Double
+                let cikisGram = itemDict["cikisGram"] as? Double
+                let cikisAdet = itemDict["cikisAdet"] as? Double
+                let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
                 dilItems.append(item)
             }
         }
@@ -898,20 +877,11 @@ extension KilitToplamaForm: CloudKitConvertible {
                       let id = UUID(uuidString: idString) else {
                     continue
                 }
-                let item = KilitItem()
-                item.id = id
-                if let girisAdet = itemDict["girisAdet"] as? Double {
-                    item.girisAdet = girisAdet
-                }
-                if let girisGram = itemDict["girisGram"] as? Double {
-                    item.girisGram = girisGram
-                }
-                if let cikisGram = itemDict["cikisGram"] as? Double {
-                    item.cikisGram = cikisGram
-                }
-                if let cikisAdet = itemDict["cikisAdet"] as? Double {
-                    item.cikisAdet = cikisAdet
-                }
+                let girisAdet = itemDict["girisAdet"] as? Double
+                let girisGram = itemDict["girisGram"] as? Double
+                let cikisGram = itemDict["cikisGram"] as? Double
+                let cikisAdet = itemDict["cikisAdet"] as? Double
+                let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
                 yayItems.append(item)
             }
         }
@@ -923,20 +893,11 @@ extension KilitToplamaForm: CloudKitConvertible {
                       let id = UUID(uuidString: idString) else {
                     continue
                 }
-                let item = KilitItem()
-                item.id = id
-                if let girisAdet = itemDict["girisAdet"] as? Double {
-                    item.girisAdet = girisAdet
-                }
-                if let girisGram = itemDict["girisGram"] as? Double {
-                    item.girisGram = girisGram
-                }
-                if let cikisGram = itemDict["cikisGram"] as? Double {
-                    item.cikisGram = cikisGram
-                }
-                if let cikisAdet = itemDict["cikisAdet"] as? Double {
-                    item.cikisAdet = cikisAdet
-                }
+                let girisAdet = itemDict["girisAdet"] as? Double
+                let girisGram = itemDict["girisGram"] as? Double
+                let cikisGram = itemDict["cikisGram"] as? Double
+                let cikisAdet = itemDict["cikisAdet"] as? Double
+                let item = KilitItem(girisAdet: girisAdet, girisGram: girisGram, cikisGram: cikisGram, cikisAdet: cikisAdet, id: id)
                 kilitItems.append(item)
             }
         }
