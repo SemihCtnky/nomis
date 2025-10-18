@@ -86,7 +86,7 @@ struct DailyOperationsEditorView: View {
                     
                     // Kartlar - Yatay scroll
                     ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(alignment: .top, spacing: 16) {
+                        HStack(alignment: .top, spacing: 16) {
                             // Tezgah kartları (ikişer tane)
                             tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
                             tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
@@ -110,9 +110,11 @@ struct DailyOperationsEditorView: View {
                             testereKesmeCard(for: gunVerisi, cardIndex: 1)
                         }
                         .padding(.horizontal, 16)
-                        .padding(.vertical, 20)
+                        .padding(.bottom, 20)
+                        .padding(.top, 20)
+                        .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
                     }
-                    .frame(height: 420)
+                    .frame(minHeight: 400)
                     .scrollBounceBehavior(.basedOnSize)
                     .scrollIndicatorsFlash(onAppear: false)
                 }

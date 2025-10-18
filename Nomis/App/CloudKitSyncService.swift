@@ -15,8 +15,8 @@ class CloudKitSyncService: ObservableObject {
     @Published var syncError: String?
     @Published var syncStatus: SyncStatus = .idle
     
-    // Auto-sync timer (debounced)
-    private var autoSyncTimer: Timer?
+    // Auto-sync task (debounced)
+    private var autoSyncTask: Task<Void, Never>?
     private let autoSyncDelay: TimeInterval = 3.0 // 3 seconds after last change
     
     enum SyncStatus: Equatable {
@@ -43,7 +43,7 @@ class CloudKitSyncService: ObservableObject {
     }
     
     deinit {
-        autoSyncTimer?.invalidate()
+        autoSyncTask?.cancel()
     }
     
     // MARK: - Auto Sync (Debounced)
@@ -51,23 +51,30 @@ class CloudKitSyncService: ObservableObject {
     /// Trigger auto-sync after a delay (debounced)
     /// Call this every time data changes
     func scheduleAutoSync(modelContext: ModelContext) {
-        // Cancel existing timer
-        autoSyncTimer?.invalidate()
+        // Cancel existing task
+        autoSyncTask?.cancel()
         
-        // Schedule new timer
-        autoSyncTimer = Timer.scheduledTimer(withTimeInterval: autoSyncDelay, repeats: false) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                // modelContext is passed directly in the main actor context
-                await self.performIncrementalSync(modelContext: modelContext)
+        // Schedule new task with sleep (no Sendable warning!)
+        autoSyncTask = Task { @MainActor [weak self] in
+            guard let self = self else { return }
+            
+            // Wait for debounce delay
+            do {
+                try await Task.sleep(for: .seconds(self.autoSyncDelay))
+            } catch {
+                // Task was cancelled, exit gracefully
+                return
             }
+            
+            // Perform sync after delay (modelContext captured in MainActor context - safe!)
+            await self.performIncrementalSync(modelContext: modelContext)
         }
     }
     
-    /// Cancel auto-sync timer
+    /// Cancel auto-sync task
     func cancelAutoSync() {
-        autoSyncTimer?.invalidate()
-        autoSyncTimer = nil
+        autoSyncTask?.cancel()
+        autoSyncTask = nil
     }
     
     // MARK: - Full Sync (Initial or Manual)
