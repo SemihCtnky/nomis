@@ -99,9 +99,9 @@ struct DailyOperationsEditorView: View {
             // Gün başlığı
             gunBasligi(for: gunVerisi)
             
-            // Kartlar - Yatay scroll (LAZY rendering for cards!)
+            // Kartlar - Yatay scroll
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: 16) {
+                HStack(alignment: .top, spacing: 16) {
                     // Tezgah kartları (ikişer tane)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
@@ -127,8 +127,9 @@ struct DailyOperationsEditorView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
                 .padding(.top, 20)
+                .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
             }
-            .frame(height: 440)
+            .frame(minHeight: 400)
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicatorsFlash(onAppear: false)
         }
