@@ -80,75 +80,73 @@ struct DailyOperationsEditorView: View {
         LazyVStack(spacing: 0, pinnedViews: []) {
             // Günlük veriler (Pazartesi - Cuma) - Cached sorted array for performance
             ForEach(Array(sortedGunler.enumerated()), id: \.element.id) { gunIndex, gunVerisi in
-                            VStack(spacing: 0) {
-                                // Gün başlığı
-                                gunBasligi(for: gunVerisi)
-                                
-                                // Kartlar - Yatay scroll
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(alignment: .top, spacing: 16) {
-                                        // Tezgah kartları (ikişer tane)
-                                        tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
-                                            .id("\(gunVerisi.id)-tezgah-1")
-                                        tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
-                                            .id("\(gunVerisi.id)-tezgah-2")
-                                        
-                                        // Cila kartı (birer tane)
-                                        cilaCard(for: gunVerisi)
-                                            .id("\(gunVerisi.id)-cila")
-                                        
-                                        // Ocak kartı (birer tane)
-                                        ocakCard(for: gunVerisi)
-                                            .id("\(gunVerisi.id)-ocak")
-                                        
-                                        // Patlatma kartı (birer tane)
-                                        patlatmaCard(for: gunVerisi)
-                                            .id("\(gunVerisi.id)-patlatma")
-                                        
-                                        // Tambur kartı (birer tane)
-                                        tamburCard(for: gunVerisi)
-                                            .id("\(gunVerisi.id)-tambur")
-                                        
-                                        // Makine Kesme kartı (sonda, birer tane) 
-                                        makineKesmeCard(for: gunVerisi, cardIndex: 1)
-                                            .id("\(gunVerisi.id)-makine")
-                                        
-                                        // Testere Kesme kartı (sonda, birer tane)
-                                        testereKesmeCard(for: gunVerisi, cardIndex: 1)
-                                            .id("\(gunVerisi.id)-testere")
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 20)
-                                    .padding(.top, 20)
-                                    .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
-                                }
-                                .frame(minHeight: 400) // Minimum height to prevent collapse
-                                .scrollBounceBehavior(.basedOnSize)
-                                .scrollIndicatorsFlash(onAppear: false)
-                            }
+                VStack(spacing: 0) {
+                    // Gün başlığı
+                    gunBasligi(for: gunVerisi)
+                    
+                    // Kartlar - Yatay scroll
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(alignment: .top, spacing: 16) {
+                            // Tezgah kartları (ikişer tane)
+                            tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
+                                .id("\(gunVerisi.id)-tezgah-1")
+                            tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
+                                .id("\(gunVerisi.id)-tezgah-2")
                             
-                            // Haftalık Fire Özeti - sadece son gün (Cuma) için
-                            if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
-                                if !weeklyFireSummaryCache.isEmpty {
-                                    VStack(spacing: 16) {
-                                        Spacer()
-                                            .frame(height: 40)
-                                        
-                                        WeeklyFireSummaryTable(fireData: weeklyFireSummaryCache)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.horizontal, 16)
-                                        
-                                        Spacer()
-                                            .frame(height: 20)
-                                    }
-                                }
-                            }
+                            // Cila kartı (birer tane)
+                            cilaCard(for: gunVerisi)
+                                .id("\(gunVerisi.id)-cila")
+                            
+                            // Ocak kartı (birer tane)
+                            ocakCard(for: gunVerisi)
+                                .id("\(gunVerisi.id)-ocak")
+                            
+                            // Patlatma kartı (birer tane)
+                            patlatmaCard(for: gunVerisi)
+                                .id("\(gunVerisi.id)-patlatma")
+                            
+                            // Tambur kartı (birer tane)
+                            tamburCard(for: gunVerisi)
+                                .id("\(gunVerisi.id)-tambur")
+                            
+                            // Makine Kesme kartı (sonda, birer tane) 
+                            makineKesmeCard(for: gunVerisi, cardIndex: 1)
+                                .id("\(gunVerisi.id)-makine")
+                            
+                            // Testere Kesme kartı (sonda, birer tane)
+                            testereKesmeCard(for: gunVerisi, cardIndex: 1)
+                                .id("\(gunVerisi.id)-testere")
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 20)
+                        .padding(.top, 20)
+                        .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
+                    }
+                    .frame(minHeight: 400)
+                    .scrollBounceBehavior(.basedOnSize)
+                    .scrollIndicatorsFlash(onAppear: false)
+                }
+                
+                // Haftalık Fire Özeti - sadece son gün (Cuma) için
+                if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
+                    if !weeklyFireSummaryCache.isEmpty {
+                        VStack(spacing: 16) {
+                            Spacer()
+                                .frame(height: 40)
+                            
+                            WeeklyFireSummaryTable(fireData: weeklyFireSummaryCache)
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                            
+                            Spacer()
+                                .frame(height: 20)
                         }
                     }
                 }
-                .transaction { transaction in
-                    transaction.animation = nil
-                }
+            }
+            .transaction { transaction in
+                transaction.animation = nil
+            }
     }
     
     var body: some View {

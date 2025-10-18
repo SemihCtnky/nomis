@@ -56,7 +56,7 @@ class CloudKitSyncService: ObservableObject {
         
         // Schedule new timer
         autoSyncTimer = Timer.scheduledTimer(withTimeInterval: autoSyncDelay, repeats: false) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self, modelContext] in
                 await self?.performIncrementalSync(modelContext: modelContext)
             }
         }
