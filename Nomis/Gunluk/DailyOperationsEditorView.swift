@@ -80,65 +80,74 @@ struct DailyOperationsEditorView: View {
         LazyVStack(spacing: 0, pinnedViews: []) {
             // Günlük veriler (Pazartesi - Cuma) - Cached sorted array for performance
             ForEach(Array(sortedGunler.enumerated()), id: \.element.id) { gunIndex, gunVerisi in
-                VStack(spacing: 0) {
-                    // Gün başlığı
-                    gunBasligi(for: gunVerisi)
-                    
-                    // Kartlar - Yatay scroll
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(alignment: .top, spacing: 16) {
-                            // Tezgah kartları (ikişer tane)
-                            tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
-                            tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
-                            
-                            // Cila kartı (birer tane)
-                            cilaCard(for: gunVerisi)
-                            
-                            // Ocak kartı (birer tane)
-                            ocakCard(for: gunVerisi)
-                            
-                            // Patlatma kartı (birer tane)
-                            patlatmaCard(for: gunVerisi)
-                            
-                            // Tambur kartı (birer tane)
-                            tamburCard(for: gunVerisi)
-                            
-                            // Makine Kesme kartı (sonda, birer tane) 
-                            makineKesmeCard(for: gunVerisi, cardIndex: 1)
-                            
-                            // Testere Kesme kartı (sonda, birer tane)
-                            testereKesmeCard(for: gunVerisi, cardIndex: 1)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
-                        .padding(.top, 20)
-                        .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
-                    }
-                    .frame(minHeight: 400)
-                    .scrollBounceBehavior(.basedOnSize)
-                    .scrollIndicatorsFlash(onAppear: false)
-                }
-                
-                // Haftalık Fire Özeti - sadece son gün (Cuma) için
-                if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
-                    if !weeklyFireSummaryCache.isEmpty {
-                        VStack(spacing: 0) {
-                            Spacer()
-                                .frame(height: 40)
-                            
-                            WeeklyFireSummaryTable(fireData: weeklyFireSummaryCache)
-                                .frame(maxWidth: .infinity)
-                                .padding(.horizontal, 16)
-                            
-                            Spacer()
-                                .frame(height: 20)
-                        }
-                    }
-                }
+                // PERFORMANCE: Each day as separate view (prevents full re-render on scroll)
+                dayContentView(for: gunVerisi, at: gunIndex)
+                    .id(gunVerisi.id)
             }
         }
         .transaction { transaction in
             transaction.animation = nil
+        }
+    }
+    
+    // MARK: - Day Content View (Optimized for Performance)
+    
+    @ViewBuilder
+    private func dayContentView(for gunVerisi: GunlukGunVerisi, at gunIndex: Int) -> some View {
+        VStack(spacing: 0) {
+            // Gün başlığı
+            gunBasligi(for: gunVerisi)
+            
+            // Kartlar - Yatay scroll
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 16) {
+                    // Tezgah kartları (ikişer tane)
+                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
+                    tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
+                    
+                    // Cila kartı (birer tane)
+                    cilaCard(for: gunVerisi)
+                    
+                    // Ocak kartı (birer tane)
+                    ocakCard(for: gunVerisi)
+                    
+                    // Patlatma kartı (birer tane)
+                    patlatmaCard(for: gunVerisi)
+                    
+                    // Tambur kartı (birer tane)
+                    tamburCard(for: gunVerisi)
+                    
+                    // Makine Kesme kartı (sonda, birer tane) 
+                    makineKesmeCard(for: gunVerisi, cardIndex: 1)
+                    
+                    // Testere Kesme kartı (sonda, birer tane)
+                    testereKesmeCard(for: gunVerisi, cardIndex: 1)
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 20)
+                .padding(.top, 20)
+                .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
+            }
+            .frame(minHeight: 400)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicatorsFlash(onAppear: false)
+        }
+        
+        // Haftalık Fire Özeti - sadece son gün (Cuma) için
+        if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
+            if !weeklyFireSummaryCache.isEmpty {
+                VStack(spacing: 0) {
+                    Spacer()
+                        .frame(height: 40)
+                    
+                    WeeklyFireSummaryTable(fireData: weeklyFireSummaryCache)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 16)
+                    
+                    Spacer()
+                        .frame(height: 20)
+                }
+            }
         }
     }
     
@@ -147,11 +156,10 @@ struct DailyOperationsEditorView: View {
             ScrollView(.vertical, showsIndicators: true) {
                 scrollContent
             }
-            .scrollDismissesKeyboard(.interactively)
+            .scrollDismissesKeyboard(.immediately)
             .scrollContentBackground(.hidden)
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicatorsFlash(onAppear: false)
             .ignoresSafeArea(.keyboard)
+            .coordinateSpace(name: "scroll")
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -212,38 +220,39 @@ struct DailyOperationsEditorView: View {
                 }
             )
         }
-        .onAppear {
-            // CRITICAL PERFORMANCE: Only update sorted cache immediately (fast)
-            updateSortedGunlerCache()
-            
-            if isNewForm {
-                // YENİ FORM: Haftalık günleri oluştur (only if empty)
-                if form.gunlukVeriler.isEmpty {
-                    form.createWeeklyDays()
-                    updateSortedGunlerCache()
-                }
+        .task {
+            // CRITICAL: Minimal work on appear - instant open!
+            if isNewForm && form.gunlukVeriler.isEmpty {
+                // Create days synchronously (fast - just 5 empty objects)
+                form.createWeeklyDays()
             }
             
-            // PERFORMANCE: Do heavy operations async in background
-            Task.detached(priority: .userInitiated) {
-                await MainActor.run {
-                    // Update fire summary cache (heavy calculation)
-                    self.updateWeeklyFireSummaryCache()
+            // Update cache (fast - just sorting)
+            updateSortedGunlerCache()
+            
+            // Update fire summary immediately (so table shows up)
+            updateWeeklyFireSummaryCache()
+            
+            // PERFORMANCE: Heavy operations in background (non-blocking)
+            if !isNewForm {
+                Task(priority: .userInitiated) {
+                    // Small delay to let UI render first
+                    try? await Task.sleep(for: .milliseconds(100))
                     
-                    if !self.isNewForm {
-                        // Mevcut form için orderIndex kontrolü yap (can be delayed)
-                        self.ensureOrderIndexForExistingRows()
+                    await MainActor.run {
+                        // Existing form: orderIndex check (can be delayed)
+                        ensureOrderIndexForExistingRows()
                         
-                        // Değişiklikleri kaydet ki orderIndex'ler kalıcı olsun
+                        // Save changes
                         do {
-                            try self.modelContext.save()
+                            try modelContext.save()
                         } catch {
                             print("OrderIndex kaydetme hatası: \(error)")
                         }
                         
-                        // Local array'leri sync et
-                        if let firstGunVerisi = self.form.gunlukVeriler.first {
-                            self.syncLocalArrays(for: firstGunVerisi)
+                        // Sync local arrays
+                        if let firstGunVerisi = form.gunlukVeriler.first {
+                            syncLocalArrays(for: firstGunVerisi)
                         }
                     }
                 }
@@ -252,7 +261,13 @@ struct DailyOperationsEditorView: View {
         .onChange(of: form.gunlukVeriler.count) { _, _ in
             // PERFORMANCE: Update cache when days change
             updateSortedGunlerCache()
-            updateWeeklyFireSummaryCache()
+            
+            // Update fire summary immediately on appear
+            Task {
+                await MainActor.run {
+                    updateWeeklyFireSummaryCache()
+                }
+            }
         }
         .onChange(of: hasChanges) { _, newValue in
             // AUTO-SYNC: Trigger auto-sync when changes detected
