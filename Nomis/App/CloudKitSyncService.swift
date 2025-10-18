@@ -395,17 +395,22 @@ class CloudKitSyncService: ObservableObject {
         let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .gunlukForm)
         syncLog("📥 Gunluk DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
         
-        // 3. MERGE: Update local or insert new
+        // 3. MERGE: Update existing or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
+                // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                syncLog("🔄 Gunluk: Updated existing form with CloudKit data", emoji: "🔄")
+                
                 // Ensure weekly days exist after update
                 if existingForm.gunlukVeriler.isEmpty {
                     existingForm.createWeeklyDays()
                 }
             } else {
+                // Insert new form
                 if let form = createGunlukForm(from: record) {
                     modelContext.insert(form)
+                    syncLog("✅ Gunluk: Inserted new form from CloudKit", emoji: "✅")
                 }
             }
         }
@@ -428,13 +433,17 @@ class CloudKitSyncService: ObservableObject {
         let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .sarnelForm)
         syncLog("📥 Sarnel DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
         
-        // 3. MERGE: Update local or insert new
+        // 3. MERGE: Update existing or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
+                // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                syncLog("🔄 Sarnel: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
+                // Insert new form
                 if let form = createSarnelForm(from: record) {
                     modelContext.insert(form)
+                    syncLog("✅ Sarnel: Inserted new form from CloudKit", emoji: "✅")
                 }
             }
         }
@@ -457,13 +466,17 @@ class CloudKitSyncService: ObservableObject {
         let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .kilitForm)
         syncLog("📥 Kilit DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
         
-        // 3. MERGE: Update local or insert new
+        // 3. MERGE: Update existing or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
+                // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                syncLog("🔄 Kilit: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
+                // Insert new form
                 if let form = createKilitForm(from: record) {
                     modelContext.insert(form)
+                    syncLog("✅ Kilit: Inserted new form from CloudKit", emoji: "✅")
                 }
             }
         }

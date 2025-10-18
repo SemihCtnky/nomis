@@ -170,8 +170,264 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let isCompletedInt = record["isCompleted"] as? Int {
             self.isCompleted = isCompletedInt == 1
         }
-        // Note: Full decoding would require recreating all nested objects
-        // This is complex and left for future implementation
+        
+        // ✅ FULL DESERIALIZATION: Decode nested data from JSON
+        guard let jsonString = record["gunlukVerilerJSON"] as? String,
+              let jsonData = jsonString.data(using: .utf8),
+              let gunVerilerArray = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]] else {
+            return
+        }
+        
+        // Clear existing gunlukVeriler (we'll recreate from CloudKit)
+        gunlukVeriler.removeAll()
+        
+        // Deserialize each GunlukGunVerisi
+        for gunDict in gunVerilerArray {
+            guard let idString = gunDict["id"] as? String,
+                  let id = UUID(uuidString: idString),
+                  let tarihTimestamp = gunDict["tarih"] as? TimeInterval else {
+                continue
+            }
+            
+            let tarih = Date(timeIntervalSince1970: tarihTimestamp)
+            let gunVerisi = GunlukGunVerisi(tarih: tarih)
+            gunVerisi.id = id
+            
+            // Deserialize Tezgah Karti 1
+            if let tezgah1Dict = gunDict["tezgahKarti1"] as? [String: Any] {
+                gunVerisi.tezgahKarti1 = decodeTezgahKarti(from: tezgah1Dict)
+            }
+            
+            // Deserialize Tezgah Karti 2
+            if let tezgah2Dict = gunDict["tezgahKarti2"] as? [String: Any] {
+                gunVerisi.tezgahKarti2 = decodeTezgahKarti(from: tezgah2Dict)
+            }
+            
+            // Deserialize Cila Karti
+            if let cilaDict = gunDict["cilaKarti"] as? [String: Any] {
+                gunVerisi.cilaKarti = decodeCilaKarti(from: cilaDict)
+            }
+            
+            // Deserialize Ocak Karti
+            if let ocakDict = gunDict["ocakKarti"] as? [String: Any] {
+                gunVerisi.ocakKarti = decodeOcakKarti(from: ocakDict)
+            }
+            
+            // Deserialize Patlatma Karti
+            if let patlatmaDict = gunDict["patlatmaKarti"] as? [String: Any] {
+                gunVerisi.patlatmaKarti = decodePatlatmaKarti(from: patlatmaDict)
+            }
+            
+            // Deserialize Tambur Karti
+            if let tamburDict = gunDict["tamburKarti"] as? [String: Any] {
+                gunVerisi.tamburKarti = decodeTamburKarti(from: tamburDict)
+            }
+            
+            // Deserialize Makine Kesme Karti
+            if let makineDict = gunDict["makineKesmeKarti"] as? [String: Any] {
+                gunVerisi.makineKesmeKarti1 = decodeMakineKesmeKarti(from: makineDict)
+            }
+            
+            // Deserialize Testere Kesme Karti
+            if let testereDict = gunDict["testereKesmeKarti"] as? [String: Any] {
+                gunVerisi.testereKesmeKarti1 = decodeTestereKesmeKarti(from: testereDict)
+            }
+            
+            gunlukVeriler.append(gunVerisi)
+        }
+    }
+    
+    // MARK: - Decode Helper Functions
+    
+    private func decodeTezgahKarti(from dict: [String: Any]) -> TezgahKarti {
+        let kart = TezgahKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        if let ayar = dict["ayar"] as? String {
+            kart.ayar = ayar
+        }
+        
+        // Decode rows
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = TezgahSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let urun = rowDict["urun"] as? String {
+                    satir.urun = urun
+                }
+                if let girisValue = rowDict["girisValue"] as? String {
+                    satir.girisValue = girisValue
+                }
+                if let cikisValue = rowDict["cikisValue"] as? String {
+                    satir.cikisValue = cikisValue
+                }
+                if let fire = rowDict["fire"] as? String {
+                    satir.fire = fire
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodeCilaKarti(from dict: [String: Any]) -> CilaKarti {
+        let kart = CilaKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodeOcakKarti(from dict: [String: Any]) -> OcakKarti {
+        let kart = OcakKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows (same as CilaKarti)
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodePatlatmaKarti(from dict: [String: Any]) -> PatlatmaKarti {
+        let kart = PatlatmaKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows (same as CilaKarti)
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodeTamburKarti(from dict: [String: Any]) -> TamburKarti {
+        let kart = TamburKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows (same as CilaKarti)
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodeMakineKesmeKarti(from dict: [String: Any]) -> MakineKesmeKarti {
+        let kart = MakineKesmeKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows (same as CilaKarti)
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
+    }
+    
+    private func decodeTestereKesmeKarti(from dict: [String: Any]) -> TestereKesmeKarti {
+        let kart = TestereKesmeKarti()
+        if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
+            kart.id = id
+        }
+        
+        // Decode rows (same as CilaKarti)
+        if let rowsArray = dict["satirlar"] as? [[String: Any]] {
+            for rowDict in rowsArray {
+                let satir = IslemSatiri()
+                if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
+                    satir.id = id
+                }
+                if let valuesArray = rowDict["girisValues"] as? [String] {
+                    satir.girisValues = valuesArray
+                }
+                if let valuesArray = rowDict["cikisValues"] as? [String] {
+                    satir.cikisValues = valuesArray
+                }
+                kart.satirlar.append(satir)
+            }
+        }
+        
+        return kart
     }
 }
 
@@ -277,6 +533,53 @@ extension SarnelForm: CloudKitConvertible {
         if let lastEditedAt = record["lastEditedAt"] as? Date {
             self.lastEditedAt = lastEditedAt
         }
+        if let startedAt = record["startedAt"] as? Date {
+            self.startedAt = startedAt
+        }
+        if let endedAt = record["endedAt"] as? Date {
+            self.endedAt = endedAt
+        }
+        
+        // ✅ FULL DESERIALIZATION: Decode nested data from JSON
+        guard let jsonString = record["sarnelDataJSON"] as? String,
+              let jsonData = jsonString.data(using: .utf8),
+              let sarnelDict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            return
+        }
+        
+        // Clear existing arrays
+        asitCikislari.removeAll()
+        extraFireItems.removeAll()
+        
+        // Deserialize asitCikislari
+        if let asitArray = sarnelDict["asitCikislari"] as? [[String: Any]] {
+            for asitDict in asitArray {
+                guard let idString = asitDict["id"] as? String,
+                      let id = UUID(uuidString: idString),
+                      let valueGr = asitDict["valueGr"] as? Double else {
+                    continue
+                }
+                let note = asitDict["note"] as? String
+                let asit = AsitItem(valueGr: valueGr, note: note ?? "")
+                asit.id = id
+                asitCikislari.append(asit)
+            }
+        }
+        
+        // Deserialize extraFireItems
+        if let fireArray = sarnelDict["extraFireItems"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString),
+                      let value = fireDict["value"] as? Double else {
+                    continue
+                }
+                let note = fireDict["note"] as? String
+                let fire = FireItem(value: value, note: note ?? "")
+                fire.id = id
+                extraFireItems.append(fire)
+            }
+        }
     }
 }
 
@@ -375,6 +678,125 @@ extension KilitToplamaForm: CloudKitConvertible {
         }
         if let ayar = record["ayar"] as? Int {
             self.ayar = ayar
+        }
+        if let startedAt = record["startedAt"] as? Date {
+            self.startedAt = startedAt
+        }
+        if let endedAt = record["endedAt"] as? Date {
+            self.endedAt = endedAt
+        }
+        
+        // ✅ FULL DESERIALIZATION: Decode nested data from JSON
+        guard let jsonString = record["kilitDataJSON"] as? String,
+              let jsonData = jsonString.data(using: .utf8),
+              let kilitDict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            return
+        }
+        
+        // Clear existing arrays
+        kasaItems.removeAll()
+        dilItems.removeAll()
+        yayItems.removeAll()
+        kilitItems.removeAll()
+        
+        // Deserialize kasaItems
+        if let kasaArray = kilitDict["kasaItems"] as? [[String: Any]] {
+            for itemDict in kasaArray {
+                guard let idString = itemDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let item = KilitItem()
+                item.id = id
+                if let girisAdet = itemDict["girisAdet"] as? Double {
+                    item.girisAdet = girisAdet
+                }
+                if let girisGram = itemDict["girisGram"] as? Double {
+                    item.girisGram = girisGram
+                }
+                if let cikisGram = itemDict["cikisGram"] as? Double {
+                    item.cikisGram = cikisGram
+                }
+                if let cikisAdet = itemDict["cikisAdet"] as? Double {
+                    item.cikisAdet = cikisAdet
+                }
+                kasaItems.append(item)
+            }
+        }
+        
+        // Deserialize dilItems
+        if let dilArray = kilitDict["dilItems"] as? [[String: Any]] {
+            for itemDict in dilArray {
+                guard let idString = itemDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let item = KilitItem()
+                item.id = id
+                if let girisAdet = itemDict["girisAdet"] as? Double {
+                    item.girisAdet = girisAdet
+                }
+                if let girisGram = itemDict["girisGram"] as? Double {
+                    item.girisGram = girisGram
+                }
+                if let cikisGram = itemDict["cikisGram"] as? Double {
+                    item.cikisGram = cikisGram
+                }
+                if let cikisAdet = itemDict["cikisAdet"] as? Double {
+                    item.cikisAdet = cikisAdet
+                }
+                dilItems.append(item)
+            }
+        }
+        
+        // Deserialize yayItems
+        if let yayArray = kilitDict["yayItems"] as? [[String: Any]] {
+            for itemDict in yayArray {
+                guard let idString = itemDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let item = KilitItem()
+                item.id = id
+                if let girisAdet = itemDict["girisAdet"] as? Double {
+                    item.girisAdet = girisAdet
+                }
+                if let girisGram = itemDict["girisGram"] as? Double {
+                    item.girisGram = girisGram
+                }
+                if let cikisGram = itemDict["cikisGram"] as? Double {
+                    item.cikisGram = cikisGram
+                }
+                if let cikisAdet = itemDict["cikisAdet"] as? Double {
+                    item.cikisAdet = cikisAdet
+                }
+                yayItems.append(item)
+            }
+        }
+        
+        // Deserialize kilitItems
+        if let kilitArray = kilitDict["kilitItems"] as? [[String: Any]] {
+            for itemDict in kilitArray {
+                guard let idString = itemDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let item = KilitItem()
+                item.id = id
+                if let girisAdet = itemDict["girisAdet"] as? Double {
+                    item.girisAdet = girisAdet
+                }
+                if let girisGram = itemDict["girisGram"] as? Double {
+                    item.girisGram = girisGram
+                }
+                if let cikisGram = itemDict["cikisGram"] as? Double {
+                    item.cikisGram = cikisGram
+                }
+                if let cikisAdet = itemDict["cikisAdet"] as? Double {
+                    item.cikisAdet = cikisAdet
+                }
+                kilitItems.append(item)
+            }
         }
     }
 }
