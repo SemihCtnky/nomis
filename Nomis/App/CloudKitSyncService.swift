@@ -419,14 +419,9 @@ class CloudKitSyncService: ObservableObject {
                     // Insert all cards within each day
                     if let tezgah = gunVerisi.tezgahKarti1 {
                         modelContext.insert(tezgah)
+                        // TezgahSatiri uses girisValue/cikisValue (singular Double, not arrays)
                         for satir in tezgah.satirlar {
                             modelContext.insert(satir)
-                            for deger in satir.girisValues {
-                                modelContext.insert(deger)
-                            }
-                            for deger in satir.cikisValues {
-                                modelContext.insert(deger)
-                            }
                         }
                         for fire in tezgah.fireEklemeleri {
                             modelContext.insert(fire)
@@ -434,14 +429,9 @@ class CloudKitSyncService: ObservableObject {
                     }
                     if let tezgah = gunVerisi.tezgahKarti2 {
                         modelContext.insert(tezgah)
+                        // TezgahSatiri uses girisValue/cikisValue (singular Double, not arrays)
                         for satir in tezgah.satirlar {
                             modelContext.insert(satir)
-                            for deger in satir.girisValues {
-                                modelContext.insert(deger)
-                            }
-                            for deger in satir.cikisValues {
-                                modelContext.insert(deger)
-                            }
                         }
                         for fire in tezgah.fireEklemeleri {
                             modelContext.insert(fire)
