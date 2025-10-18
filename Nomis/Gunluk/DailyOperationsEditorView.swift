@@ -98,9 +98,9 @@ struct DailyOperationsEditorView: View {
             // Gün başlığı
             gunBasligi(for: gunVerisi)
             
-            // Kartlar - Yatay scroll
+            // Kartlar - Yatay scroll (LAZY - only visible cards render!)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 16) {
+                LazyHStack(alignment: .top, spacing: 16) {
                     // Tezgah kartları (ikişer tane)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
@@ -220,17 +220,17 @@ struct DailyOperationsEditorView: View {
             )
         }
         .onAppear {
-            // INSTANT LOAD: Everything loads immediately - no delay!
+            // INSTANT OPEN: ABSOLUTELY MINIMAL - only create days if needed!
             if isNewForm && form.gunlukVeriler.isEmpty {
                 form.createWeeklyDays()
             }
-            
-            // Update all caches immediately (FAST)
+        }
+        .task {
+            // PERFORMANCE: Everything else in background task (non-blocking)
             updateSortedGunlerCache()
             updateWeeklyFireSummaryCache()
             
             if !isNewForm {
-                // Existing form operations
                 ensureOrderIndexForExistingRows()
                 
                 do {
