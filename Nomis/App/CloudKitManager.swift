@@ -315,9 +315,10 @@ class CloudKitManager: ObservableObject {
         await checkAndUpdateAvailability()
         try ensureAvailable()
         
-        let predicate = NSPredicate(format: "modificationDate > %@", date as NSDate)
+        // FIXED: Don't use modificationDate in predicate (not queryable in CloudKit)
+        // Fetch all records and filter client-side
+        let predicate = NSPredicate(value: true) // Fetch all
         let query = CKQuery(recordType: recordType.rawValue, predicate: predicate)
-        // Removed sort descriptor to prevent "recordName marked queryable" error
         
         var allRecords: [CKRecord] = []
         var cursor: CKQueryOperation.Cursor?
@@ -328,8 +329,14 @@ class CloudKitManager: ObservableObject {
             cursor = nextCursor
         } while cursor != nil
         
+        // Filter client-side by modification date
+        let filteredRecords = allRecords.filter { record in
+            let modDate = record.modificationDate ?? record.creationDate ?? Date.distantPast
+            return modDate > date
+        }
+        
         // Sort locally by modification date
-        return allRecords.sorted { (record1, record2) in
+        return filteredRecords.sorted { (record1, record2) in
             let date1 = record1.modificationDate ?? Date.distantPast
             let date2 = record2.modificationDate ?? Date.distantPast
             return date1 > date2
