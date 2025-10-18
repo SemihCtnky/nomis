@@ -381,9 +381,21 @@ class CloudKitSyncService: ObservableObject {
     // MARK: - Incremental Sync (only changes)
     
     private func syncGunlukFormsIncremental(modelContext: ModelContext, since date: Date) async throws {
-        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .gunlukForm)
+        // 1. UPLOAD: Local forms to CloudKit
         let localForms = try modelContext.fetch(FetchDescriptor<YeniGunlukForm>())
+        syncLog("📤 Gunluk UPLOAD: \(localForms.count) forms found locally", emoji: "📤")
         
+        let records = localForms.map { $0.toCKRecord() }
+        if !records.isEmpty {
+            try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Gunluk UPLOAD: \(records.count) forms uploaded", emoji: "✅")
+        }
+        
+        // 2. DOWNLOAD: Fetch only records modified after last sync
+        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .gunlukForm)
+        syncLog("📥 Gunluk DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
+        
+        // 3. MERGE: Update local or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 existingForm.updateFromRecord(record)
@@ -402,9 +414,21 @@ class CloudKitSyncService: ObservableObject {
     }
     
     private func syncSarnelFormsIncremental(modelContext: ModelContext, since date: Date) async throws {
-        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .sarnelForm)
+        // 1. UPLOAD: Local forms to CloudKit
         let localForms = try modelContext.fetch(FetchDescriptor<SarnelForm>())
+        syncLog("📤 Sarnel UPLOAD: \(localForms.count) forms found locally", emoji: "📤")
         
+        let records = localForms.map { $0.toCKRecord() }
+        if !records.isEmpty {
+            try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Sarnel UPLOAD: \(records.count) forms uploaded", emoji: "✅")
+        }
+        
+        // 2. DOWNLOAD: Fetch only records modified after last sync
+        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .sarnelForm)
+        syncLog("📥 Sarnel DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
+        
+        // 3. MERGE: Update local or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 existingForm.updateFromRecord(record)
@@ -419,9 +443,21 @@ class CloudKitSyncService: ObservableObject {
     }
     
     private func syncKilitFormsIncremental(modelContext: ModelContext, since date: Date) async throws {
-        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .kilitForm)
+        // 1. UPLOAD: Local forms to CloudKit
         let localForms = try modelContext.fetch(FetchDescriptor<KilitToplamaForm>())
+        syncLog("📤 Kilit UPLOAD: \(localForms.count) forms found locally", emoji: "📤")
         
+        let records = localForms.map { $0.toCKRecord() }
+        if !records.isEmpty {
+            try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Kilit UPLOAD: \(records.count) forms uploaded", emoji: "✅")
+        }
+        
+        // 2. DOWNLOAD: Fetch only records modified after last sync
+        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .kilitForm)
+        syncLog("📥 Kilit DOWNLOAD: \(cloudRecords.count) new/modified forms", emoji: "📥")
+        
+        // 3. MERGE: Update local or insert new
         for record in cloudRecords {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 existingForm.updateFromRecord(record)
@@ -436,9 +472,21 @@ class CloudKitSyncService: ObservableObject {
     }
     
     private func syncNotesIncremental(modelContext: ModelContext, since date: Date) async throws {
-        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .note)
+        // 1. UPLOAD: Local notes to CloudKit
         let localNotes = try modelContext.fetch(FetchDescriptor<Note>())
+        syncLog("📤 Notes UPLOAD: \(localNotes.count) notes found locally", emoji: "📤")
         
+        let records = localNotes.map { $0.toCKRecord() }
+        if !records.isEmpty {
+            try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Notes UPLOAD: \(records.count) notes uploaded", emoji: "✅")
+        }
+        
+        // 2. DOWNLOAD: Fetch only records modified after last sync
+        let cloudRecords = try await cloudKitManager.fetchRecordsModifiedAfter(date, ofType: .note)
+        syncLog("📥 Notes DOWNLOAD: \(cloudRecords.count) new/modified notes", emoji: "📥")
+        
+        // 3. MERGE: Update local or insert new
         for record in cloudRecords {
             if let existingNote = localNotes.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 existingNote.updateFromRecord(record)
