@@ -86,43 +86,33 @@ struct DailyOperationsEditorView: View {
                     
                     // Kartlar - Yatay scroll
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(alignment: .top, spacing: 16) {
+                        LazyHStack(alignment: .top, spacing: 16) {
                             // Tezgah kartları (ikişer tane)
                             tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
-                                .id("\(gunVerisi.id)-tezgah-1")
                             tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
-                                .id("\(gunVerisi.id)-tezgah-2")
                             
                             // Cila kartı (birer tane)
                             cilaCard(for: gunVerisi)
-                                .id("\(gunVerisi.id)-cila")
                             
                             // Ocak kartı (birer tane)
                             ocakCard(for: gunVerisi)
-                                .id("\(gunVerisi.id)-ocak")
                             
                             // Patlatma kartı (birer tane)
                             patlatmaCard(for: gunVerisi)
-                                .id("\(gunVerisi.id)-patlatma")
                             
                             // Tambur kartı (birer tane)
                             tamburCard(for: gunVerisi)
-                                .id("\(gunVerisi.id)-tambur")
                             
                             // Makine Kesme kartı (sonda, birer tane) 
                             makineKesmeCard(for: gunVerisi, cardIndex: 1)
-                                .id("\(gunVerisi.id)-makine")
                             
                             // Testere Kesme kartı (sonda, birer tane)
                             testereKesmeCard(for: gunVerisi, cardIndex: 1)
-                                .id("\(gunVerisi.id)-testere")
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
-                        .padding(.top, 20)
-                        .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
+                        .padding(.vertical, 20)
                     }
-                    .frame(minHeight: 400)
+                    .frame(height: 420)
                     .scrollBounceBehavior(.basedOnSize)
                     .scrollIndicatorsFlash(onAppear: false)
                 }
@@ -130,7 +120,7 @@ struct DailyOperationsEditorView: View {
                 // Haftalık Fire Özeti - sadece son gün (Cuma) için
                 if gunIndex == sortedGunler.count - 1 || isFriday(gunVerisi.tarih) {
                     if !weeklyFireSummaryCache.isEmpty {
-                        VStack(spacing: 16) {
+                        VStack(spacing: 0) {
                             Spacer()
                                 .frame(height: 40)
                             
@@ -157,6 +147,8 @@ struct DailyOperationsEditorView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .scrollContentBackground(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicatorsFlash(onAppear: false)
             .ignoresSafeArea(.keyboard)
             .navigationTitle(isNewForm ? "Yeni Günlük İşlemler" : "Günlük İşlemler")
             .navigationBarTitleDisplayMode(.inline)
@@ -219,33 +211,39 @@ struct DailyOperationsEditorView: View {
             )
         }
         .onAppear {
-            // PERFORMANCE: Update caches on appear
+            // CRITICAL PERFORMANCE: Only update sorted cache immediately (fast)
             updateSortedGunlerCache()
-            updateWeeklyFireSummaryCache()
             
             if isNewForm {
-                // YENİ FORM: Haftalık günleri oluştur
+                // YENİ FORM: Haftalık günleri oluştur (only if empty)
                 if form.gunlukVeriler.isEmpty {
                     form.createWeeklyDays()
-                    print("✅ Yeni form için hafta günleri oluşturuldu: \(form.gunlukVeriler.count) gün")
                     updateSortedGunlerCache()
                 }
-            } else {
-                // Mevcut form için orderIndex kontrolü yap
-                ensureOrderIndexForExistingRows()
-                
-                // ❌ sortAllCardRows() KALDIRILDI - Satırların yerini değiştiriyor
-                // ForEach zaten orderIndex'e göre sıralı gösteriyor
-                
-                // Değişiklikleri kaydet ki orderIndex'ler kalıcı olsun
-                do {
-                    try modelContext.save()
-                } catch {
-                    print("OrderIndex kaydetme hatası: \(error)")
-                }
-                // Local array'leri sync et - SwiftData array sıralaması sorununu bypass et
-                if let firstGunVerisi = form.gunlukVeriler.first {
-                    syncLocalArrays(for: firstGunVerisi)
+            }
+            
+            // PERFORMANCE: Do heavy operations async in background
+            Task.detached(priority: .userInitiated) {
+                await MainActor.run {
+                    // Update fire summary cache (heavy calculation)
+                    self.updateWeeklyFireSummaryCache()
+                    
+                    if !self.isNewForm {
+                        // Mevcut form için orderIndex kontrolü yap (can be delayed)
+                        self.ensureOrderIndexForExistingRows()
+                        
+                        // Değişiklikleri kaydet ki orderIndex'ler kalıcı olsun
+                        do {
+                            try self.modelContext.save()
+                        } catch {
+                            print("OrderIndex kaydetme hatası: \(error)")
+                        }
+                        
+                        // Local array'leri sync et
+                        if let firstGunVerisi = self.form.gunlukVeriler.first {
+                            self.syncLocalArrays(for: firstGunVerisi)
+                        }
+                    }
                 }
             }
         }
