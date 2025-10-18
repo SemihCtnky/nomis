@@ -100,6 +100,7 @@ extension YeniGunlukForm: CloudKitConvertible {
             satirDict["aciklamaCikis"] = satir.aciklamaCikis
             satirDict["girisValue"] = satir.girisValue ?? 0.0
             satirDict["cikisValue"] = satir.cikisValue ?? 0.0
+            satirDict["orderIndex"] = satir.orderIndex
             if let ayar = satir.ayar {
                 satirDict["ayar"] = ayar
             }
@@ -143,6 +144,7 @@ extension YeniGunlukForm: CloudKitConvertible {
                         satirDict["aciklamaCikis"] = satir.aciklamaCikis
                         satirDict["girisValues"] = satir.girisValues.map { $0.value ?? 0.0 }
                         satirDict["cikisValues"] = satir.cikisValues.map { $0.value ?? 0.0 }
+                        satirDict["orderIndex"] = satir.orderIndex
                         satirlarArray.append(satirDict)
                     }
                     dict["satirlar"] = satirlarArray
@@ -269,6 +271,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
                 }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
+                }
                 kart.satirlar.append(satir)
             }
         }
@@ -334,6 +339,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
                 }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
+                }
                 kart.satirlar.append(satir)
             }
         }
@@ -379,6 +387,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 }
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
+                }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
                 }
                 kart.satirlar.append(satir)
             }
@@ -426,6 +437,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
                 }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
+                }
                 kart.satirlar.append(satir)
             }
         }
@@ -471,6 +485,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 }
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
+                }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
                 }
                 kart.satirlar.append(satir)
             }
@@ -518,6 +535,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
                 }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
+                }
                 kart.satirlar.append(satir)
             }
         }
@@ -563,6 +583,9 @@ extension YeniGunlukForm: CloudKitConvertible {
                 }
                 if let ayar = rowDict["ayar"] as? Int {
                     satir.ayar = ayar
+                }
+                if let orderIndex = rowDict["orderIndex"] as? Int {
+                    satir.orderIndex = orderIndex
                 }
                 kart.satirlar.append(satir)
             }

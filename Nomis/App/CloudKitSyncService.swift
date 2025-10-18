@@ -169,6 +169,10 @@ class CloudKitSyncService: ObservableObject {
             try await syncKilitFormsIncremental(modelContext: modelContext, since: lastSync)
             try await syncNotesIncremental(modelContext: modelContext, since: lastSync)
             
+            // Model ve Firma her zaman sync (az veri oldugu icin)
+            try await syncModelItems(modelContext: modelContext)
+            try await syncCompanyItems(modelContext: modelContext)
+            
             lastSyncDate = Date()
             UserDefaults.standard.set(lastSyncDate, forKey: "lastCloudKitSync")
             
