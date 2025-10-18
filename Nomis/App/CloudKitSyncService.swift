@@ -519,7 +519,7 @@ class CloudKitSyncService: ObservableObject {
                 }
             } else {
                 // Insert new form
-                if let form = createGunlukForm(from: record) {
+                if let form = createGunlukForm(from: record, modelContext: modelContext) {
                     modelContext.insert(form)
                     syncLog("✅ Gunluk: Inserted new form from CloudKit", emoji: "✅")
                 }
