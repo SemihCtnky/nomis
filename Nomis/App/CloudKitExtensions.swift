@@ -244,7 +244,7 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
-        if let ayar = dict["ayar"] as? String {
+        if let ayar = dict["ayar"] as? Int {
             kart.ayar = ayar
         }
         
@@ -255,19 +255,41 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let urun = rowDict["urun"] as? String {
-                    satir.urun = urun
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let girisValue = rowDict["girisValue"] as? String {
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                if let girisValue = rowDict["girisValue"] as? Double {
                     satir.girisValue = girisValue
                 }
-                if let cikisValue = rowDict["cikisValue"] as? String {
+                if let cikisValue = rowDict["cikisValue"] as? Double {
                     satir.cikisValue = cikisValue
                 }
-                if let fire = rowDict["fire"] as? String {
-                    satir.fire = fire
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -279,6 +301,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -287,13 +312,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -305,6 +366,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -313,13 +377,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -331,6 +431,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -339,13 +442,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -357,6 +496,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -365,13 +507,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -383,6 +561,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -391,13 +572,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
@@ -409,6 +626,9 @@ extension YeniGunlukForm: CloudKitConvertible {
         if let idString = dict["id"] as? String, let id = UUID(uuidString: idString) {
             kart.id = id
         }
+        if let ayar = dict["ayar"] as? Int {
+            kart.ayar = ayar
+        }
         
         // Decode rows (same as CilaKarti)
         if let rowsArray = dict["satirlar"] as? [[String: Any]] {
@@ -417,13 +637,49 @@ extension YeniGunlukForm: CloudKitConvertible {
                 if let idString = rowDict["id"] as? String, let id = UUID(uuidString: idString) {
                     satir.id = id
                 }
-                if let valuesArray = rowDict["girisValues"] as? [String] {
-                    satir.girisValues = valuesArray
+                if let aciklamaGiris = rowDict["aciklamaGiris"] as? String {
+                    satir.aciklamaGiris = aciklamaGiris
                 }
-                if let valuesArray = rowDict["cikisValues"] as? [String] {
-                    satir.cikisValues = valuesArray
+                if let aciklamaCikis = rowDict["aciklamaCikis"] as? String {
+                    satir.aciklamaCikis = aciklamaCikis
+                }
+                // Decode girisValues: [Double] → [GenisletilebilirDeger]
+                if let girisValuesArray = rowDict["girisValues"] as? [Double] {
+                    for value in girisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.girisValues.append(deger)
+                    }
+                }
+                // Decode cikisValues: [Double] → [GenisletilebilirDeger]
+                if let cikisValuesArray = rowDict["cikisValues"] as? [Double] {
+                    for value in cikisValuesArray {
+                        let deger = GenisletilebilirDeger(value: value)
+                        satir.cikisValues.append(deger)
+                    }
+                }
+                if let ayar = rowDict["ayar"] as? Int {
+                    satir.ayar = ayar
                 }
                 kart.satirlar.append(satir)
+            }
+        }
+        
+        // Decode fire eklemeleri
+        if let fireArray = dict["fireEklemeleri"] as? [[String: Any]] {
+            for fireDict in fireArray {
+                guard let idString = fireDict["id"] as? String,
+                      let id = UUID(uuidString: idString) else {
+                    continue
+                }
+                let fire = FireEklemesi()
+                fire.id = id
+                if let value = fireDict["value"] as? Double {
+                    fire.value = value
+                }
+                if let aciklama = fireDict["aciklama"] as? String {
+                    fire.aciklama = aciklama
+                }
+                kart.fireEklemeleri.append(fire)
             }
         }
         
