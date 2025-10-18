@@ -1090,11 +1090,29 @@ struct KilitEditorView: View {
             existingForm.startedAt = hasStarted ? startDate : nil
             existingForm.endedAt = showingFinalSummary ? endDate : nil
             
-            // Update items
-            existingForm.kasaItems = kasaItems
-            existingForm.dilItems = dilItems
-            existingForm.yayItems = yayItems
-            existingForm.kilitItems = kilitItems
+            // Clear existing items and add new ones
+            existingForm.kasaItems.removeAll()
+            existingForm.dilItems.removeAll()
+            existingForm.yayItems.removeAll()
+            existingForm.kilitItems.removeAll()
+            
+            // Insert each item into context before adding to form
+            for item in kasaItems {
+                modelContext.insert(item)
+                existingForm.kasaItems.append(item)
+            }
+            for item in dilItems {
+                modelContext.insert(item)
+                existingForm.dilItems.append(item)
+            }
+            for item in yayItems {
+                modelContext.insert(item)
+                existingForm.yayItems.append(item)
+            }
+            for item in kilitItems {
+                modelContext.insert(item)
+                existingForm.kilitItems.append(item)
+            }
         } else {
             let newForm = KilitToplamaForm(
                 model: model,
@@ -1104,12 +1122,27 @@ struct KilitEditorView: View {
             
             newForm.startedAt = hasStarted ? startDate : nil
             newForm.endedAt = showingFinalSummary ? endDate : nil
-            newForm.kasaItems = kasaItems
-            newForm.dilItems = dilItems
-            newForm.yayItems = yayItems
-            newForm.kilitItems = kilitItems
             
+            // Insert form first
             modelContext.insert(newForm)
+            
+            // Then insert each item into context and add to form
+            for item in kasaItems {
+                modelContext.insert(item)
+                newForm.kasaItems.append(item)
+            }
+            for item in dilItems {
+                modelContext.insert(item)
+                newForm.dilItems.append(item)
+            }
+            for item in yayItems {
+                modelContext.insert(item)
+                newForm.yayItems.append(item)
+            }
+            for item in kilitItems {
+                modelContext.insert(item)
+                newForm.kilitItems.append(item)
+            }
         }
         
         do {
