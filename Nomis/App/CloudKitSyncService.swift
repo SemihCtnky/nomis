@@ -412,6 +412,100 @@ class CloudKitSyncService: ObservableObject {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                
+                // ✅ CRITICAL: Insert all nested items into ModelContext
+                for gunVerisi in existingForm.gunlukVeriler {
+                    modelContext.insert(gunVerisi)
+                    // Insert all cards within each day
+                    if let tezgah = gunVerisi.tezgahKarti {
+                        modelContext.insert(tezgah)
+                        for satir in tezgah.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                        for fire in tezgah.fireEklemeleri {
+                            modelContext.insert(fire)
+                        }
+                    }
+                    if let cila = gunVerisi.cilaKarti {
+                        modelContext.insert(cila)
+                        for satir in cila.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                    if let ocak = gunVerisi.ocakKarti {
+                        modelContext.insert(ocak)
+                        for satir in ocak.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                    if let patlatma = gunVerisi.patlatmaKarti {
+                        modelContext.insert(patlatma)
+                        for satir in patlatma.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                    if let tambur = gunVerisi.tamburKarti {
+                        modelContext.insert(tambur)
+                        for satir in tambur.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                    if let makineKesme = gunVerisi.makineKesmeKarti {
+                        modelContext.insert(makineKesme)
+                        for satir in makineKesme.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                    if let testereKesme = gunVerisi.testereKesmeKarti {
+                        modelContext.insert(testereKesme)
+                        for satir in testereKesme.satirlar {
+                            modelContext.insert(satir)
+                            for deger in satir.girisValues {
+                                modelContext.insert(deger)
+                            }
+                            for deger in satir.cikisValues {
+                                modelContext.insert(deger)
+                            }
+                        }
+                    }
+                }
+                
                 syncLog("🔄 Gunluk: Updated existing form with CloudKit data", emoji: "🔄")
                 
                 // Ensure weekly days exist after update
@@ -450,6 +544,15 @@ class CloudKitSyncService: ObservableObject {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                
+                // ✅ CRITICAL: Insert all nested items into ModelContext
+                for item in existingForm.asitCikislari {
+                    modelContext.insert(item)
+                }
+                for item in existingForm.fireData {
+                    modelContext.insert(item)
+                }
+                
                 syncLog("🔄 Sarnel: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
                 // Insert new form
@@ -483,6 +586,21 @@ class CloudKitSyncService: ObservableObject {
             if let existingForm = localForms.first(where: { $0.id.uuidString == record.recordID.recordName }) {
                 // ✅ Update existing form with full nested data from CloudKit
                 existingForm.updateFromRecord(record)
+                
+                // ✅ CRITICAL: Insert all nested items into ModelContext
+                for item in existingForm.kasaItems {
+                    modelContext.insert(item)
+                }
+                for item in existingForm.dilItems {
+                    modelContext.insert(item)
+                }
+                for item in existingForm.yayItems {
+                    modelContext.insert(item)
+                }
+                for item in existingForm.kilitItems {
+                    modelContext.insert(item)
+                }
+                
                 syncLog("🔄 Kilit: Updated existing form with CloudKit data", emoji: "🔄")
             } else {
                 // Insert new form
