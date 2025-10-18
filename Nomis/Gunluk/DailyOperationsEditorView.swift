@@ -83,7 +83,6 @@ struct DailyOperationsEditorView: View {
                 // PERFORMANCE: Each day as separate view (prevents full re-render on scroll)
                 dayContentView(for: gunVerisi, at: gunIndex)
                     .id(gunVerisi.id)
-                    .drawingGroup() // GPU acceleration for smooth scroll
             }
         }
         .scrollTargetLayout() // Optimize scroll performance
