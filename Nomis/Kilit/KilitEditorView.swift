@@ -1096,22 +1096,46 @@ struct KilitEditorView: View {
             existingForm.yayItems.removeAll()
             existingForm.kilitItems.removeAll()
             
-            // Insert each item into context before adding to form
+            // Create NEW items (to properly trigger SwiftData init)
             for item in kasaItems {
-                modelContext.insert(item)
-                existingForm.kasaItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                existingForm.kasaItems.append(newItem)
             }
             for item in dilItems {
-                modelContext.insert(item)
-                existingForm.dilItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                existingForm.dilItems.append(newItem)
             }
             for item in yayItems {
-                modelContext.insert(item)
-                existingForm.yayItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                existingForm.yayItems.append(newItem)
             }
             for item in kilitItems {
-                modelContext.insert(item)
-                existingForm.kilitItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                existingForm.kilitItems.append(newItem)
             }
         } else {
             let newForm = KilitToplamaForm(
@@ -1126,22 +1150,46 @@ struct KilitEditorView: View {
             // Insert form first
             modelContext.insert(newForm)
             
-            // Then insert each item into context and add to form
+            // Create NEW items (to properly trigger SwiftData init)
             for item in kasaItems {
-                modelContext.insert(item)
-                newForm.kasaItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                newForm.kasaItems.append(newItem)
             }
             for item in dilItems {
-                modelContext.insert(item)
-                newForm.dilItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                newForm.dilItems.append(newItem)
             }
             for item in yayItems {
-                modelContext.insert(item)
-                newForm.yayItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                newForm.yayItems.append(newItem)
             }
             for item in kilitItems {
-                modelContext.insert(item)
-                newForm.kilitItems.append(item)
+                let newItem = KilitItem(
+                    girisAdet: item.girisAdet,
+                    girisGram: item.girisGram,
+                    cikisGram: item.cikisGram,
+                    cikisAdet: item.cikisAdet
+                )
+                modelContext.insert(newItem)
+                newForm.kilitItems.append(newItem)
             }
         }
         

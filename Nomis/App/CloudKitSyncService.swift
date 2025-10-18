@@ -340,12 +340,16 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncModelItems(modelContext: ModelContext) async throws {
         let localItems = try modelContext.fetch(FetchDescriptor<ModelItem>())
+        syncLog("📤 Model UPLOAD: \(localItems.count) items found locally", emoji: "📤")
+        
         let records = localItems.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Model UPLOAD: \(records.count) items uploaded", emoji: "✅")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .modelItem)
+        syncLog("📥 Model DOWNLOAD: \(cloudRecords.count) items from CloudKit", emoji: "📥")
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
@@ -362,12 +366,16 @@ class CloudKitSyncService: ObservableObject {
     
     private func syncCompanyItems(modelContext: ModelContext) async throws {
         let localItems = try modelContext.fetch(FetchDescriptor<CompanyItem>())
+        syncLog("📤 Firma UPLOAD: \(localItems.count) items found locally", emoji: "📤")
+        
         let records = localItems.map { $0.toCKRecord() }
         if !records.isEmpty {
             try await cloudKitManager.uploadRecords(records)
+            syncLog("✅ Firma UPLOAD: \(records.count) items uploaded", emoji: "✅")
         }
         
         let cloudRecords = try await cloudKitManager.fetchRecords(ofType: .companyItem)
+        syncLog("📥 Firma DOWNLOAD: \(cloudRecords.count) items from CloudKit", emoji: "📥")
         
         for record in cloudRecords {
             if let existingItem = localItems.first(where: { $0.id.uuidString == record.recordID.recordName }) {
