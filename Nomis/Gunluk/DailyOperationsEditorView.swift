@@ -83,8 +83,10 @@ struct DailyOperationsEditorView: View {
                 // PERFORMANCE: Each day as separate view (prevents full re-render on scroll)
                 dayContentView(for: gunVerisi, at: gunIndex)
                     .id(gunVerisi.id)
+                    .drawingGroup() // GPU acceleration for smooth scroll
             }
         }
+        .scrollTargetLayout() // Optimize scroll performance
         .transaction { transaction in
             transaction.animation = nil
         }
@@ -98,9 +100,9 @@ struct DailyOperationsEditorView: View {
             // Gün başlığı
             gunBasligi(for: gunVerisi)
             
-            // Kartlar - Yatay scroll
+            // Kartlar - Yatay scroll (LAZY rendering for cards!)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 16) {
+                LazyHStack(alignment: .top, spacing: 16) {
                     // Tezgah kartları (ikişer tane)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 1)
                     tezgahCard(for: gunVerisi, gunIndex: gunIndex, cardIndex: 2)
@@ -126,9 +128,8 @@ struct DailyOperationsEditorView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
                 .padding(.top, 20)
-                .frame(minHeight: 0, maxHeight: .infinity, alignment: .top)
             }
-            .frame(minHeight: 400)
+            .frame(height: 440)
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicatorsFlash(onAppear: false)
         }
@@ -227,19 +228,19 @@ struct DailyOperationsEditorView: View {
                 form.createWeeklyDays()
             }
             
-            // Update cache (fast - just sorting)
+            // Update sorted cache only (INSTANT - ~2ms)
             updateSortedGunlerCache()
             
-            // Update fire summary immediately (so table shows up)
-            updateWeeklyFireSummaryCache()
-            
-            // PERFORMANCE: Heavy operations in background (non-blocking)
-            if !isNewForm {
-                Task(priority: .userInitiated) {
-                    // Small delay to let UI render first
-                    try? await Task.sleep(for: .milliseconds(100))
+            // PERFORMANCE: All heavy operations async (non-blocking UI)
+            Task(priority: .userInitiated) {
+                // Let UI render first (instant open!)
+                try? await Task.sleep(for: .milliseconds(16)) // 1 frame @ 60fps
+                
+                await MainActor.run {
+                    // Update fire summary (heavy calculation)
+                    updateWeeklyFireSummaryCache()
                     
-                    await MainActor.run {
+                    if !isNewForm {
                         // Existing form: orderIndex check (can be delayed)
                         ensureOrderIndexForExistingRows()
                         
