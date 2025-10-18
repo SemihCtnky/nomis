@@ -6,6 +6,8 @@ struct SarnelEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var authManager: AuthenticationManager
     
+    @StateObject private var syncService = CloudKitSyncService.shared
+    
     @State var form: SarnelForm?
     
     @State private var karatAyar: Int?
@@ -204,6 +206,12 @@ struct SarnelEditorView: View {
                 if !newItems.isEmpty && newItems.contains(where: { $0.valueGr > 0 }) {
                     showingFinalSummary = true
                     hasChanges = true
+                }
+            }
+            .onChange(of: hasChanges) { _, newValue in
+                // AUTO-SYNC: Trigger auto-sync when changes detected
+                if newValue {
+                    triggerAutoSync()
                 }
             }
             .onChange(of: extraFireItems) { _, newItems in
@@ -1045,6 +1053,13 @@ struct SarnelEditorView: View {
     }
     
     // MARK: - Helper Methods
+    
+    // MARK: - Auto Sync Trigger
+    
+    private func triggerAutoSync() {
+        guard !isReadOnly && !isNewForm else { return }
+        syncService.scheduleAutoSync(modelContext: modelContext)
+    }
     
     private func loadFormData() {
         guard let form = form else { return }

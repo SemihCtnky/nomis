@@ -55,6 +55,8 @@ struct KilitEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var authManager: AuthenticationManager
     
+    @StateObject private var syncService = CloudKitSyncService.shared
+    
     @Query private var models: [ModelItem]
     @Query private var companies: [CompanyItem]
     
@@ -162,6 +164,12 @@ struct KilitEditorView: View {
         .onAppear {
             if isNewForm && !hasStarted {
                 startFormIfNeeded()
+            }
+        }
+        .onChange(of: hasChanges) { _, newValue in
+            // AUTO-SYNC: Trigger auto-sync when changes detected
+            if newValue {
+                triggerAutoSync()
             }
         }
     }
@@ -1046,6 +1054,14 @@ struct KilitEditorView: View {
     }
     
     // MARK: - Helper Functions
+    
+    // MARK: - Auto Sync Trigger
+    
+    private func triggerAutoSync() {
+        guard !isReadOnly && !isNewForm else { return }
+        syncService.scheduleAutoSync(modelContext: modelContext)
+    }
+    
     private func startFormIfNeeded() {
         if !hasStarted && canStartForm {
             startDate = Date()

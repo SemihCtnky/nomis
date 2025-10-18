@@ -6,6 +6,8 @@ struct NoteEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var authManager: AuthenticationManager
     
+    @StateObject private var syncService = CloudKitSyncService.shared
+    
     let note: Note?
     let isReadOnly: Bool
     @State private var title: String = ""
@@ -107,8 +109,21 @@ struct NoteEditorView: View {
             .onDisappear {
                 stopAutoSave()
             }
+            .onChange(of: hasChanges) { _, newValue in
+                // AUTO-SYNC: Trigger auto-sync when changes detected
+                if newValue {
+                    triggerAutoSync()
+                }
+            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    // MARK: - Auto Sync Trigger
+    
+    private func triggerAutoSync() {
+        guard !isReadOnly && note != nil else { return }
+        syncService.scheduleAutoSync(modelContext: modelContext)
     }
     
     private func onContentChanged() {
