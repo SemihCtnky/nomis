@@ -144,9 +144,10 @@ struct DailyOperationsEditorView: View {
                     }
                 }
             }
-            .transaction { transaction in
-                transaction.animation = nil
-            }
+        }
+        .transaction { transaction in
+            transaction.animation = nil
+        }
     }
     
     var body: some View {
