@@ -180,7 +180,10 @@ extension YeniGunlukForm: CloudKitConvertible {
             return
         }
         
-        // Clear existing gunlukVeriler (we'll recreate from CloudKit)
+        // ✅ DELETE existing gunlukVeriler from ModelContext (critical for SwiftData)
+        for oldGun in gunlukVeriler {
+            modelContext.delete(oldGun)
+        }
         gunlukVeriler.removeAll()
         
         // Deserialize each GunlukGunVerisi
@@ -739,7 +742,13 @@ extension SarnelForm: CloudKitConvertible {
             return
         }
         
-        // Clear existing arrays
+        // ✅ DELETE existing items from ModelContext (critical for SwiftData)
+        for oldAsit in asitCikislari {
+            modelContext.delete(oldAsit)
+        }
+        for oldFire in extraFireItems {
+            modelContext.delete(oldFire)
+        }
         asitCikislari.removeAll()
         extraFireItems.removeAll()
         
@@ -885,7 +894,19 @@ extension KilitToplamaForm: CloudKitConvertible {
             return
         }
         
-        // Clear existing arrays
+        // ✅ DELETE existing items from ModelContext (critical for SwiftData)
+        for oldItem in kasaItems {
+            modelContext.delete(oldItem)
+        }
+        for oldItem in dilItems {
+            modelContext.delete(oldItem)
+        }
+        for oldItem in yayItems {
+            modelContext.delete(oldItem)
+        }
+        for oldItem in kilitItems {
+            modelContext.delete(oldItem)
+        }
         kasaItems.removeAll()
         dilItems.removeAll()
         yayItems.removeAll()
