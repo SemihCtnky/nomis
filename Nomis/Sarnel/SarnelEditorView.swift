@@ -63,7 +63,15 @@ struct SarnelEditorView: View {
         let existingAsitCikisi = asitItems.reduce(0) { $0 + $1.valueGr }
         let newAsitCikisi = newAsitValue ?? 0
         let totalAsitCikisi = existingAsitCikisi + newAsitCikisi
-        let tozCikisi = (demirli_3 ?? 0) * (altinOrani ?? 0) / 100
+        
+        // ✅ Prevent NaN: Ensure altinOrani is not nil and valid
+        guard let altinOraniValue = altinOrani, !altinOraniValue.isNaN, !altinOraniValue.isInfinite else {
+            // If altinOrani is invalid, skip toz calculation
+            let cikisTablosu = totalAsitCikisi
+            return girisTablosu - cikisTablosu
+        }
+        
+        let tozCikisi = (demirli_3 ?? 0) * altinOraniValue / 100
         let cikisTablosu = totalAsitCikisi + tozCikisi
         // Fire = Bitirme tablosundaki giriş - çıkış
         return girisTablosu - cikisTablosu
