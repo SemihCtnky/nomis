@@ -1062,7 +1062,18 @@ struct KilitEditorView: View {
             print("🔒 [KILIT] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
             return
         }
-        print("🔒 [KILIT] AUTO-SYNC TRIGGER: Data changed")
+        
+        // ✅ CRITICAL: Save form BEFORE sync (kullanıcı "Kaydet"e basmadan bile)
+        do {
+            print("💾 [KILIT] AUTO-SAVE: Saving form changes before sync...")
+            try modelContext.save()
+            print("✅ [KILIT] AUTO-SAVE: Success")
+        } catch {
+            print("❌ [KILIT] AUTO-SAVE FAILED: \(error.localizedDescription)")
+            return // Don't sync if save failed
+        }
+        
+        print("🔒 [KILIT] AUTO-SYNC TRIGGER: Scheduling sync in 2s...")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

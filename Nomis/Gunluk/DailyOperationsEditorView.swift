@@ -282,7 +282,18 @@ struct DailyOperationsEditorView: View {
             print("📝 [GUNLUK] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
             return
         }
-        print("📝 [GUNLUK] AUTO-SYNC TRIGGER: Data changed")
+        
+        // ✅ CRITICAL: Save form BEFORE sync (kullanıcı "Kaydet"e basmadan bile)
+        do {
+            print("💾 [GUNLUK] AUTO-SAVE: Saving form changes before sync...")
+            try modelContext.save()
+            print("✅ [GUNLUK] AUTO-SAVE: Success")
+        } catch {
+            print("❌ [GUNLUK] AUTO-SAVE FAILED: \(error.localizedDescription)")
+            return // Don't sync if save failed
+        }
+        
+        print("📝 [GUNLUK] AUTO-SYNC TRIGGER: Scheduling sync in 2s...")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

@@ -26,7 +26,7 @@ class CloudKitSyncService: ObservableObject {
     
     // Auto-sync task (debounced)
     private var autoSyncTask: Task<Void, Never>?
-    private let autoSyncDelay: TimeInterval = 3.0 // 3 seconds after last change
+    private let autoSyncDelay: TimeInterval = 2.0 // 2 seconds after last change (faster response)
     
     enum SyncStatus: Equatable {
         case idle
