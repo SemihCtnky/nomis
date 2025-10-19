@@ -55,8 +55,6 @@ struct HomeView: View {
     // MARK: - Auto Fetch for Read-Only Users
     
     private func startAutoFetch() {
-        print("🏠 [HOME] AUTO-FETCH STARTED: Initial fetch + 30s periodic timer")
-        
         // Initial fetch on app launch
         Task {
             await syncService.performIncrementalSync(modelContext: modelContext)
@@ -66,7 +64,6 @@ struct HomeView: View {
         // This ensures read-only users see updates from admin users
         autoFetchTimer?.invalidate()
         autoFetchTimer = Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak syncService, modelContext] _ in
-            print("🏠 [HOME] AUTO-FETCH TRIGGERED: 30s timer fired")
             Task { @MainActor in
                 await syncService?.performIncrementalSync(modelContext: modelContext)
             }

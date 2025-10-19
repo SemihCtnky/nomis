@@ -1065,22 +1065,16 @@ struct SarnelEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && !isNewForm else {
-            print("💎 [SARNEL] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
-            return
-        }
+        guard !isReadOnly && !isNewForm else { return }
         
-        // ✅ CRITICAL: Save form BEFORE sync (kullanıcı "Kaydet"e basmadan bile)
+        // ✅ Save form BEFORE sync (auto-save without user clicking Save button)
         do {
-            print("💾 [SARNEL] AUTO-SAVE: Saving form changes before sync...")
             try modelContext.save()
-            print("✅ [SARNEL] AUTO-SAVE: Success")
         } catch {
-            print("❌ [SARNEL] AUTO-SAVE FAILED: \(error.localizedDescription)")
+            print("❌ [SARNEL] Auto-save failed: \(error.localizedDescription)")
             return // Don't sync if save failed
         }
         
-        print("💎 [SARNEL] AUTO-SYNC TRIGGER: Scheduling sync in 2s...")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

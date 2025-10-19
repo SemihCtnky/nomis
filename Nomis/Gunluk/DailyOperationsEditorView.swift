@@ -278,22 +278,16 @@ struct DailyOperationsEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && !isNewForm else {
-            print("📝 [GUNLUK] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NewForm=\(isNewForm)")
-            return
-        }
+        guard !isReadOnly && !isNewForm else { return }
         
-        // ✅ CRITICAL: Save form BEFORE sync (kullanıcı "Kaydet"e basmadan bile)
+        // ✅ Save form BEFORE sync (auto-save without user clicking Save button)
         do {
-            print("💾 [GUNLUK] AUTO-SAVE: Saving form changes before sync...")
             try modelContext.save()
-            print("✅ [GUNLUK] AUTO-SAVE: Success")
         } catch {
-            print("❌ [GUNLUK] AUTO-SAVE FAILED: \(error.localizedDescription)")
+            print("❌ [GUNLUK] Auto-save failed: \(error.localizedDescription)")
             return // Don't sync if save failed
         }
         
-        print("📝 [GUNLUK] AUTO-SYNC TRIGGER: Scheduling sync in 2s...")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

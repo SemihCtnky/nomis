@@ -2,8 +2,8 @@ import Foundation
 import CloudKit
 import SwiftData
 
-// MARK: - 🔍 DEBUG LOGGING (TEMPORARY - REMOVE AFTER TESTING!)
-private let DEBUG_CLOUDKIT = true
+// MARK: - 🔍 DEBUG LOGGING (SET TO FALSE FOR PRODUCTION)
+private let DEBUG_CLOUDKIT = false  // ✅ Production: Clean logs, only critical errors
 
 private func debugLog(_ message: String, emoji: String = "🔵") {
     if DEBUG_CLOUDKIT {

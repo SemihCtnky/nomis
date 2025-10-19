@@ -122,22 +122,16 @@ struct NoteEditorView: View {
     // MARK: - Auto Sync Trigger
     
     private func triggerAutoSync() {
-        guard !isReadOnly && note != nil else {
-            print("📓 [NOTE] AUTO-SYNC SKIPPED: ReadOnly=\(isReadOnly) NoteExists=\(note != nil)")
-            return
-        }
+        guard !isReadOnly && note != nil else { return }
         
-        // ✅ CRITICAL: Save note BEFORE sync (kullanıcı "Kaydet"e basmadan bile)
+        // ✅ Save note BEFORE sync (auto-save without user clicking Save button)
         do {
-            print("💾 [NOTE] AUTO-SAVE: Saving note changes before sync...")
             try modelContext.save()
-            print("✅ [NOTE] AUTO-SAVE: Success")
         } catch {
-            print("❌ [NOTE] AUTO-SAVE FAILED: \(error.localizedDescription)")
+            print("❌ [NOTE] Auto-save failed: \(error.localizedDescription)")
             return // Don't sync if save failed
         }
         
-        print("📓 [NOTE] AUTO-SYNC TRIGGER: Scheduling sync in 2s...")
         syncService.scheduleAutoSync(modelContext: modelContext)
     }
     

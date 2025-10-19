@@ -2,8 +2,8 @@ import Foundation
 import SwiftData
 import CloudKit
 
-// MARK: - 🔍 DEBUG LOGGING (TEMPORARY - REMOVE AFTER TESTING!)
-private let DEBUG_SYNC = true
+// MARK: - 🔍 DEBUG LOGGING (SET TO FALSE FOR PRODUCTION)
+private let DEBUG_SYNC = false  // ✅ Production: Clean logs, only critical errors
 
 private func syncLog(_ message: String, emoji: String = "🔵") {
     if DEBUG_SYNC {
